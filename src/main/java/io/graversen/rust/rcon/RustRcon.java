@@ -12,10 +12,10 @@ public class RustRcon
         rconClient.sendRaw("env.time 900");
         rconClient.sendRaw("global.maxthreads");
         rconClient.sendRaw("<color=red>Test message</color>");
-//        rconClient.sendRaw("inventory.giveto pope stones 100000000");
-//        rconClient.sendRaw("inventory.giveto pope metal.refined 100000000");
-//        rconClient.sendRaw("inventory.giveto pope metal.fragments 100000000");
-//        rconClient.sendRaw("inventory.giveto pope wood 100000000");
+        rconClient.sendRaw("inventory.giveto pope stones 100000000");
+        rconClient.sendRaw("inventory.giveto pope metal.refined 100000000");
+        rconClient.sendRaw("inventory.giveto pope metal.fragments 100000000");
+        rconClient.sendRaw("inventory.giveto pope wood 100000000");
 
     }
 }
