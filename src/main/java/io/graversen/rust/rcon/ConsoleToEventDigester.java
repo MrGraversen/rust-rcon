@@ -2,14 +2,17 @@ package io.graversen.rust.rcon;
 
 import io.graversen.rust.rcon.events.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ConsoleToEventDigester
 {
-    private final Pattern squareBracketMatcher = Pattern.compile("\\[(.*?)]");
+    private final Pattern squareBracketInsideMatcher = Pattern.compile("\\[(.*?)\\]");
+    private final Pattern squareBracketOutsideMatcher = Pattern.compile("\\](.*?)\\[");
 
     public Optional<ConsoleDigests> digest(String consoleInput)
     {
@@ -24,12 +27,25 @@ public class ConsoleToEventDigester
         final String leftHandString = consoleInput.split(":")[0];
         final String chatMessage = consoleInput.split(":")[1].trim();
 
-        final Matcher matcher = squareBracketMatcher.matcher(leftHandString);
-        final String steamId64 = matcher.group(2).split("/")[1];
+        final Matcher matcherSteamId = squareBracketInsideMatcher.matcher(leftHandString);
 
-        final var chatMessageEvent = new ChatMessageEvent(, , chatMessage);
+        List<String> matchingStrings = new ArrayList<>();
+        while (matcherSteamId.find())
+        {
+            matchingStrings.add(matcherSteamId.group(1));
+        }
 
-        return null;
+        final String steamId64 = matchingStrings.get(matchingStrings.size() - 1).split("/")[1];
+
+        final Matcher matcherPlayerName = squareBracketOutsideMatcher.matcher(leftHandString);
+
+        String playerName = "N/A";
+        if (matcherPlayerName.find())
+        {
+            playerName = matcherPlayerName.group(1).trim();
+        }
+
+        return new ChatMessageEvent(playerName, steamId64, chatMessage);
     }
 
     public PlayerConnectedEvent digestPlayerConnectedEvent(String consoleInput)
