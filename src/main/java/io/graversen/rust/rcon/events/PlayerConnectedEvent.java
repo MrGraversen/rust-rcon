@@ -16,4 +16,24 @@ public class PlayerConnectedEvent extends BaseEvent
         this.steamId64 = steamId64;
         this.playerName = playerName;
     }
+
+    public String getConnectionTuple()
+    {
+        return connectionTuple;
+    }
+
+    public String getOsDescriptor()
+    {
+        return osDescriptor;
+    }
+
+    public String getSteamId64()
+    {
+        return steamId64;
+    }
+
+    public String getPlayerName()
+    {
+        return playerName;
+    }
 }
