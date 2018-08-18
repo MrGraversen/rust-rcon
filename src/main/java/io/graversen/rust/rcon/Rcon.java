@@ -32,6 +32,18 @@ public class Rcon
         rconClient.sendRaw(command);
     }
 
+    public void ownerId(String steamId, String name, String reason)
+    {
+        final String command = String.format("ownerid \"%s\" \"%s\" \"%s\"", steamId, name, reason);
+        rconClient.sendRaw(command);
+    }
+
+    public void removeOwner(String steamId)
+    {
+        final String command = String.format("removeowner \"%s\"", steamId);
+        rconClient.sendRaw(command);
+    }
+
     public InventoryRcon inventory()
     {
         return inventoryRcon;
