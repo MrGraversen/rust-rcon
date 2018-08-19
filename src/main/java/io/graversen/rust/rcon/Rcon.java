@@ -1,15 +1,19 @@
 package io.graversen.rust.rcon;
 
+import com.google.gson.Gson;
+
 public class Rcon
 {
     private final IRconClient rconClient;
+    private final Gson gson;
 
     private final InventoryRcon inventoryRcon;
     private final AiRcon aiRcon;
 
-    public Rcon(IRconClient rconClient)
+    Rcon(IRconClient rconClient, Gson gson)
     {
         this.rconClient = rconClient;
+        this.gson = gson;
         this.inventoryRcon = new InventoryRcon();
         this.aiRcon = new AiRcon();
     }

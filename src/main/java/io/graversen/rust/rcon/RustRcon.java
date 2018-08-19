@@ -1,21 +1,21 @@
 package io.graversen.rust.rcon;
 
-import java.util.Optional;
+import io.graversen.rust.rcon.listeners.IConsoleListener;
+import io.graversen.rust.rcon.objects.rust.Player;
 
-public class RustRcon {
-    public static void main(String[] args) {
-        final IRconClient rconClient = RconClient.connect("graversen.io", Constants.RCON_PASSWORD, 30208);
-        final ConsoleMessageDigester consoleMessageDigester = new ConsoleMessageDigester();
+import java.util.List;
 
-        rconClient.attachConsoleListener(consoleMessage -> {
-            Optional<ConsoleDigests> digestsOptional = consoleMessageDigester.digest(consoleMessage);
+public class RustRcon
+{
+    public static void main(String[] args)
+    {
+        final IRconClient rconClient = RconClient.connect("graversen.io", Constants.RCON_PASSWORD, 30204);
+        rconClient.attachConsoleListener(consoleListener());
+        List<Player> currentPlayers = rconClient.getCurrentPlayers();
+    }
 
-            digestsOptional.ifPresent(consoleDigest -> {
-                if (consoleDigest.equals(ConsoleDigests.CHAT)) {
-
-                }
-            });
-        });
-
+    private static IConsoleListener consoleListener()
+    {
+        return System.out::println;
     }
 }
