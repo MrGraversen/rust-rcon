@@ -60,12 +60,12 @@ public enum ConsoleDigests implements IDigest
                     return consoleInput.contains("] was killed by [");
                 }
             },
-    SERVER_EVENT
+    WORLD_EVENT
             {
                 @Override
                 public boolean deepMatches(String consoleInput)
                 {
-                    return matches(consoleInput) && nothingElse(SERVER_EVENT, consoleInput);
+                    return matches(consoleInput) && nothingElse(WORLD_EVENT, consoleInput);
                 }
 
                 @Override

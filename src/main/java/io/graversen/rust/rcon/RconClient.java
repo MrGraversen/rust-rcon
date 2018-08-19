@@ -3,6 +3,7 @@ package io.graversen.rust.rcon;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import io.graversen.rust.rcon.events.*;
 import io.graversen.rust.rcon.listeners.IConsoleListener;
 import io.graversen.rust.rcon.listeners.IServerEventListener;
 import io.graversen.rust.rcon.objects.rust.Player;
@@ -16,6 +17,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 public class RconClient extends WebSocketClient implements IRconClient
 {
@@ -30,6 +32,8 @@ public class RconClient extends WebSocketClient implements IRconClient
     private final List<IServerEventListener> serverEventListeners;
     private final Map<Integer, CompletableFuture<WsIngoingObject>> asyncRequests;
 
+    private final ConsoleMessageDigester consoleMessageDigester;
+
     private RconClient(URI uri)
     {
         super(uri);
@@ -43,22 +47,40 @@ public class RconClient extends WebSocketClient implements IRconClient
         this.consoleListeners = new ArrayList<>();
         this.serverEventListeners = new ArrayList<>();
         this.asyncRequests = new ConcurrentHashMap<>();
+        this.consoleMessageDigester = new ConsoleMessageDigester();
 
-        printLog(false, "Initialized: %s", connectionTuple);
+        printLog("Initialized: %s", connectionTuple);
     }
 
-    public static RconClient connect(String hostname, String password)
+    public static RconClient connect(String hostname, String password) throws RconException
     {
         return RconClient.connect(hostname, password, RconClient.DEFAULT_PORT);
     }
 
-    public static RconClient connect(String hostname, String password, int port)
+    public static RconClient connect(String hostname, String password, int port) throws RconException
+    {
+        return connect(hostname, password, port, Collections.emptyList(), Collections.emptyList());
+    }
+
+    public static RconClient connect(String hostname, String password, int port, List<IConsoleListener> consoleListeners, List<IServerEventListener> serverEventListeners) throws RconException
     {
         try
         {
-            final RconClient rconClient = new RconClient(new URI(String.format("ws://%s:%d/%s", hostname, port, password)));
-            rconClient.connectBlocking();
+            final String connectionUri = String.format("ws://%s:%d/%s", hostname, port, password);
+            final String connectionUriMasked = String.format("ws://%s:%d/******", hostname, port);
+
+            final RconClient rconClient = new RconClient(new URI(connectionUri));
+
+            consoleListeners.forEach(rconClient::attachConsoleListener);
+            serverEventListeners.forEach(rconClient::attachServerEventListener);
             rconClient.attachDefaultListeners();
+
+            final boolean connected = rconClient.connectBlocking();
+
+            if (!connected)
+            {
+                throw new RconException(String.format("Could not connect to %s", connectionUriMasked));
+            }
 
             return rconClient;
         }
@@ -112,7 +134,7 @@ public class RconClient extends WebSocketClient implements IRconClient
         final int identifier = currentRequestCounter.getAndIncrement();
         final WsOutgoingObject wsOutgoingObject = new WsOutgoingObject(identifier, command, "rust-rcon");
         final String json = gson.toJson(wsOutgoingObject);
-        printLog(false, "Sending: %s", json);
+        printLog("Sending: %s", json);
         send(json);
 
         return identifier;
@@ -121,25 +143,28 @@ public class RconClient extends WebSocketClient implements IRconClient
     @Override
     public void onOpen(ServerHandshake handshakedata)
     {
-        printLog(false, "Open: %d %s", handshakedata.getHttpStatus(), handshakedata.getHttpStatusMessage());
+        printLog("Open: %d %s", handshakedata.getHttpStatus(), handshakedata.getHttpStatusMessage());
+        serverEventListeners.forEach(IServerEventListener::onRconOpen);
     }
 
     @Override
     public void onMessage(String message)
     {
-        printLog(true, message);
+        printLog(message);
+        consoleListeners.forEach(consoleListener -> consoleListener.onConsoleMessage(message));
     }
 
     @Override
     public void onClose(int code, String reason, boolean remote)
     {
-        printLog(false, "Closed: %d %s", code, reason);
+        printLog("Closed: %d %s", code, reason);
+        serverEventListeners.forEach(serverEventListener -> serverEventListener.onRconClosed(code, reason));
     }
 
     @Override
     public void onError(Exception ex)
     {
-        ex.printStackTrace();
+        serverEventListeners.forEach(serverEventListener -> serverEventListener.onRconError(ex));
     }
 
     @Override
@@ -154,20 +179,15 @@ public class RconClient extends WebSocketClient implements IRconClient
         this.serverEventListeners.add(serverEventListener);
     }
 
-    private void printLog(boolean propagate, String logText, Object... args)
+    private void printLog(String logText, Object... args)
     {
         final String formattedLogText = String.format(logText, args);
         System.out.println(String.format("[RconClient]: %s", formattedLogText));
-
-        if (propagate)
-        {
-            consoleListeners.forEach(consoleListener -> consoleListener.onConsoleMessage(formattedLogText));
-        }
     }
 
     private void printCommand(String command)
     {
-        printLog(false, "Piping command: %s", command);
+        printLog("Piping command: %s", command);
     }
 
     private void attachDefaultListeners()
@@ -196,10 +216,46 @@ public class RconClient extends WebSocketClient implements IRconClient
         return consoleMessage ->
         {
             final Optional<WsIngoingObject> wsObjectOptional = tryDeserialize(consoleMessage);
-            wsObjectOptional.ifPresent(wsOutgoingObject ->
-            {
+            wsObjectOptional.ifPresent(
+                    wsOutgoingObject -> consoleMessageDigester.digest(consoleMessage).ifPresent(propagateConsoleDigest(consoleMessage))
+            );
+        };
+    }
 
-            });
+    private Consumer<ConsoleDigests> propagateConsoleDigest(String consoleMessage)
+    {
+        return consoleDigest ->
+        {
+            try
+            {
+                switch (consoleDigest)
+                {
+                    case CHAT:
+                        final ChatMessageEvent chatMessageEvent = consoleMessageDigester.digestChatMessageEvent(consoleMessage);
+                        serverEventListeners.forEach(serverEventListener -> serverEventListener.onChatMessage(chatMessageEvent));
+                        break;
+                    case PLAYER_CONNECTED:
+                        final PlayerConnectedEvent playerConnectedEvent = consoleMessageDigester.digestPlayerConnectedEvent(consoleMessage);
+                        serverEventListeners.forEach(serverEventListener -> serverEventListener.onPlayerConnected(playerConnectedEvent));
+                        break;
+                    case PLAYER_DISCONNECTED:
+                        final PlayerDisconnectedEvent playerDisconnectedEvent = consoleMessageDigester.digestPlayerDisconnectedEvent(consoleMessage);
+                        serverEventListeners.forEach(serverEventListener -> serverEventListener.onPlayerDisconnected(playerDisconnectedEvent));
+                        break;
+                    case PLAYER_DEATH:
+                        final PlayerDeathEvent playerDeathEvent = consoleMessageDigester.digestPlayerDeathEvent(consoleMessage);
+                        serverEventListeners.forEach(serverEventListener -> serverEventListener.onPlayerDeath(playerDeathEvent));
+                        break;
+                    case WORLD_EVENT:
+                        final WorldEvent worldEvent = consoleMessageDigester.digestWorldEvent(consoleMessage);
+                        serverEventListeners.forEach(serverEventListener -> serverEventListener.onWorldEvent(worldEvent));
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                serverEventListeners.forEach(serverEventListener -> serverEventListener.onEventParseError(e));
+            }
         };
     }
 

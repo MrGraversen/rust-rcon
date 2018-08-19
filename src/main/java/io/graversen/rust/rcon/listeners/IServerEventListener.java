@@ -4,6 +4,12 @@ import io.graversen.rust.rcon.events.*;
 
 public interface IServerEventListener
 {
+    void onRconOpen();
+
+    void onRconClosed(int code, String reason);
+
+    void onRconError(Exception e);
+
     void onChatMessage(ChatMessageEvent event);
 
     void onPlayerConnected(PlayerConnectedEvent event);
@@ -13,4 +19,6 @@ public interface IServerEventListener
     void onPlayerDeath(PlayerDeathEvent event);
 
     void onWorldEvent(WorldEvent event);
+
+    void onEventParseError(Exception e);
 }

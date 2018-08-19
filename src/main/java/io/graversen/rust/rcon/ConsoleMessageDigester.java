@@ -86,7 +86,7 @@ public class ConsoleMessageDigester
         return new PlayerDisconnectedEvent(ipAddress, steamId64, playerName, reason);
     }
 
-    public WorldEvent digestServerEvent(String consoleInput)
+    public WorldEvent digestWorldEvent(String consoleInput)
     {
         // [event] assets/prefabs/npc/cargo plane/cargo_plane.prefab
         // [event] assets/prefabs/npc/ch47/ch47scientists.entity.prefab

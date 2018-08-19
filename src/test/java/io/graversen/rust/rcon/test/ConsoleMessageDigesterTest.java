@@ -54,9 +54,9 @@ class ConsoleMessageDigesterTest
         Arrays.stream(eventMessages).forEach(s -> consoleMessageDigester.digest(s)
                 .orElseThrow(() -> new RuntimeException("Could not digest event message")));
 
-        assertEquals(WorldEvent.EventTypes.CARGO_PLANE, consoleMessageDigester.digestServerEvent(eventMessages[0]).getEventType());
-        assertEquals(WorldEvent.EventTypes.CH47_SCIENTISTS, consoleMessageDigester.digestServerEvent(eventMessages[1]).getEventType());
-        assertEquals(WorldEvent.EventTypes.PATROL_HELICOPTER, consoleMessageDigester.digestServerEvent(eventMessages[2]).getEventType());
+        assertEquals(WorldEvent.EventTypes.CARGO_PLANE, consoleMessageDigester.digestWorldEvent(eventMessages[0]).getEventType());
+        assertEquals(WorldEvent.EventTypes.CH47_SCIENTISTS, consoleMessageDigester.digestWorldEvent(eventMessages[1]).getEventType());
+        assertEquals(WorldEvent.EventTypes.PATROL_HELICOPTER, consoleMessageDigester.digestWorldEvent(eventMessages[2]).getEventType());
     }
 
     @Test
