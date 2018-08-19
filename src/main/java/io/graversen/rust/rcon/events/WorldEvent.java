@@ -2,18 +2,22 @@ package io.graversen.rust.rcon.events;
 
 import io.graversen.fiber.event.common.BaseEvent;
 
-public class ServerEvent extends BaseEvent {
+public class WorldEvent extends BaseEvent
+{
     private final EventTypes eventType;
 
-    public ServerEvent(EventTypes eventType) {
+    public WorldEvent(EventTypes eventType)
+    {
         this.eventType = eventType;
     }
 
-    public EventTypes getEventType() {
+    public EventTypes getEventType()
+    {
         return eventType;
     }
 
-    public enum EventTypes {
+    public enum EventTypes
+    {
         CARGO_PLANE,
         CH47_SCIENTISTS,
         PATROL_HELICOPTER

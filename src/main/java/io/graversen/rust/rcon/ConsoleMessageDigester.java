@@ -86,7 +86,7 @@ public class ConsoleMessageDigester
         return new PlayerDisconnectedEvent(ipAddress, steamId64, playerName, reason);
     }
 
-    public ServerEvent digestServerEvent(String consoleInput)
+    public WorldEvent digestServerEvent(String consoleInput)
     {
         // [event] assets/prefabs/npc/cargo plane/cargo_plane.prefab
         // [event] assets/prefabs/npc/ch47/ch47scientists.entity.prefab
@@ -94,13 +94,13 @@ public class ConsoleMessageDigester
 
         if (consoleInput.equalsIgnoreCase("[event] assets/prefabs/npc/cargo plane/cargo_plane.prefab"))
         {
-            return new ServerEvent(ServerEvent.EventTypes.CARGO_PLANE);
+            return new WorldEvent(WorldEvent.EventTypes.CARGO_PLANE);
         } else if (consoleInput.equalsIgnoreCase("[event] assets/prefabs/npc/ch47/ch47scientists.entity.prefab"))
         {
-            return new ServerEvent(ServerEvent.EventTypes.CH47_SCIENTISTS);
+            return new WorldEvent(WorldEvent.EventTypes.CH47_SCIENTISTS);
         } else if (consoleInput.equalsIgnoreCase("[event] assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab"))
         {
-            return new ServerEvent(ServerEvent.EventTypes.PATROL_HELICOPTER);
+            return new WorldEvent(WorldEvent.EventTypes.PATROL_HELICOPTER);
         } else
         {
             return null;

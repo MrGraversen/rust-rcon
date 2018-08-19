@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import io.graversen.rust.rcon.listeners.IConsoleListener;
+import io.graversen.rust.rcon.listeners.IServerEventListener;
 import io.graversen.rust.rcon.objects.rust.Player;
 import io.graversen.rust.rcon.objects.ws.WsIngoingObject;
 import io.graversen.rust.rcon.objects.ws.WsOutgoingObject;
@@ -22,11 +23,11 @@ public class RconClient extends WebSocketClient implements IRconClient
 
     private final String connectionTuple;
     private final AtomicInteger currentRequestCounter;
-    private final ExecutorService executorService;
     private final Rcon rcon;
     private final Gson gson;
 
     private final List<IConsoleListener> consoleListeners;
+    private final List<IServerEventListener> serverEventListeners;
     private final Map<Integer, CompletableFuture<WsIngoingObject>> asyncRequests;
 
     private RconClient(URI uri)
@@ -38,27 +39,12 @@ public class RconClient extends WebSocketClient implements IRconClient
 
         this.connectionTuple = String.format("%s:%d", uri.getHost(), uri.getPort());
         this.currentRequestCounter = new AtomicInteger(1);
-        this.executorService = Executors.newSingleThreadExecutor();
         this.rcon = new Rcon(this, this.gson);
         this.consoleListeners = new ArrayList<>();
+        this.serverEventListeners = new ArrayList<>();
         this.asyncRequests = new ConcurrentHashMap<>();
 
-        try
-        {
-            connectBlocking();
-        }
-        catch (InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        attachConsoleListener(asyncRequestsListener());
         printLog(false, "Initialized: %s", connectionTuple);
-    }
-
-    public Rcon rcon()
-    {
-        return rcon;
     }
 
     public static RconClient connect(String hostname, String password)
@@ -70,12 +56,22 @@ public class RconClient extends WebSocketClient implements IRconClient
     {
         try
         {
-            return new RconClient(new URI(String.format("ws://%s:%d/%s", hostname, port, password)));
+            final RconClient rconClient = new RconClient(new URI(String.format("ws://%s:%d/%s", hostname, port, password)));
+            rconClient.connectBlocking();
+            rconClient.attachDefaultListeners();
+
+            return rconClient;
         }
-        catch (URISyntaxException e)
+        catch (URISyntaxException | InterruptedException e)
         {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Rcon rcon()
+    {
+        return rcon;
     }
 
     @Override
@@ -152,6 +148,12 @@ public class RconClient extends WebSocketClient implements IRconClient
         this.consoleListeners.add(consoleListener);
     }
 
+    @Override
+    public void attachServerEventListener(IServerEventListener serverEventListener)
+    {
+        this.serverEventListeners.add(serverEventListener);
+    }
+
     private void printLog(boolean propagate, String logText, Object... args)
     {
         final String formattedLogText = String.format(logText, args);
@@ -168,6 +170,12 @@ public class RconClient extends WebSocketClient implements IRconClient
         printLog(false, "Piping command: %s", command);
     }
 
+    private void attachDefaultListeners()
+    {
+        attachConsoleListener(asyncRequestsListener());
+        attachConsoleListener(serverEventDigestListener());
+    }
+
     private IConsoleListener asyncRequestsListener()
     {
         return consoleMessage ->
@@ -179,6 +187,18 @@ public class RconClient extends WebSocketClient implements IRconClient
                 {
                     asyncRequests.get(wsOutgoingObject.getIdentifier()).complete(wsOutgoingObject);
                 }
+            });
+        };
+    }
+
+    private IConsoleListener serverEventDigestListener()
+    {
+        return consoleMessage ->
+        {
+            final Optional<WsIngoingObject> wsObjectOptional = tryDeserialize(consoleMessage);
+            wsObjectOptional.ifPresent(wsOutgoingObject ->
+            {
+
             });
         };
     }

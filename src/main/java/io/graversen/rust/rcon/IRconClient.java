@@ -1,6 +1,7 @@
 package io.graversen.rust.rcon;
 
 import io.graversen.rust.rcon.listeners.IConsoleListener;
+import io.graversen.rust.rcon.listeners.IServerEventListener;
 import io.graversen.rust.rcon.objects.rust.Player;
 
 import java.io.Closeable;
@@ -15,4 +16,6 @@ public interface IRconClient extends Closeable
     void attachConsoleListener(IConsoleListener consoleListener);
 
     Rcon rcon();
+
+    void attachServerEventListener(IServerEventListener serverEventListener);
 }

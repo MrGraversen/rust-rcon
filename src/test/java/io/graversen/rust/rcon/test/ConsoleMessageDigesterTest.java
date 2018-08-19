@@ -3,7 +3,7 @@ package io.graversen.rust.rcon.test;
 import io.graversen.rust.rcon.ConsoleMessageDigester;
 import io.graversen.rust.rcon.events.ChatMessageEvent;
 import io.graversen.rust.rcon.events.PlayerDisconnectedEvent;
-import io.graversen.rust.rcon.events.ServerEvent;
+import io.graversen.rust.rcon.events.WorldEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,9 +54,9 @@ class ConsoleMessageDigesterTest
         Arrays.stream(eventMessages).forEach(s -> consoleMessageDigester.digest(s)
                 .orElseThrow(() -> new RuntimeException("Could not digest event message")));
 
-        assertEquals(ServerEvent.EventTypes.CARGO_PLANE, consoleMessageDigester.digestServerEvent(eventMessages[0]).getEventType());
-        assertEquals(ServerEvent.EventTypes.CH47_SCIENTISTS, consoleMessageDigester.digestServerEvent(eventMessages[1]).getEventType());
-        assertEquals(ServerEvent.EventTypes.PATROL_HELICOPTER, consoleMessageDigester.digestServerEvent(eventMessages[2]).getEventType());
+        assertEquals(WorldEvent.EventTypes.CARGO_PLANE, consoleMessageDigester.digestServerEvent(eventMessages[0]).getEventType());
+        assertEquals(WorldEvent.EventTypes.CH47_SCIENTISTS, consoleMessageDigester.digestServerEvent(eventMessages[1]).getEventType());
+        assertEquals(WorldEvent.EventTypes.PATROL_HELICOPTER, consoleMessageDigester.digestServerEvent(eventMessages[2]).getEventType());
     }
 
     @Test
