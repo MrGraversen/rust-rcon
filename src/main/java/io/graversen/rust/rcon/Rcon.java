@@ -174,6 +174,16 @@ public class Rcon
             rconClient.sendRaw(command);
         }
 
+        public void stabilityEnabled(boolean enabled)
+        {
+            final String command = String.format("server.stability %s", String.valueOf(enabled));
+            rconClient.sendRaw(command);
+        }
 
+        public void radiationEnabled(boolean enabled)
+        {
+            final String command = String.format("server.radiation %s", String.valueOf(enabled));
+            rconClient.sendRaw(command);
+        }
     }
 }
