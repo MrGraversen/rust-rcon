@@ -9,6 +9,7 @@ public class Rcon
 
     private final InventoryRcon inventoryRcon;
     private final AiRcon aiRcon;
+    private final EventRcon eventRcon;
 
     Rcon(IRconClient rconClient, Gson gson)
     {
@@ -16,6 +17,7 @@ public class Rcon
         this.gson = gson;
         this.inventoryRcon = new InventoryRcon();
         this.aiRcon = new AiRcon();
+        this.eventRcon = new EventRcon();
     }
 
     public void kick(String player, String reason)
@@ -48,6 +50,12 @@ public class Rcon
         rconClient.sendRaw(command);
     }
 
+    public void setTime(int hour)
+    {
+        final String command = String.format("env.time %d", hour);
+        rconClient.sendRaw(command);
+    }
+
     public InventoryRcon inventory()
     {
         return inventoryRcon;
@@ -56,6 +64,11 @@ public class Rcon
     public AiRcon ai()
     {
         return aiRcon;
+    }
+
+    public EventRcon event()
+    {
+        return eventRcon;
     }
 
     private class InventoryRcon
@@ -91,6 +104,30 @@ public class Rcon
         {
             final String command = String.format("ai.move %s", String.valueOf(move));
             rconClient.sendRaw(command);
+        }
+    }
+
+    private class EventRcon
+    {
+        public void airDrop()
+        {
+            rconClient.sendRaw("supply.call");
+        }
+
+        public void patrolHelicopter()
+        {
+            rconClient.sendRaw("heli.call");
+        }
+
+        public void patrolHelicopter(String player)
+        {
+            patrolHelicopter();
+            rconClient.sendRaw(String.format("heli.strafe %s", player));
+        }
+
+        public void ch47Helicopter()
+        {
+            rconClient.sendRaw("spawn ch47scientists.entity");
         }
     }
 }
