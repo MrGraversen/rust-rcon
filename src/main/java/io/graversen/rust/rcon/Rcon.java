@@ -38,6 +38,11 @@ public class Rcon
         rconClient.sendRaw(command);
     }
 
+    public void kickAll()
+    {
+        rconClient.sendRaw("global.kickall");
+    }
+
     public void ban(String player, String reason)
     {
         final String command = String.format("ban \"%s\" \"%s\"", player, reason);
