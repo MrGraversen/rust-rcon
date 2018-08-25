@@ -10,6 +10,7 @@ public class Rcon
     private final InventoryRcon inventoryRcon;
     private final AiRcon aiRcon;
     private final EventRcon eventRcon;
+    private final SettingsRcon settingsRcon;
 
     Rcon(IRconClient rconClient, Gson gson)
     {
@@ -18,6 +19,17 @@ public class Rcon
         this.inventoryRcon = new InventoryRcon();
         this.aiRcon = new AiRcon();
         this.eventRcon = new EventRcon();
+        this.settingsRcon = new SettingsRcon();
+    }
+
+    public void writeConfig()
+    {
+        rconClient.sendRaw("server.writecfg");
+    }
+
+    public void stopServer()
+    {
+        rconClient.sendRaw("server.stop");
     }
 
     public void kick(String player, String reason)
@@ -69,6 +81,11 @@ public class Rcon
     public EventRcon event()
     {
         return eventRcon;
+    }
+
+    public SettingsRcon settings()
+    {
+        return settingsRcon;
     }
 
     private class InventoryRcon
@@ -129,5 +146,34 @@ public class Rcon
         {
             rconClient.sendRaw("spawn ch47scientists.entity");
         }
+    }
+
+    private class SettingsRcon
+    {
+        public void disableDecay()
+        {
+            setDecayScale(0);
+            setDecayUpkeep(false);
+        }
+
+        public void resetDecay()
+        {
+            setDecayScale(100);
+            setDecayUpkeep(true);
+        }
+
+        public void setDecayScale(int decayPercent)
+        {
+            final String command = String.format("decay.scale %d", decayPercent);
+            rconClient.sendRaw(command);
+        }
+
+        public void setDecayUpkeep(boolean upkeep)
+        {
+            final String command = String.format("decay.upkeep %s", String.valueOf(upkeep));
+            rconClient.sendRaw(command);
+        }
+
+
     }
 }
