@@ -142,6 +142,22 @@ public class Rcon
             rconClient.sendRaw(String.format("heli.strafe %s", player));
         }
 
+        public void resetPatrolHelicopterLifetime()
+        {
+            setPatrolHelicopterLifetime(15);
+        }
+
+        public void disablePatrolHelicopter()
+        {
+            setPatrolHelicopterLifetime(0);
+        }
+
+        public void setPatrolHelicopterLifetime(int lifetimeMinutes)
+        {
+            final String command = String.format("heli.lifetimeminutes %d", lifetimeMinutes);
+            rconClient.sendRaw(command);
+        }
+
         public void ch47Helicopter()
         {
             rconClient.sendRaw("spawn ch47scientists.entity");
