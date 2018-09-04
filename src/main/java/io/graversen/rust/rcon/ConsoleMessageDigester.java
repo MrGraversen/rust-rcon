@@ -67,6 +67,8 @@ public class ConsoleMessageDigester
     public PlayerKillEvent digestPlayerKillEvent(String consoleInput)
     {
         // [4267870/8141844] was killed by Jiji[3831334/76561198189196679]
+        // UnknOwn  csgolive.com[9460039/76561198104761939] was killed by Doctor Delete[9126388/76561197979952036]
+        // -_-[9468122/76561198165597845] was killed by Doctor Delete[9126388/76561197979952036]
         return null;
     }
 
