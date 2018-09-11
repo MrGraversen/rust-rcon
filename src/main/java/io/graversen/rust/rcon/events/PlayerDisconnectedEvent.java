@@ -4,22 +4,22 @@ import io.graversen.fiber.event.common.BaseEvent;
 
 public class PlayerDisconnectedEvent extends BaseEvent
 {
-    private final String ipAddress;
+    private final String connectionTuple;
     private final String steamId64;
     private final String playerName;
     private final String reason;
 
-    public PlayerDisconnectedEvent(String ipAddress, String steamId64, String playerName, String reason)
+    public PlayerDisconnectedEvent(String connectionTuple, String steamId64, String playerName, String reason)
     {
-        this.ipAddress = ipAddress;
+        this.connectionTuple = connectionTuple;
         this.steamId64 = steamId64;
         this.playerName = playerName;
         this.reason = reason;
     }
 
-    public String getIpAddress()
+    public String getConnectionTuple()
     {
-        return ipAddress;
+        return connectionTuple;
     }
 
     public String getSteamId64()
