@@ -1,6 +1,9 @@
 package io.graversen.rust.rcon.events;
 
-public class PlayerSpawnedEvent
+public class PlayerSpawnedEvent extends BasePlayerEvent
 {
-    // DarkDouchebag[1014803/76561198046357656] has entered the game
+    public PlayerSpawnedEvent(String playerName, String steamId64)
+    {
+        super(playerName, steamId64);
+    }
 }

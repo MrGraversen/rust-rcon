@@ -1,11 +1,10 @@
 package io.graversen.rust.rcon.events;
 
-import io.graversen.fiber.event.common.BaseEvent;
-
-public class PlayerDeathEvent extends BaseEvent
+public class PlayerDeathEvent extends BasePlayerEvent
 {
     public PlayerDeathEvent()
     {
+        super(null, null);
         throw new UnsupportedOperationException();
     }
 }
