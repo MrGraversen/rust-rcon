@@ -30,6 +30,6 @@ public class TestDigestPlayerDisconnectedEvent extends BaseDigesterTest
         assertEquals("Doctor Delete", playerDisconnectedEvent.getPlayerName());
         assertEquals("closing", playerDisconnectedEvent.getReason());
         assertEquals("76561197979952036", playerDisconnectedEvent.getSteamId64());
-        assertEquals("82.102.20.168:53998", playerDisconnectedEvent.getIpAddress());
+        assertEquals("82.102.20.168:53998", playerDisconnectedEvent.getConnectionTuple());
     }
 }

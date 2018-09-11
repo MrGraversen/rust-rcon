@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 public class ConsoleMessageDigester
 {
@@ -26,7 +27,8 @@ public class ConsoleMessageDigester
         // [CHAT] Pope of the Nope[468295/76561197979952036] : ssss
         validateEvent(consoleInput, ConsoleDigests.CHAT);
 
-        final String[] chatMessageParts = consoleInput.split("\\s:\\s");
+        final String[] chatMessageParts = consoleInput.split("\\s:\\s", 2);
+
         final String leftHandString = chatMessageParts[0];
         final String chatMessage = chatMessageParts[1].trim();
 

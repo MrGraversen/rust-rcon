@@ -16,7 +16,8 @@ public class TestDigestChatMessageEvent extends BaseDigesterTest
             "[CHAT] DarkDouchebag[1014803/76561198046357656] : [Server] Kan jo ikke huske hvordan den laver det",
             "[CHAT] DarkDouchebag[1014803/76561198046357656] : [DarkDouchebag] [Server] Hello mate",
             "[CHAT] DarkDouchebag[1014803/76561198046357656] : PLain old text, PLain old text, PLain old text, PLain old text, PLain old text, PLain old text, PLai",
-            "[CHAT] DarkDouchebag[1014803/76561198046357656] : [CHAT] dont know hwat to write \\:o :o"
+            "[CHAT] DarkDouchebag[1014803/76561198046357656] : [CHAT] dont know hwat to write \\:o :o",
+            "[CHAT] DarkDouchebag[1014803/76561198046357656] : This message : will not work : haha"
     };
 
     @Test
@@ -61,6 +62,16 @@ public class TestDigestChatMessageEvent extends BaseDigesterTest
         final ChatMessageEvent chatMessageEvent = consoleMessageDigester.digestChatMessageEvent(chatMessages[5]);
 
         assertEquals("[CHAT] dont know hwat to write \\:o :o", chatMessageEvent.getChatMessage());
+        assertEquals("DarkDouchebag", chatMessageEvent.getPlayerName());
+        assertEquals("76561198046357656", chatMessageEvent.getSteamId64());
+    }
+
+    @Test
+    void test_findCorrectInfo_5()
+    {
+        final ChatMessageEvent chatMessageEvent = consoleMessageDigester.digestChatMessageEvent(chatMessages[6]);
+
+        assertEquals("This message : will not work : haha", chatMessageEvent.getChatMessage());
         assertEquals("DarkDouchebag", chatMessageEvent.getPlayerName());
         assertEquals("76561198046357656", chatMessageEvent.getSteamId64());
     }
