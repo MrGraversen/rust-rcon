@@ -93,6 +93,25 @@ public class ConsoleMessageDigester
         return new PlayerDisconnectedEvent(ipAddress, steamId64, playerName, reason);
     }
 
+    public PlayerSpawnedEvent digestPlayerSpawnedEvent(String consoleInput)
+    {
+        // DarkDouchebag[1014803/76561198046357656] has entered the game
+        validateEvent(consoleInput, ConsoleDigests.PLAYER_SPAWNED);
+
+        final Matcher matcherSteamId = squareBracketInsideMatcher.matcher(consoleInput);
+
+        List<String> matchingStrings = new ArrayList<>();
+        while (matcherSteamId.find())
+        {
+            matchingStrings.add(matcherSteamId.group(1));
+        }
+
+        final String steamId64 = matchingStrings.get(matchingStrings.size() - 1).split("/")[1];
+        final String playerName = consoleInput.split("\\[")[0].trim();
+
+        return new PlayerSpawnedEvent(playerName, steamId64);
+    }
+
     public WorldEvent digestWorldEvent(String consoleInput)
     {
         // [event] assets/prefabs/npc/cargo plane/cargo_plane.prefab

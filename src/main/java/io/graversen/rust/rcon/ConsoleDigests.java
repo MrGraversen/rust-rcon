@@ -60,6 +60,20 @@ public enum ConsoleDigests implements IDigest
                     return consoleInput.contains("] was killed by [");
                 }
             },
+    PLAYER_SPAWNED
+            {
+                @Override
+                public boolean deepMatches(String consoleInput)
+                {
+                    return matches(consoleInput) && nothingElse(PLAYER_SPAWNED, consoleInput);
+                }
+
+                @Override
+                public boolean matches(String consoleInput)
+                {
+                    return consoleInput.endsWith("has entered the game");
+                }
+            },
     WORLD_EVENT
             {
                 @Override
