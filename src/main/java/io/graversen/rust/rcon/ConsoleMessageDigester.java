@@ -132,7 +132,7 @@ public class ConsoleMessageDigester
         }
         else
         {
-            return null;
+            throw new UnsupportedOperationException("Unsupported World Event");
         }
     }
 
