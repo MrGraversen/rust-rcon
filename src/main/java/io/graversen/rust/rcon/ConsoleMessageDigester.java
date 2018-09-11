@@ -58,15 +58,17 @@ public class ConsoleMessageDigester
         // 82.102.20.179:52298/76561197979952036/Pope of the Nope joined [windows/76561197979952036]
         // 79.193.40.58:55162/76561198845816557/m_7o7 joined [linux/76561198845816557]
         // 92.171.193.37:52278/76561198063601715/Orion (EN/FR/ES) joined [windows/76561198063601715]
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public PlayerDeathEvent digestPlayerDeathEvent(String consoleInput)
     {
+        // Omit entirely in favour of PlayerKillEvent???
+
         // Jiji[3831334/76561198189196679] was killed by [4267870/8141844]
         // TheLyss Gamer[4147282/76561198154440141] was killed by boar (Boar)
         // TheLyss Gamer[4147282/76561198154440141] was killed by Doctor Delete[168316/76561197979952036]
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public PlayerKillEvent digestPlayerKillEvent(String consoleInput)
@@ -74,7 +76,11 @@ public class ConsoleMessageDigester
         // [4267870/8141844] was killed by Jiji[3831334/76561198189196679]
         // UnknOwn  csgolive.com[9460039/76561198104761939] was killed by Doctor Delete[9126388/76561197979952036]
         // -_-[9468122/76561198165597845] was killed by Doctor Delete[9126388/76561197979952036]
-        return null;
+        // Jiji[3831334/76561198189196679] was killed by [4267870/8141844]
+        // TheLyss Gamer[4147282/76561198154440141] was killed by boar (Boar)
+        // TheLyss Gamer[4147282/76561198154440141] was killed by Doctor Delete[168316/76561197979952036]
+
+        throw new UnsupportedOperationException();
     }
 
     public PlayerDisconnectedEvent digestPlayerDisconnectedEvent(String consoleInput)
