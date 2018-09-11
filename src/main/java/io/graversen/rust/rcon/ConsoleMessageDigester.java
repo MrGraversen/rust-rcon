@@ -16,7 +16,9 @@ public class ConsoleMessageDigester
 
     public Optional<ConsoleDigests> digest(String consoleInput)
     {
-        return Arrays.stream(ConsoleDigests.values()).filter(x -> x.matches(consoleInput)).findFirst();
+        return Arrays.stream(ConsoleDigests.values())
+                .filter(x -> x.deepMatches(consoleInput))
+                .findFirst();
     }
 
     public ChatMessageEvent digestChatMessageEvent(String consoleInput)
@@ -98,13 +100,16 @@ public class ConsoleMessageDigester
         if (consoleInput.equalsIgnoreCase("[event] assets/prefabs/npc/cargo plane/cargo_plane.prefab"))
         {
             return new WorldEvent(WorldEvent.EventTypes.CARGO_PLANE);
-        } else if (consoleInput.equalsIgnoreCase("[event] assets/prefabs/npc/ch47/ch47scientists.entity.prefab"))
+        }
+        else if (consoleInput.equalsIgnoreCase("[event] assets/prefabs/npc/ch47/ch47scientists.entity.prefab"))
         {
             return new WorldEvent(WorldEvent.EventTypes.CH47_SCIENTISTS);
-        } else if (consoleInput.equalsIgnoreCase("[event] assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab"))
+        }
+        else if (consoleInput.equalsIgnoreCase("[event] assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab"))
         {
             return new WorldEvent(WorldEvent.EventTypes.PATROL_HELICOPTER);
-        } else
+        }
+        else
         {
             return null;
         }
@@ -112,8 +117,8 @@ public class ConsoleMessageDigester
 
     public void validateEvent(String consoleInput, ConsoleDigests consoleDigest)
     {
-        this.digest(consoleInput)
-                .map(c -> c.equals(consoleDigest))
+        digest(consoleInput)
+                .filter(c -> c.equals(consoleDigest))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid event type for console input"));
     }
 }
