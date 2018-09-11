@@ -24,8 +24,9 @@ public class ConsoleMessageDigester
         // [CHAT] Pope of the Nope[468295/76561197979952036] : ssss
         validateEvent(consoleInput, ConsoleDigests.CHAT);
 
-        final String leftHandString = consoleInput.split(":")[0];
-        final String chatMessage = consoleInput.split(":")[1].trim();
+        final String[] chatMessageParts = consoleInput.split("\\s:\\s");
+        final String leftHandString = chatMessageParts[0];
+        final String chatMessage = chatMessageParts[1].trim();
 
         final Matcher matcherSteamId = squareBracketInsideMatcher.matcher(leftHandString);
 
@@ -109,7 +110,7 @@ public class ConsoleMessageDigester
         }
     }
 
-    private void validateEvent(String consoleInput, ConsoleDigests consoleDigest)
+    public void validateEvent(String consoleInput, ConsoleDigests consoleDigest)
     {
         this.digest(consoleInput)
                 .map(c -> c.equals(consoleDigest))
