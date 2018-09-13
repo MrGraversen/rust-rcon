@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.ConsoleDigests;
+import io.graversen.rust.rcon.RconMessages;
 import io.graversen.rust.rcon.events.PlayerSpawnedEvent;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ public class TestDigestPlayerSpawnedEvent extends BaseDigesterTest
     @Test
     void test_validation()
     {
-        Arrays.stream(playerSpawnedMessages).forEach(s -> consoleMessageDigester.validateEvent(s, ConsoleDigests.PLAYER_SPAWNED));
+        Arrays.stream(playerSpawnedMessages).forEach(s -> consoleMessageDigester.validateEvent(s, RconMessages.PLAYER_SPAWNED));
     }
 
     @Test

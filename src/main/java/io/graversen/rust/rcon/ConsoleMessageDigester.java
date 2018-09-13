@@ -14,17 +14,17 @@ public class ConsoleMessageDigester
     private final Pattern squareBracketInsideMatcher = Pattern.compile("\\[(.*?)\\]");
     private final Pattern squareBracketOutsideMatcher = Pattern.compile("\\](.*?)\\[");
 
-    public Optional<ConsoleDigests> digest(String consoleInput)
+    public Optional<RconMessages> digest(String consoleInput)
     {
-        return Arrays.stream(ConsoleDigests.values())
-                .filter(x -> x.deepMatches(consoleInput))
+        return Arrays.stream(RconMessages.values())
+                .filter(rconMessage -> deepMatches(consoleInput, rconMessage))
                 .findFirst();
     }
 
     public ChatMessageEvent digestChatMessageEvent(String consoleInput)
     {
         // [CHAT] Pope of the Nope[468295/76561197979952036] : ssss
-        validateEvent(consoleInput, ConsoleDigests.CHAT);
+        validateEvent(consoleInput, RconMessages.CHAT);
 
         final String[] chatMessageParts = consoleInput.split("\\s:\\s", 2);
 
@@ -85,7 +85,7 @@ public class ConsoleMessageDigester
     public PlayerDisconnectedEvent digestPlayerDisconnectedEvent(String consoleInput)
     {
         // 82.102.20.179:61714/76561197979952036/Pope of the Nope disconnecting: closing
-        validateEvent(consoleInput, ConsoleDigests.PLAYER_DISCONNECTED);
+        validateEvent(consoleInput, RconMessages.PLAYER_DISCONNECTED);
 
         final String[] splitInput = consoleInput.split("/");
         final String[] splitInputLastElement = splitInput[2].split("disconnecting:");
@@ -101,7 +101,7 @@ public class ConsoleMessageDigester
     public PlayerSpawnedEvent digestPlayerSpawnedEvent(String consoleInput)
     {
         // DarkDouchebag[1014803/76561198046357656] has entered the game
-        validateEvent(consoleInput, ConsoleDigests.PLAYER_SPAWNED);
+        validateEvent(consoleInput, RconMessages.PLAYER_SPAWNED);
 
         final Matcher matcherSteamId = squareBracketInsideMatcher.matcher(consoleInput);
 
@@ -141,10 +141,22 @@ public class ConsoleMessageDigester
         }
     }
 
-    public void validateEvent(String consoleInput, ConsoleDigests consoleDigest)
+    public void validateEvent(String consoleInput, RconMessages consoleDigest)
     {
         digest(consoleInput)
                 .filter(c -> c.equals(consoleDigest))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid event type for console input"));
+    }
+
+    private boolean deepMatches(String consoleInput, RconMessages rconMessage)
+    {
+        return rconMessage.matches(consoleInput) && nothingElse(rconMessage, consoleInput);
+    }
+
+    private static boolean nothingElse(RconMessages except, String consoleInput)
+    {
+        return Arrays.stream(RconMessages.values())
+                .filter(c -> !c.equals(except))
+                .noneMatch(c -> c.matches(consoleInput));
     }
 }

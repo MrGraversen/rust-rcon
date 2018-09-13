@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.ConsoleDigests;
+import io.graversen.rust.rcon.RconMessages;
 import io.graversen.rust.rcon.events.PlayerDisconnectedEvent;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ public class TestDigestPlayerDisconnectedEvent extends BaseDigesterTest
     @Test
     void test_validation()
     {
-        Arrays.stream(disconnectMessages).forEach(s -> consoleMessageDigester.validateEvent(s, ConsoleDigests.PLAYER_DISCONNECTED));
+        Arrays.stream(disconnectMessages).forEach(s -> consoleMessageDigester.validateEvent(s, RconMessages.PLAYER_DISCONNECTED));
     }
 
     @Test

@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon;
 
-public interface IDigest {
-    boolean deepMatches(String consoleInput);
+public interface IRconMessage
+{
     boolean matches(String consoleInput);
 }

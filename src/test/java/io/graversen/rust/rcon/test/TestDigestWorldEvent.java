@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.ConsoleDigests;
+import io.graversen.rust.rcon.RconMessages;
 import io.graversen.rust.rcon.events.WorldEvent;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ class TestDigestWorldEvent extends BaseDigesterTest
                 "[event] assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab"
         };
 
-        Arrays.stream(eventMessages).forEach(s -> consoleMessageDigester.validateEvent(s, ConsoleDigests.WORLD_EVENT));
+        Arrays.stream(eventMessages).forEach(s -> consoleMessageDigester.validateEvent(s, RconMessages.WORLD_EVENT));
     }
 
     @Test

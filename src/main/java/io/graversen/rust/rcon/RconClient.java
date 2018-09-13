@@ -224,7 +224,7 @@ public class RconClient extends WebSocketClient implements IRconClient
         };
     }
 
-    private Consumer<ConsoleDigests> propagateConsoleDigest(String consoleMessage)
+    private Consumer<RconMessages> propagateConsoleDigest(String consoleMessage)
     {
         return consoleDigest ->
         {

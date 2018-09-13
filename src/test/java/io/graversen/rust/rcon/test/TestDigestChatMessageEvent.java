@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.ConsoleDigests;
+import io.graversen.rust.rcon.RconMessages;
 import io.graversen.rust.rcon.events.ChatMessageEvent;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ public class TestDigestChatMessageEvent extends BaseDigesterTest
     @Test
     void test_validation()
     {
-        Arrays.stream(chatMessages).forEach(s -> consoleMessageDigester.validateEvent(s, ConsoleDigests.CHAT));
+        Arrays.stream(chatMessages).forEach(s -> consoleMessageDigester.validateEvent(s, RconMessages.CHAT));
     }
 
     @Test
