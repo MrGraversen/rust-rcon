@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestDigestPlayerSpawnedEvent extends BaseDigesterTest
+class TestDigestPlayerSpawnedEvent extends BaseDigesterTest
 {
     private final String[] playerSpawnedMessages = {
             "DarkDouchebag[1014803/76561198046357656] has entered the game"

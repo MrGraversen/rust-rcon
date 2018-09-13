@@ -2,11 +2,11 @@ package io.graversen.rust.rcon.test;
 
 import io.graversen.rust.rcon.ConsoleMessageDigester;
 
-public abstract class BaseDigesterTest
+abstract class BaseDigesterTest
 {
-    protected final ConsoleMessageDigester consoleMessageDigester;
+    final ConsoleMessageDigester consoleMessageDigester;
 
-    protected BaseDigesterTest()
+    BaseDigesterTest()
     {
         this.consoleMessageDigester = new ConsoleMessageDigester();
     }

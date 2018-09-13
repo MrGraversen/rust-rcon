@@ -1,6 +1,7 @@
 package io.graversen.rust.rcon;
 
 import io.graversen.rust.rcon.events.*;
+import io.graversen.rust.rcon.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +24,6 @@ public class ConsoleMessageDigester
 
     public ChatMessageEvent digestChatMessageEvent(String consoleInput)
     {
-        // [CHAT] Pope of the Nope[468295/76561197979952036] : ssss
         validateEvent(consoleInput, RconMessages.CHAT);
 
         final String[] chatMessageParts = consoleInput.split("\\s:\\s", 2);
@@ -55,9 +55,22 @@ public class ConsoleMessageDigester
     public PlayerConnectedEvent digestPlayerConnectedEvent(String consoleInput)
     {
         // 82.102.20.179:52298/76561197979952036/Pope of the Nope joined [windows/76561197979952036]
-        // 79.193.40.58:55162/76561198845816557/m_7o7 joined [linux/76561198845816557]
-        // 92.171.193.37:52278/76561198063601715/Orion (EN/FR/ES) joined [windows/76561198063601715]
-        throw new UnsupportedOperationException();
+        validateEvent(consoleInput, RconMessages.PLAYER_CONNECTED);
+
+        final String[] splitInput = consoleInput.split("/");
+
+        final String connectionTuple = splitInput[0];
+        final String steamId64 = splitInput[1];
+
+        final int osDescriptorFromIndex = consoleInput.lastIndexOf('[') + 1;
+        final int osDescriptorToIndex = consoleInput.lastIndexOf('/');
+        final String osDescriptor = consoleInput.substring(osDescriptorFromIndex, osDescriptorToIndex);
+
+        final int playerNameFromIndex = Utils.nthIndexOf(consoleInput, '/', 2) + 1;
+        final int playerNameToIndex = consoleInput.lastIndexOf("joined");
+        final String playerName = consoleInput.substring(playerNameFromIndex, playerNameToIndex).trim();
+
+        return new PlayerConnectedEvent(connectionTuple, osDescriptor, steamId64, playerName);
     }
 
     public PlayerDeathEvent digestPlayerDeathEvent(String consoleInput)
@@ -84,7 +97,6 @@ public class ConsoleMessageDigester
 
     public PlayerDisconnectedEvent digestPlayerDisconnectedEvent(String consoleInput)
     {
-        // 82.102.20.179:61714/76561197979952036/Pope of the Nope disconnecting: closing
         validateEvent(consoleInput, RconMessages.PLAYER_DISCONNECTED);
 
         final String[] splitInput = consoleInput.split("/");
@@ -100,7 +112,6 @@ public class ConsoleMessageDigester
 
     public PlayerSpawnedEvent digestPlayerSpawnedEvent(String consoleInput)
     {
-        // DarkDouchebag[1014803/76561198046357656] has entered the game
         validateEvent(consoleInput, RconMessages.PLAYER_SPAWNED);
 
         final Matcher matcherSteamId = squareBracketInsideMatcher.matcher(consoleInput);
@@ -119,10 +130,6 @@ public class ConsoleMessageDigester
 
     public WorldEvent digestWorldEvent(String consoleInput)
     {
-        // [event] assets/prefabs/npc/cargo plane/cargo_plane.prefab
-        // [event] assets/prefabs/npc/ch47/ch47scientists.entity.prefab
-        // [event] assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab
-
         if (consoleInput.equalsIgnoreCase("[event] assets/prefabs/npc/cargo plane/cargo_plane.prefab"))
         {
             return new WorldEvent(WorldEvent.EventTypes.CARGO_PLANE);
