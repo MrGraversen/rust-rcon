@@ -61,7 +61,7 @@ public class RconClient extends WebSocketClient implements IRconClient
 
     public static RconClient connect(String hostname, String password, int port) throws RconException
     {
-        return connect(hostname, password, port, Collections.emptyList(), Collections.emptyList());
+        return connect(hostname, password, port, new ArrayList<>(), new ArrayList<>());
     }
 
     public static RconClient connect(String hostname, String password, int port, List<IConsoleListener> consoleListeners, List<IServerEventListener> serverEventListeners) throws RconException
