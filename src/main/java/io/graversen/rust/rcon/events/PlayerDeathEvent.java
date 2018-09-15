@@ -2,9 +2,16 @@ package io.graversen.rust.rcon.events;
 
 public class PlayerDeathEvent extends BasePlayerEvent
 {
-    public PlayerDeathEvent()
+    private final String targetEntityName;
+
+    public PlayerDeathEvent(String playerName, String steamId64, String targetEntityName)
     {
-        super(null, null);
-        throw new UnsupportedOperationException();
+        super(playerName, steamId64);
+        this.targetEntityName = targetEntityName;
+    }
+
+    public String getTargetEntityName()
+    {
+        return targetEntityName;
     }
 }

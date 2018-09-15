@@ -33,7 +33,7 @@ public enum RconMessages implements IRconMessage
                 @Override
                 public boolean matches(String consoleInput)
                 {
-                    return consoleInput.contains("] was killed by [");
+                    return consoleInput.contains("] was killed by ");
                 }
             },
     PLAYER_SPAWNED
