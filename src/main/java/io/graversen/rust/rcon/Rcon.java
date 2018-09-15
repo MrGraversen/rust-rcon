@@ -93,7 +93,7 @@ public class Rcon
         return settingsRcon;
     }
 
-    private class InventoryRcon
+    class InventoryRcon
     {
         public void giveTo(String player, String itemShortName, int amount)
         {
@@ -114,7 +114,7 @@ public class Rcon
         }
     }
 
-    private class AiRcon
+    class AiRcon
     {
         public void think(boolean think)
         {
@@ -129,7 +129,7 @@ public class Rcon
         }
     }
 
-    private class EventRcon
+    class EventRcon
     {
         public void airDrop()
         {
@@ -169,7 +169,7 @@ public class Rcon
         }
     }
 
-    private class SettingsRcon
+    class SettingsRcon
     {
         public void disableDecay()
         {

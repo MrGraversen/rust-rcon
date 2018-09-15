@@ -10,4 +10,14 @@ public class Item
         this.shortName = shortName;
         this.amount = amount;
     }
+
+    public String getShortName()
+    {
+        return shortName;
+    }
+
+    public int getAmount()
+    {
+        return amount;
+    }
 }
