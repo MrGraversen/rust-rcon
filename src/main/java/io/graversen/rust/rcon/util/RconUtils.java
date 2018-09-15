@@ -1,5 +1,6 @@
-package io.graversen.rust.rcon;
+package io.graversen.rust.rcon.util;
 
+import io.graversen.rust.rcon.IRconClient;
 import io.graversen.rust.rcon.composite.Loadout;
 
 public abstract class RconUtils

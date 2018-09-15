@@ -1,7 +1,5 @@
 package io.graversen.rust.rcon;
 
-import java.util.Arrays;
-
 public enum RconMessages implements IRconMessage
 {
     CHAT
