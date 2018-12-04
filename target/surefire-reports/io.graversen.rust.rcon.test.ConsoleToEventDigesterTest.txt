@@ -1,9 +1,0 @@
--------------------------------------------------------------------------------
-Test set: io.graversen.rust.rcon.test.ConsoleToEventDigesterTest
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.094 sec <<< FAILURE! - in io.graversen.rust.rcon.test.ConsoleToEventDigesterTest
-testDigestChatMessageEvent_validation()  Time elapsed: 0.043 sec  <<< ERROR!
-java.lang.IllegalStateException: No match found
-	at io.graversen.rust.rcon.test.ConsoleToEventDigesterTest.lambda$testDigestChatMessageEvent_validation$0(ConsoleToEventDigesterTest.java:28)
-	at io.graversen.rust.rcon.test.ConsoleToEventDigesterTest.testDigestChatMessageEvent_validation(ConsoleToEventDigesterTest.java:28)
-
