@@ -9,7 +9,7 @@ public class RustRcon
 {
     public static void main(String[] args) throws RconException
     {
-        final IRconClient rconClient = RconClient.connect("graversen.io", Constants.RCON_PASSWORD, 30204);
+        final IRconClient rconClient = RconClient.connect("graversen.io", Constants.rconPassword(), 30204);
         rconClient.attachConsoleListener(consoleListener());
         List<Player> currentPlayers = rconClient.getCurrentPlayers();
         System.out.printf("Current Player Count: %d\n", currentPlayers.size());
