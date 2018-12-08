@@ -49,5 +49,13 @@ public enum RconMessages implements IRconMessage
                 {
                     return consoleInput.startsWith("[event]");
                 }
+            },
+    SAVE_EVENT
+            {
+                @Override
+                public boolean matches(String consoleInput)
+                {
+                    return consoleInput.equalsIgnoreCase("Saving complete");
+                }
             }
 }

@@ -22,6 +22,11 @@ public class ConsoleMessageDigester
                 .findFirst();
     }
 
+    public SaveEvent digestSaveEvent(String consoleInput)
+    {
+        return new SaveEvent();
+    }
+
     public ChatMessageEvent digestChatMessageEvent(String consoleInput)
     {
         validateEvent(consoleInput, RconMessages.CHAT);
@@ -80,7 +85,6 @@ public class ConsoleMessageDigester
         // Jiji[3831334/76561198189196679] was killed by [4267870/8141844]
         // TheLyss Gamer[4147282/76561198154440141] was killed by boar (Boar)
         // TheLyss Gamer[4147282/76561198154440141] was killed by Doctor Delete[168316/76561197979952036]
-
 
 
         throw new UnsupportedOperationException();
