@@ -6,9 +6,14 @@ public abstract class BaseModSupport
 {
     private final IRconClient rconClient;
 
-    public BaseModSupport(IRconClient rconClient)
+    protected BaseModSupport(IRconClient rconClient)
     {
         this.rconClient = rconClient;
+    }
+
+    protected IRconClient rconClient()
+    {
+        return rconClient;
     }
 
     public abstract String modName();
@@ -16,4 +21,8 @@ public abstract class BaseModSupport
     public abstract String description();
 
     public abstract String version();
+
+    public abstract String umodLink();
+
+    public abstract String umodDirectLink();
 }
