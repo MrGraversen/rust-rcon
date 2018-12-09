@@ -23,7 +23,7 @@ Below is a description of events raised by `rust-rcon`. The player-centric event
 * **PlayerDeathEvent**: Represents a player in-game death
 * **PlayerDisconnectedEvent**: Occurs when a player leaves the server
 * **PlayerSpawnedEvent**: Occurs after a player has spawned (e.g. after death or connecting)
-* **SaveEvent**: The server has auto-saved
+* **SaveEvent**: The server has auto-saved (world data has been flushed to disk)
 * **WorldEvent**: Represents interesting world events, e.g. patrol helicopter, air drop, etc.
 
 *To be continued...*
