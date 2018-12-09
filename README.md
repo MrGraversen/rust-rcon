@@ -16,7 +16,7 @@ Console messages from the Rust server are not currently in a machine-readable fo
 * Support for extending with mod support
 
 ## Events
-Below is a description of events raised by `rust-rcon`:
+Below is a description of events raised by `rust-rcon`. The player-centric events will contain basic information, such as the player's name, 64-bit Steam ID, etc.
 
 * **ChatMessageEvent**: Occurs when a player sends a chat message
 * **PlayerConnectedEvent**: Occurs when a player joins the server
