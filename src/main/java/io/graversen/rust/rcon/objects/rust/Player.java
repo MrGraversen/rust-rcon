@@ -2,7 +2,7 @@ package io.graversen.rust.rcon.objects.rust;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Player
+public class Player implements ISteamPlayer
 {
     @SerializedName("SteamID")
     private String steamId;
@@ -25,6 +25,7 @@ public class Player
     @SerializedName("Health")
     private double health;
 
+    @Override
     public String getSteamId()
     {
         return steamId;
