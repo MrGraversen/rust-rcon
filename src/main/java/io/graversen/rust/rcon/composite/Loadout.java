@@ -1,10 +1,10 @@
 package io.graversen.rust.rcon.composite;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 
-public class Loadout
+public class Loadout implements Iterable<Item>
 {
     private final String playerName;
     private final List<Item> items;
@@ -25,8 +25,9 @@ public class Loadout
         return playerName;
     }
 
-    public Stream<Item> getItems()
+    @Override
+    public Iterator<Item> iterator()
     {
-        return items.stream();
+        return items.iterator();
     }
 }

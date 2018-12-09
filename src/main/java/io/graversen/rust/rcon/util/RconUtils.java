@@ -7,7 +7,7 @@ public abstract class RconUtils
 {
     public void executeLoadout(IRconClient rconClient, Loadout loadout)
     {
-        loadout.getItems().forEach(
+        loadout.forEach(
                 item -> rconClient.rcon().inventory().giveTo(loadout.getPlayerName(), item.getShortName(), item.getAmount())
         );
     }
