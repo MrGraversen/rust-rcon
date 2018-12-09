@@ -139,7 +139,7 @@ public class ConsoleMessageDigester
         }
         else
         {
-            throw new UnsupportedOperationException("Unsupported World Event");
+            return new WorldEvent(WorldEvent.EventTypes.UNKNOWN);
         }
     }
 

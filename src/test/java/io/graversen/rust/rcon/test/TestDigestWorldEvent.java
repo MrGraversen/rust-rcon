@@ -23,6 +23,13 @@ class TestDigestWorldEvent extends BaseDigesterTest
     }
 
     @Test
+    void test_unknown()
+    {
+        final String eventString = "[event] wubba lubba dub dub";
+        assertEquals(WorldEvent.EventTypes.UNKNOWN, consoleMessageDigester.digestWorldEvent(eventString).getEventType());
+    }
+
+    @Test
     void test_cargoPlane()
     {
         final String eventString = "[event] assets/prefabs/npc/cargo plane/cargo_plane.prefab";

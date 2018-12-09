@@ -20,6 +20,7 @@ public class WorldEvent extends BaseEvent
     {
         CARGO_PLANE,
         CH47_SCIENTISTS,
-        PATROL_HELICOPTER
+        PATROL_HELICOPTER,
+        UNKNOWN
     }
 }
