@@ -9,6 +9,7 @@ public class OxideSupport
 {
     private final String OXIDE_GRANT = "oxide.grant";
     private final String OXIDE_REVOKE = "oxide.revoke";
+    private final String OXIDE_RELOAD = "oxide.reload";
     private final IRconClient rconClient;
 
     public OxideSupport(IRconClient rconClient)
@@ -30,6 +31,16 @@ public class OxideSupport
         final String command = getCommandString(oxidePermissible, OXIDE_REVOKE, player, permission);
 
         rconClient.sendRaw(command);
+    }
+
+    public void reloadAll()
+    {
+        reload("*");
+    }
+
+    public void reload(String pluginName)
+    {
+        final String command = String.format("%s %s", OXIDE_RELOAD, pluginName);
     }
 
     private String getCommandString(IOxidePermissible oxidePermissible, String oxidePrefix, ISteamPlayer player, String permission)
