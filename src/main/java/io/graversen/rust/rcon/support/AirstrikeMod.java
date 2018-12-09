@@ -1,6 +1,7 @@
 package io.graversen.rust.rcon.support;
 
 import io.graversen.rust.rcon.IRconClient;
+import io.graversen.rust.rcon.objects.rust.Player;
 
 public class AirstrikeMod extends BaseModSupport
 {
@@ -50,6 +51,12 @@ public class AirstrikeMod extends BaseModSupport
     public void callStrike(StrikeTypes strikeType, String player)
     {
         final String command = String.format("%s %s %s", BASE_COMMAND, strikeType.name().toLowerCase(), player);
+        rconClient().sendRaw(command);
+    }
+
+    public void callStrike(StrikeTypes strikeType, Player player)
+    {
+        final String command = String.format("%s %s %s", BASE_COMMAND, strikeType.name().toLowerCase(), player.getDisplayName());
         rconClient().sendRaw(command);
     }
 

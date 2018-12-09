@@ -2,6 +2,7 @@ package io.graversen.rust.rcon;
 
 import io.graversen.rust.rcon.listeners.IConsoleListener;
 import io.graversen.rust.rcon.objects.rust.Player;
+import io.graversen.rust.rcon.support.AirstrikeMod;
 
 import java.util.List;
 
@@ -11,8 +12,6 @@ public class RustRcon
     {
         final IRconClient rconClient = RconClient.connect("graversen.io", Constants.rconPassword(), 30204);
         rconClient.attachConsoleListener(consoleListener());
-        List<Player> currentPlayers = rconClient.getCurrentPlayers();
-        System.out.printf("Current Player Count: %d\n", currentPlayers.size());
 //
 //        rconClient.rcon().inventory().giveTo("doctor delete", "stones", 100000000);
 //        rconClient.rcon().inventory().giveTo("doctor delete", "metal.refined", 100000000);
@@ -33,6 +32,10 @@ public class RustRcon
 //
 //        rconClient.rcon().ownerId("76561197979952036", "MARTIN", "CHEATER ADMIN");
 //        rconClient.rcon().writeConfig();
+
+//        final AirstrikeMod airstrikeMod = new AirstrikeMod(rconClient);
+//        airstrikeMod.callStrikeRandom(AirstrikeMod.StrikeTypes.STRIKE);
+//        airstrikeMod.callStrikeRandom(AirstrikeMod.StrikeTypes.STRIKE);
     }
 
     private static IConsoleListener consoleListener()
