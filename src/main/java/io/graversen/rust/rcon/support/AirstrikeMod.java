@@ -3,7 +3,7 @@ package io.graversen.rust.rcon.support;
 import io.graversen.rust.rcon.IRconClient;
 import io.graversen.rust.rcon.objects.rust.Player;
 
-public class AirstrikeMod extends BaseModSupport
+public class AirstrikeMod extends BaseModSupport implements IOxidePermissible
 {
     private final String BASE_COMMAND = "airstrike";
 
@@ -58,6 +58,12 @@ public class AirstrikeMod extends BaseModSupport
     {
         final String command = String.format("%s %s %s", BASE_COMMAND, strikeType.name().toLowerCase(), player.getDisplayName());
         rconClient().sendRaw(command);
+    }
+
+    @Override
+    public String baseName()
+    {
+        return "airstrike";
     }
 
     public enum StrikeTypes
