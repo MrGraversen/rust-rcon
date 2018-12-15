@@ -1,6 +1,7 @@
 package io.graversen.rust.rcon;
 
 import com.google.gson.Gson;
+import io.graversen.rust.rcon.objects.util.Weather;
 
 class Rcon
 {
@@ -70,6 +71,12 @@ class Rcon
     public void setTime(int hour)
     {
         final String command = String.format("env.time %d", hour);
+        rconClient.sendRaw(command);
+    }
+
+    public void setWeatherProbability(Weather weather, int probability)
+    {
+        final String command = String.format("weather.%s %d", weather.name().toLowerCase(), probability);
         rconClient.sendRaw(command);
     }
 
