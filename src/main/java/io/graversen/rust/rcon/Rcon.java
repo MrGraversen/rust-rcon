@@ -213,5 +213,11 @@ class Rcon
             final String command = String.format("server.radiation %s", String.valueOf(enabled));
             rconClient.sendRaw(command);
         }
+
+        public void setGlobalChatEnabled(boolean enabled)
+        {
+            final String command = String.format("server.globalchat %d", enabled ? 1 : 0);
+            rconClient.sendRaw(command);
+        }
     }
 }
