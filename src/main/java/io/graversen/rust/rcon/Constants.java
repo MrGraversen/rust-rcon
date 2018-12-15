@@ -4,11 +4,16 @@ import io.graversen.trunk.io.IOUtils;
 
 public class Constants
 {
-    private static final IOUtils ioUtils = IOUtils.automaticProjectName();
+    private static final IOUtils ioUtils = new IOUtils(".rustrcon");
 
     private Constants()
     {
 
+    }
+
+    public static String projectName()
+    {
+        return "Rust RCON";
     }
 
     public static String rconPassword()

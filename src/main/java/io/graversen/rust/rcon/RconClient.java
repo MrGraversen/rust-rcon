@@ -184,7 +184,7 @@ public class RconClient extends WebSocketClient implements IRconClient
     private void printLog(String logText, Object... args)
     {
         final String formattedLogText = String.format(logText, args);
-        System.out.println(String.format("[RconClient]: %s", formattedLogText));
+        System.out.println(String.format("[%s]: %s", Constants.projectName(), formattedLogText));
     }
 
     private void printCommand(String command)
