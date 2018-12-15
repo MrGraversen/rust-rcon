@@ -3,7 +3,7 @@ package io.graversen.rust.rcon;
 import com.google.gson.Gson;
 import io.graversen.rust.rcon.objects.util.Weather;
 
-class Rcon
+public class Rcon
 {
     private final IRconClient rconClient;
     private final Gson gson;
@@ -80,6 +80,17 @@ class Rcon
         rconClient.sendRaw(command);
     }
 
+    public void say(String message)
+    {
+        final String command = String.format("say %s", message);
+        rconClient.sendRaw(command);
+    }
+
+    public void say(String message, String... args)
+    {
+        say(String.format(message, args));
+    }
+
     public InventoryRcon inventory()
     {
         return inventoryRcon;
@@ -121,7 +132,7 @@ class Rcon
         }
     }
 
-    class AiRcon
+    public class AiRcon
     {
         public void think(boolean think)
         {
@@ -136,7 +147,7 @@ class Rcon
         }
     }
 
-    class EventRcon
+    public class EventRcon
     {
         public void airDrop()
         {
@@ -176,7 +187,7 @@ class Rcon
         }
     }
 
-    class SettingsRcon
+    public class SettingsRcon
     {
         public void disableDecay()
         {
