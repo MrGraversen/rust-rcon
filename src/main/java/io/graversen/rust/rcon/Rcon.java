@@ -2,7 +2,7 @@ package io.graversen.rust.rcon;
 
 import com.google.gson.Gson;
 
-public class Rcon
+class Rcon
 {
     private final IRconClient rconClient;
     private final Gson gson;
@@ -114,7 +114,7 @@ public class Rcon
         }
     }
 
-    public class AiRcon
+    class AiRcon
     {
         public void think(boolean think)
         {
@@ -129,7 +129,7 @@ public class Rcon
         }
     }
 
-    public class EventRcon
+    class EventRcon
     {
         public void airDrop()
         {
@@ -169,7 +169,7 @@ public class Rcon
         }
     }
 
-    public class SettingsRcon
+    class SettingsRcon
     {
         public void disableDecay()
         {
