@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 public class TestParseSaveEvent extends BaseDefaultParserTest
 {
-    private final String EVENT_STRING = "Saving complete";
+    private static final String EVENT_STRING = "Saving complete";
 
     @Test
     void test_validation()

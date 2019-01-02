@@ -5,7 +5,7 @@ import io.graversen.rust.rcon.objects.rust.Player;
 
 public class AirstrikeMod extends BaseModSupport implements IOxidePermissible
 {
-    private final String BASE_COMMAND = "airstrike";
+    private static final String BASE_COMMAND = "airstrike";
 
     public AirstrikeMod(IRconClient rconClient)
     {

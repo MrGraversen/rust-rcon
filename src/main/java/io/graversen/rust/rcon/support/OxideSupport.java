@@ -7,9 +7,10 @@ import java.util.Arrays;
 
 public class OxideSupport
 {
-    private final String OXIDE_GRANT = "oxide.grant";
-    private final String OXIDE_REVOKE = "oxide.revoke";
-    private final String OXIDE_RELOAD = "oxide.reload";
+    private static final String OXIDE_GRANT = "oxide.grant";
+    private static final String OXIDE_REVOKE = "oxide.revoke";
+    private static final String OXIDE_RELOAD = "oxide.reload";
+
     private final IRconClient rconClient;
 
     public OxideSupport(IRconClient rconClient)

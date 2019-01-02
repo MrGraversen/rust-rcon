@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestParsePlayerSpawnedEvent extends BaseDefaultParserTest
 {
-    private final String[] playerSpawnedMessages = {
+    private static final String[] playerSpawnedMessages = {
             "DarkDouchebag[1014803/76561198046357656] has entered the game"
     };
 

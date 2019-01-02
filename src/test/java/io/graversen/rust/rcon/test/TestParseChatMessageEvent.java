@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestParseChatMessageEvent extends BaseDefaultParserTest
 {
-    private final String[] chatMessages = {
+    private static final String[] chatMessages = {
             "[CHAT] Pope of the Nope[468295/76561197979952036] : ssss",
             "[CHAT] DarkDouchebag[1014803/76561198046357656] : Don't know waht to write :o",
             "[CHAT] DarkDouchebag[1014803/76561198046357656] : [Server] Kan jo ikke huske hvordan den laver det",

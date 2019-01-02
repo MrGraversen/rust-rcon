@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestParsePlayerConnectedEvent extends BaseDefaultParserTest
 {
-    private final String[] connectMessages = {
+    private static final String[] connectMessages = {
             "82.102.20.179:52298/76561197979952036/Pope of the Nope joined [windows/76561197979952036]",
             "79.193.40.58:55162/76561198845816557/m_7o7 joined [linux/76561198845816557]",
             "92.171.193.37:52278/76561198063601715/Orion (EN/FR/ES) joined [windows/76561198063601715]"

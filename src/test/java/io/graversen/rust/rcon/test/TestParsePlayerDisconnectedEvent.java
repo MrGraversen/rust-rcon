@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestParsePlayerDisconnectedEvent extends BaseDefaultParserTest
 {
-    private final String[] disconnectMessages = {
+    private static final String[] disconnectMessages = {
             "82.102.20.168:53998/76561197979952036/Doctor Delete disconnecting: closing",
             "82.102.20.179:61714/76561197979952036/Pope of the Nope disconnecting: closing",
             "130.225.244.179:64745/76561198046357656/DarkDouchebag disconnecting: closing",

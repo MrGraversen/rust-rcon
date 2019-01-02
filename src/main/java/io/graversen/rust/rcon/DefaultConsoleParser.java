@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 
 public class DefaultConsoleParser
 {
-    private final Pattern squareBracketInsideMatcher = Pattern.compile("\\[(.*?)\\]");
-    private final Pattern squareBracketOutsideMatcher = Pattern.compile("\\](.*?)\\[");
+    private static final Pattern squareBracketInsideMatcher = Pattern.compile("\\[(.*?)\\]");
+    private static final Pattern squareBracketOutsideMatcher = Pattern.compile("\\](.*?)\\[");
 
     public Optional<RconMessages> parse(String consoleInput)
     {
