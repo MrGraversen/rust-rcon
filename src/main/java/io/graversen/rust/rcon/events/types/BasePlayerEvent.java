@@ -1,8 +1,6 @@
 package io.graversen.rust.rcon.events.types;
 
-import io.graversen.fiber.event.common.BaseEvent;
-
-public abstract class BasePlayerEvent extends BaseEvent
+public abstract class BasePlayerEvent extends BaseRustEvent
 {
     private final String playerName;
     private final String steamId64;

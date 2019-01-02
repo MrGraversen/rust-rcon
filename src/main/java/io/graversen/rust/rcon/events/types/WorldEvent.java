@@ -1,8 +1,6 @@
 package io.graversen.rust.rcon.events.types;
 
-import io.graversen.fiber.event.common.BaseEvent;
-
-public class WorldEvent extends BaseEvent
+public class WorldEvent extends BaseRustEvent
 {
     private final EventTypes eventType;
 
