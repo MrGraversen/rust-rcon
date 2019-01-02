@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestDigestPlayerConnectedEvent extends BaseDigesterTest
+class TestParsePlayerConnectedEvent extends BaseDefaultParserTest
 {
     private final String[] connectMessages = {
             "82.102.20.179:52298/76561197979952036/Pope of the Nope joined [windows/76561197979952036]",

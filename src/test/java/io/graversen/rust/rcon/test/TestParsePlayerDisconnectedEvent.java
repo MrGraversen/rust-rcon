@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestDigestPlayerDisconnectedEvent extends BaseDigesterTest
+class TestParsePlayerDisconnectedEvent extends BaseDefaultParserTest
 {
     private final String[] disconnectMessages = {
             "82.102.20.168:53998/76561197979952036/Doctor Delete disconnecting: closing",

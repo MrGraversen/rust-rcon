@@ -2,11 +2,11 @@ package io.graversen.rust.rcon.test;
 
 import io.graversen.rust.rcon.DefaultConsoleParser;
 
-abstract class BaseDigesterTest
+abstract class BaseDefaultParserTest
 {
     final DefaultConsoleParser defaultConsoleParser;
 
-    BaseDigesterTest()
+    BaseDefaultParserTest()
     {
         this.defaultConsoleParser = new DefaultConsoleParser();
     }

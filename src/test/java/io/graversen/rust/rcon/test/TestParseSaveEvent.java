@@ -5,7 +5,7 @@ import io.graversen.rust.rcon.events.SaveEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class TestDigestSaveEvent extends BaseDigesterTest
+public class TestParseSaveEvent extends BaseDefaultParserTest
 {
     private final String EVENT_STRING = "Saving complete";
 

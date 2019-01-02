@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestDigestWorldEvent extends BaseDigesterTest
+class TestParseWorldEvent extends BaseDefaultParserTest
 {
     @Test
     void test_validation()
