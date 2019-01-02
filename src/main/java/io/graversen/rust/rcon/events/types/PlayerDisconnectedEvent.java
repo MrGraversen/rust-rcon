@@ -1,4 +1,4 @@
-package io.graversen.rust.rcon.events;
+package io.graversen.rust.rcon.events.types;
 
 public class PlayerDisconnectedEvent extends BasePlayerEvent
 {

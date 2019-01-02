@@ -1,7 +1,7 @@
 package io.graversen.rust.rcon.test;
 
 import io.graversen.rust.rcon.RconMessages;
-import io.graversen.rust.rcon.events.SaveEvent;
+import io.graversen.rust.rcon.events.types.SaveEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

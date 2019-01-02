@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon;
 
-import io.graversen.rust.rcon.events.*;
+import io.graversen.rust.rcon.events.types.*;
 import io.graversen.rust.rcon.util.Utils;
 
 import java.util.ArrayList;

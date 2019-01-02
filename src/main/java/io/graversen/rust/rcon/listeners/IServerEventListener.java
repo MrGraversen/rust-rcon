@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.listeners;
 
-import io.graversen.rust.rcon.events.*;
+import io.graversen.rust.rcon.events.types.*;
 
 public interface IServerEventListener
 {

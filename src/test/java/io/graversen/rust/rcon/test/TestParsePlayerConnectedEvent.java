@@ -1,7 +1,7 @@
 package io.graversen.rust.rcon.test;
 
 import io.graversen.rust.rcon.RconMessages;
-import io.graversen.rust.rcon.events.PlayerConnectedEvent;
+import io.graversen.rust.rcon.events.types.PlayerConnectedEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

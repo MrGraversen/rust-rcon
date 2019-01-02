@@ -1,4 +1,4 @@
-package io.graversen.rust.rcon.events;
+package io.graversen.rust.rcon.events.types;
 
 import io.graversen.fiber.event.common.BaseEvent;
 

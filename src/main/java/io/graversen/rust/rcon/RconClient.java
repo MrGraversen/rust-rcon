@@ -3,7 +3,7 @@ package io.graversen.rust.rcon;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import io.graversen.rust.rcon.events.*;
+import io.graversen.rust.rcon.events.types.*;
 import io.graversen.rust.rcon.listeners.IConsoleListener;
 import io.graversen.rust.rcon.listeners.IServerEventListener;
 import io.graversen.rust.rcon.objects.rust.Player;
