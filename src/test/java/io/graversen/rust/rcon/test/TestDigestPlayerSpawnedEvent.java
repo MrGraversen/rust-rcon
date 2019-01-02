@@ -17,13 +17,13 @@ class TestDigestPlayerSpawnedEvent extends BaseDigesterTest
     @Test
     void test_validation()
     {
-        Arrays.stream(playerSpawnedMessages).forEach(s -> consoleMessageDigester.validateEvent(s, RconMessages.PLAYER_SPAWNED));
+        Arrays.stream(playerSpawnedMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessages.PLAYER_SPAWNED));
     }
 
     @Test
     void test_findCorrectInfo_1()
     {
-        final PlayerSpawnedEvent playerSpawnedEvent = consoleMessageDigester.digestPlayerSpawnedEvent(playerSpawnedMessages[0]);
+        final PlayerSpawnedEvent playerSpawnedEvent = defaultConsoleParser.parserPlayerSpawnedEvent(playerSpawnedMessages[0]);
 
         assertEquals("DarkDouchebag", playerSpawnedEvent.getPlayerName());
         assertEquals("76561198046357656", playerSpawnedEvent.getSteamId64());

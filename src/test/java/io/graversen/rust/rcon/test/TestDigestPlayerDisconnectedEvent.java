@@ -20,13 +20,13 @@ class TestDigestPlayerDisconnectedEvent extends BaseDigesterTest
     @Test
     void test_validation()
     {
-        Arrays.stream(disconnectMessages).forEach(s -> consoleMessageDigester.validateEvent(s, RconMessages.PLAYER_DISCONNECTED));
+        Arrays.stream(disconnectMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessages.PLAYER_DISCONNECTED));
     }
 
     @Test
     void test_findCorrectInfo_1()
     {
-        final PlayerDisconnectedEvent playerDisconnectedEvent = consoleMessageDigester.digestPlayerDisconnectedEvent(disconnectMessages[0]);
+        final PlayerDisconnectedEvent playerDisconnectedEvent = defaultConsoleParser.parsePlayerDisconnectedEvent(disconnectMessages[0]);
 
         assertEquals("Doctor Delete", playerDisconnectedEvent.getPlayerName());
         assertEquals("closing", playerDisconnectedEvent.getReason());

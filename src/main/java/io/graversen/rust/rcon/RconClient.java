@@ -34,7 +34,7 @@ public class RconClient extends WebSocketClient implements IRconClient
     private final List<IServerEventListener> serverEventListeners;
     private final Map<Integer, CompletableFuture<WsIngoingObject>> asyncRequests;
 
-    private final ConsoleMessageDigester consoleMessageDigester;
+    private final DefaultConsoleParser defaultConsoleParser;
 
     private RconClient(URI uri)
     {
@@ -49,7 +49,7 @@ public class RconClient extends WebSocketClient implements IRconClient
         this.consoleListeners = new ArrayList<>();
         this.serverEventListeners = new ArrayList<>();
         this.asyncRequests = new ConcurrentHashMap<>();
-        this.consoleMessageDigester = new ConsoleMessageDigester();
+        this.defaultConsoleParser = new DefaultConsoleParser();
 
         printLog("Initialized: %s", connectionTuple);
     }
@@ -219,7 +219,7 @@ public class RconClient extends WebSocketClient implements IRconClient
         {
             final Optional<WsIngoingObject> wsObjectOptional = tryDeserialize(consoleMessage);
             wsObjectOptional.ifPresent(
-                    wsOutgoingObject -> consoleMessageDigester.digest(consoleMessage).ifPresent(propagateConsoleDigest(consoleMessage))
+                    wsOutgoingObject -> defaultConsoleParser.parse(consoleMessage).ifPresent(propagateConsoleDigest(consoleMessage))
             );
         };
     }
@@ -233,23 +233,23 @@ public class RconClient extends WebSocketClient implements IRconClient
                 switch (consoleDigest)
                 {
                     case CHAT:
-                        final ChatMessageEvent chatMessageEvent = consoleMessageDigester.digestChatMessageEvent(consoleMessage);
+                        final ChatMessageEvent chatMessageEvent = defaultConsoleParser.parseChatMessageEvent(consoleMessage);
                         serverEventListeners.forEach(serverEventListener -> serverEventListener.onChatMessage(chatMessageEvent));
                         break;
                     case PLAYER_CONNECTED:
-                        final PlayerConnectedEvent playerConnectedEvent = consoleMessageDigester.digestPlayerConnectedEvent(consoleMessage);
+                        final PlayerConnectedEvent playerConnectedEvent = defaultConsoleParser.parsePlayerConnectedEvent(consoleMessage);
                         serverEventListeners.forEach(serverEventListener -> serverEventListener.onPlayerConnected(playerConnectedEvent));
                         break;
                     case PLAYER_DISCONNECTED:
-                        final PlayerDisconnectedEvent playerDisconnectedEvent = consoleMessageDigester.digestPlayerDisconnectedEvent(consoleMessage);
+                        final PlayerDisconnectedEvent playerDisconnectedEvent = defaultConsoleParser.parsePlayerDisconnectedEvent(consoleMessage);
                         serverEventListeners.forEach(serverEventListener -> serverEventListener.onPlayerDisconnected(playerDisconnectedEvent));
                         break;
                     case PLAYER_DEATH:
-                        final PlayerDeathEvent playerDeathEvent = consoleMessageDigester.digestPlayerDeathEvent(consoleMessage);
+                        final PlayerDeathEvent playerDeathEvent = defaultConsoleParser.parsePlayerDeathEvent(consoleMessage);
                         serverEventListeners.forEach(serverEventListener -> serverEventListener.onPlayerDeath(playerDeathEvent));
                         break;
                     case WORLD_EVENT:
-                        final WorldEvent worldEvent = consoleMessageDigester.digestWorldEvent(consoleMessage);
+                        final WorldEvent worldEvent = defaultConsoleParser.parseWorldEvent(consoleMessage);
                         serverEventListeners.forEach(serverEventListener -> serverEventListener.onWorldEvent(worldEvent));
                         break;
                 }

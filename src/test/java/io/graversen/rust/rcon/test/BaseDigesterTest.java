@@ -1,13 +1,13 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.ConsoleMessageDigester;
+import io.graversen.rust.rcon.DefaultConsoleParser;
 
 abstract class BaseDigesterTest
 {
-    final ConsoleMessageDigester consoleMessageDigester;
+    final DefaultConsoleParser defaultConsoleParser;
 
     BaseDigesterTest()
     {
-        this.consoleMessageDigester = new ConsoleMessageDigester();
+        this.defaultConsoleParser = new DefaultConsoleParser();
     }
 }

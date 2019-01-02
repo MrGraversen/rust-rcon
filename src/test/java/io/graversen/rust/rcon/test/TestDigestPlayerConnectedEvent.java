@@ -19,13 +19,13 @@ class TestDigestPlayerConnectedEvent extends BaseDigesterTest
     @Test
     void test_validation()
     {
-        Arrays.stream(connectMessages).forEach(s -> consoleMessageDigester.validateEvent(s, RconMessages.PLAYER_CONNECTED));
+        Arrays.stream(connectMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessages.PLAYER_CONNECTED));
     }
 
     @Test
     void test_findCorrectInfo_1()
     {
-        final PlayerConnectedEvent playerConnectedEvent = consoleMessageDigester.digestPlayerConnectedEvent(connectMessages[0]);
+        final PlayerConnectedEvent playerConnectedEvent = defaultConsoleParser.parsePlayerConnectedEvent(connectMessages[0]);
 
         assertEquals("Pope of the Nope", playerConnectedEvent.getPlayerName());
         assertEquals("windows", playerConnectedEvent.getOsDescriptor());
@@ -36,7 +36,7 @@ class TestDigestPlayerConnectedEvent extends BaseDigesterTest
     @Test
     void test_findCorrectInfo_2()
     {
-        final PlayerConnectedEvent playerConnectedEvent = consoleMessageDigester.digestPlayerConnectedEvent(connectMessages[2]);
+        final PlayerConnectedEvent playerConnectedEvent = defaultConsoleParser.parsePlayerConnectedEvent(connectMessages[2]);
 
         assertEquals("Orion (EN/FR/ES)", playerConnectedEvent.getPlayerName());
         assertEquals("windows", playerConnectedEvent.getOsDescriptor());

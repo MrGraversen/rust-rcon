@@ -12,13 +12,13 @@ public class TestDigestSaveEvent extends BaseDigesterTest
     @Test
     void test_validation()
     {
-        consoleMessageDigester.validateEvent(EVENT_STRING, RconMessages.SAVE_EVENT);
+        defaultConsoleParser.validateEvent(EVENT_STRING, RconMessages.SAVE_EVENT);
     }
 
     @Test
     void test_parse()
     {
-        final SaveEvent saveEvent = consoleMessageDigester.digestSaveEvent(EVENT_STRING);
+        final SaveEvent saveEvent = defaultConsoleParser.parseSaveEvent(EVENT_STRING);
         Assertions.assertNotNull(saveEvent);
     }
 }

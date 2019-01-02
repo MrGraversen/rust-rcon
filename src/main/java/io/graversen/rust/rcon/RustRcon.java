@@ -3,6 +3,7 @@ package io.graversen.rust.rcon;
 import io.graversen.rust.rcon.listeners.IConsoleListener;
 import io.graversen.rust.rcon.objects.rust.Player;
 import io.graversen.rust.rcon.support.AirstrikeMod;
+import io.graversen.rust.rcon.util.Colors;
 
 import java.util.List;
 
@@ -12,8 +13,9 @@ public class RustRcon
     {
         final IRconClient rconClient = RconClient.connect("graversen.io", Constants.rconPassword(), 30204);
         rconClient.attachConsoleListener(consoleListener());
+//        rconClient.rcon().say("%s %s %s", "hej", Colors.blue("med"), Colors.green("dig"));
 //
-//        rconClient.rcon().inventory().giveTo("doctor delete", "stones", 100000000);
+        rconClient.rcon().inventory().giveTo("doctor delete", "stones", 100000000);
 //        rconClient.rcon().inventory().giveTo("doctor delete", "metal.refined", 100000000);
 //        rconClient.rcon().inventory().giveTo("doctor delete", "metal.fragments", 100000000);
 //        rconClient.rcon().inventory().giveTo("doctor delete", "wood", 100000000);

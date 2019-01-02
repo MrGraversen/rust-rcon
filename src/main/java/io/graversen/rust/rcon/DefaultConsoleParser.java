@@ -10,24 +10,24 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ConsoleMessageDigester
+public class DefaultConsoleParser
 {
     private final Pattern squareBracketInsideMatcher = Pattern.compile("\\[(.*?)\\]");
     private final Pattern squareBracketOutsideMatcher = Pattern.compile("\\](.*?)\\[");
 
-    public Optional<RconMessages> digest(String consoleInput)
+    public Optional<RconMessages> parse(String consoleInput)
     {
         return Arrays.stream(RconMessages.values())
                 .filter(rconMessage -> deepMatches(consoleInput, rconMessage))
                 .findFirst();
     }
 
-    public SaveEvent digestSaveEvent(String consoleInput)
+    public SaveEvent parseSaveEvent(String consoleInput)
     {
         return new SaveEvent();
     }
 
-    public ChatMessageEvent digestChatMessageEvent(String consoleInput)
+    public ChatMessageEvent parseChatMessageEvent(String consoleInput)
     {
         validateEvent(consoleInput, RconMessages.CHAT);
 
@@ -57,7 +57,7 @@ public class ConsoleMessageDigester
         return new ChatMessageEvent(playerName, steamId64, chatMessage);
     }
 
-    public PlayerConnectedEvent digestPlayerConnectedEvent(String consoleInput)
+    public PlayerConnectedEvent parsePlayerConnectedEvent(String consoleInput)
     {
         validateEvent(consoleInput, RconMessages.PLAYER_CONNECTED);
 
@@ -77,7 +77,7 @@ public class ConsoleMessageDigester
         return new PlayerConnectedEvent(connectionTuple, osDescriptor, steamId64, playerName);
     }
 
-    public PlayerDeathEvent digestPlayerDeathEvent(String consoleInput)
+    public PlayerDeathEvent parsePlayerDeathEvent(String consoleInput)
     {
         // [4267870/8141844] was killed by Jiji[3831334/76561198189196679]
         // UnknOwn  csgolive.com[9460039/76561198104761939] was killed by Doctor Delete[9126388/76561197979952036]
@@ -90,7 +90,7 @@ public class ConsoleMessageDigester
         throw new UnsupportedOperationException();
     }
 
-    public PlayerDisconnectedEvent digestPlayerDisconnectedEvent(String consoleInput)
+    public PlayerDisconnectedEvent parsePlayerDisconnectedEvent(String consoleInput)
     {
         validateEvent(consoleInput, RconMessages.PLAYER_DISCONNECTED);
 
@@ -105,7 +105,7 @@ public class ConsoleMessageDigester
         return new PlayerDisconnectedEvent(ipAddress, steamId64, playerName, reason);
     }
 
-    public PlayerSpawnedEvent digestPlayerSpawnedEvent(String consoleInput)
+    public PlayerSpawnedEvent parserPlayerSpawnedEvent(String consoleInput)
     {
         validateEvent(consoleInput, RconMessages.PLAYER_SPAWNED);
 
@@ -123,7 +123,7 @@ public class ConsoleMessageDigester
         return new PlayerSpawnedEvent(playerName, steamId64);
     }
 
-    public WorldEvent digestWorldEvent(String consoleInput)
+    public WorldEvent parseWorldEvent(String consoleInput)
     {
         if (consoleInput.equalsIgnoreCase("[event] assets/prefabs/npc/cargo plane/cargo_plane.prefab"))
         {
@@ -145,7 +145,7 @@ public class ConsoleMessageDigester
 
     public void validateEvent(String consoleInput, RconMessages consoleDigest)
     {
-        digest(consoleInput)
+        parse(consoleInput)
                 .filter(c -> c.equals(consoleDigest))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid event type for console input"));
     }

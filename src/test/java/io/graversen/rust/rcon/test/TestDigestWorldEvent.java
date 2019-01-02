@@ -19,34 +19,34 @@ class TestDigestWorldEvent extends BaseDigesterTest
                 "[event] assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab"
         };
 
-        Arrays.stream(eventMessages).forEach(s -> consoleMessageDigester.validateEvent(s, RconMessages.WORLD_EVENT));
+        Arrays.stream(eventMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessages.WORLD_EVENT));
     }
 
     @Test
     void test_unknown()
     {
         final String eventString = "[event] wubba lubba dub dub";
-        assertEquals(WorldEvent.EventTypes.UNKNOWN, consoleMessageDigester.digestWorldEvent(eventString).getEventType());
+        assertEquals(WorldEvent.EventTypes.UNKNOWN, defaultConsoleParser.parseWorldEvent(eventString).getEventType());
     }
 
     @Test
     void test_cargoPlane()
     {
         final String eventString = "[event] assets/prefabs/npc/cargo plane/cargo_plane.prefab";
-        assertEquals(WorldEvent.EventTypes.CARGO_PLANE, consoleMessageDigester.digestWorldEvent(eventString).getEventType());
+        assertEquals(WorldEvent.EventTypes.CARGO_PLANE, defaultConsoleParser.parseWorldEvent(eventString).getEventType());
     }
 
     @Test
     void test_ch47()
     {
         final String eventString = "[event] assets/prefabs/npc/ch47/ch47scientists.entity.prefab";
-        assertEquals(WorldEvent.EventTypes.CH47_SCIENTISTS, consoleMessageDigester.digestWorldEvent(eventString).getEventType());
+        assertEquals(WorldEvent.EventTypes.CH47_SCIENTISTS, defaultConsoleParser.parseWorldEvent(eventString).getEventType());
     }
 
     @Test
     void test_patrolHelicopter()
     {
         final String eventString = "[event] assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab";
-        assertEquals(WorldEvent.EventTypes.PATROL_HELICOPTER, consoleMessageDigester.digestWorldEvent(eventString).getEventType());
+        assertEquals(WorldEvent.EventTypes.PATROL_HELICOPTER, defaultConsoleParser.parseWorldEvent(eventString).getEventType());
     }
 }

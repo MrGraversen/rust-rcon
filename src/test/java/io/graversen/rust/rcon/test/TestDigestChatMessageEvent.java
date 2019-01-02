@@ -23,13 +23,13 @@ class TestDigestChatMessageEvent extends BaseDigesterTest
     @Test
     void test_validation()
     {
-        Arrays.stream(chatMessages).forEach(s -> consoleMessageDigester.validateEvent(s, RconMessages.CHAT));
+        Arrays.stream(chatMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessages.CHAT));
     }
 
     @Test
     void test_findCorrectInfo_1()
     {
-        final ChatMessageEvent chatMessageEvent = consoleMessageDigester.digestChatMessageEvent(chatMessages[0]);
+        final ChatMessageEvent chatMessageEvent = defaultConsoleParser.parseChatMessageEvent(chatMessages[0]);
 
         assertEquals("ssss", chatMessageEvent.getChatMessage());
         assertEquals("Pope of the Nope", chatMessageEvent.getPlayerName());
@@ -39,7 +39,7 @@ class TestDigestChatMessageEvent extends BaseDigesterTest
     @Test
     void test_findCorrectInfo_2()
     {
-        final ChatMessageEvent chatMessageEvent = consoleMessageDigester.digestChatMessageEvent(chatMessages[1]);
+        final ChatMessageEvent chatMessageEvent = defaultConsoleParser.parseChatMessageEvent(chatMessages[1]);
 
         assertEquals("Don't know waht to write :o", chatMessageEvent.getChatMessage());
         assertEquals("DarkDouchebag", chatMessageEvent.getPlayerName());
@@ -49,7 +49,7 @@ class TestDigestChatMessageEvent extends BaseDigesterTest
     @Test
     void test_findCorrectInfo_3()
     {
-        final ChatMessageEvent chatMessageEvent = consoleMessageDigester.digestChatMessageEvent(chatMessages[3]);
+        final ChatMessageEvent chatMessageEvent = defaultConsoleParser.parseChatMessageEvent(chatMessages[3]);
 
         assertEquals("[DarkDouchebag] [Server] Hello mate", chatMessageEvent.getChatMessage());
         assertEquals("DarkDouchebag", chatMessageEvent.getPlayerName());
@@ -59,7 +59,7 @@ class TestDigestChatMessageEvent extends BaseDigesterTest
     @Test
     void test_findCorrectInfo_4()
     {
-        final ChatMessageEvent chatMessageEvent = consoleMessageDigester.digestChatMessageEvent(chatMessages[5]);
+        final ChatMessageEvent chatMessageEvent = defaultConsoleParser.parseChatMessageEvent(chatMessages[5]);
 
         assertEquals("[CHAT] dont know hwat to write \\:o :o", chatMessageEvent.getChatMessage());
         assertEquals("DarkDouchebag", chatMessageEvent.getPlayerName());
@@ -69,7 +69,7 @@ class TestDigestChatMessageEvent extends BaseDigesterTest
     @Test
     void test_findCorrectInfo_5()
     {
-        final ChatMessageEvent chatMessageEvent = consoleMessageDigester.digestChatMessageEvent(chatMessages[6]);
+        final ChatMessageEvent chatMessageEvent = defaultConsoleParser.parseChatMessageEvent(chatMessages[6]);
 
         assertEquals("This message : will not work : haha", chatMessageEvent.getChatMessage());
         assertEquals("DarkDouchebag", chatMessageEvent.getPlayerName());
