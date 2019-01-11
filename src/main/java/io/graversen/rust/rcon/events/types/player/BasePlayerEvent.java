@@ -1,4 +1,6 @@
-package io.graversen.rust.rcon.events.types;
+package io.graversen.rust.rcon.events.types.player;
+
+import io.graversen.rust.rcon.events.types.BaseRustEvent;
 
 public abstract class BasePlayerEvent extends BaseRustEvent
 {

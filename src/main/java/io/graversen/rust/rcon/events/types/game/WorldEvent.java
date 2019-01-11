@@ -1,6 +1,6 @@
-package io.graversen.rust.rcon.events.types;
+package io.graversen.rust.rcon.events.types.game;
 
-public class WorldEvent extends BaseRustEvent
+public class WorldEvent extends BaseGameEvent
 {
     private final EventTypes eventType;
 
