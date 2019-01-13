@@ -2,32 +2,24 @@ package io.graversen.rust.rcon.events;
 
 import io.graversen.fiber.event.bus.IEventBus;
 import io.graversen.fiber.event.listeners.IEventListener;
-import io.graversen.rust.rcon.IRconClient;
 import io.graversen.rust.rcon.RconMessages;
 import io.graversen.rust.rcon.events.types.BaseRustEvent;
 
-import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class RconEvents
 {
-    private final IRconClient rconClient;
     private final IEventBus eventBus;
-    private final ConcurrentMap<RconMessages, IEventParser<? extends BaseRustEvent>> eventParsers;
-    private final ConcurrentMap<Class<? extends BaseRustEvent>, IEventListener<? extends BaseRustEvent>> eventListeners;
+    private final ConcurrentMap<RconMessages, IEventParser<?>> eventParsers;
+    private final ConcurrentMap<Class<?>, IEventListener<?>> eventListeners;
 
-    private RconEvents(IRconClient rconClient, IEventBus eventBus)
+    public RconEvents(IEventBus eventBus)
     {
-        this.rconClient = rconClient;
         this.eventBus = eventBus;
         this.eventParsers = new ConcurrentHashMap<>();
         this.eventListeners = new ConcurrentHashMap<>();
-    }
-
-    public static RconEvents using(IRconClient rconClient, IEventBus eventBus)
-    {
-        return new RconEvents(rconClient, eventBus);
     }
 
     public <T extends BaseRustEvent> void parse(RconMessages rconMessage, IEventParser<T> eventParser)
@@ -35,8 +27,20 @@ public class RconEvents
         eventParsers.putIfAbsent(rconMessage, eventParser);
     }
 
-    public <T extends BaseRustEvent> void listen(Class<T> eventClass, IEventListener<T>... eventListeners)
+    public <T extends BaseRustEvent> void listen(Class<T> eventClass, IEventListener<T> eventListener)
     {
-        Arrays.stream(eventListeners).forEach(eventListener -> this.eventListeners.putIfAbsent(eventClass, eventListener));
+        this.eventListeners.putIfAbsent(eventClass, eventListener);
+    }
+
+    public <T extends BaseRustEvent> Optional<IEventParser<T>> eventParser(RconMessages rconMessage)
+    {
+        final IEventParser<T> eventParserOrNull = (IEventParser<T>) eventParsers.getOrDefault(rconMessage, null);
+        return Optional.ofNullable(eventParserOrNull);
+    }
+
+    public <T extends BaseRustEvent> Optional<IEventListener<T>> eventListener(Class<T> eventClass)
+    {
+        final IEventListener<T> eventListenerOrNull = (IEventListener<T>) eventListeners.getOrDefault(eventClass, null);
+        return Optional.ofNullable(eventListenerOrNull);
     }
 }
