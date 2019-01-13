@@ -3,7 +3,11 @@ package io.graversen.rust.rcon;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import io.graversen.rust.rcon.events.types.*;
+import io.graversen.rust.rcon.events.types.game.WorldEvent;
+import io.graversen.rust.rcon.events.types.player.ChatMessageEvent;
+import io.graversen.rust.rcon.events.types.player.PlayerConnectedEvent;
+import io.graversen.rust.rcon.events.types.player.PlayerDeathEvent;
+import io.graversen.rust.rcon.events.types.player.PlayerDisconnectedEvent;
 import io.graversen.rust.rcon.listeners.IConsoleListener;
 import io.graversen.rust.rcon.listeners.IServerEventListener;
 import io.graversen.rust.rcon.objects.rust.Player;
@@ -21,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class RconClient extends WebSocketClient implements IRconClient
+public class RconClient extends WebSocketClient implements IRconClient, AutoCloseable
 {
     private static final int DEFAULT_PORT = 25575;
 
