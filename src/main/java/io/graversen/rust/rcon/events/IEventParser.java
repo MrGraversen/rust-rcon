@@ -6,5 +6,5 @@ import java.util.function.Function;
 
 public interface IEventParser<T extends BaseRustEvent>
 {
-    Function<String, T> parseEvent(String consoleMessage);
+    Function<String, T> parseEvent();
 }

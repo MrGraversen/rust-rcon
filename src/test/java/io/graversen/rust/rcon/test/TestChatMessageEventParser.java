@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestParseChatMessageEvent extends BaseDefaultParserTest
+class TestChatMessageEventParser extends BaseDefaultParserTest
 {
     private static final String[] chatMessages = {
             "[CHAT] Pope of the Nope[468295/76561197979952036] : ssss",
