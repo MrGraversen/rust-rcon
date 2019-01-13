@@ -10,13 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class DefaultConsoleParser
 {
-    private static final Pattern squareBracketInsideMatcher = Pattern.compile("\\[(.*?)\\]");
-    private static final Pattern squareBracketOutsideMatcher = Pattern.compile("\\](.*?)\\[");
-
     public Optional<RconMessages> parse(String consoleInput)
     {
         return Arrays.stream(RconMessages.values())
@@ -38,7 +34,7 @@ public class DefaultConsoleParser
         final String leftHandString = chatMessageParts[0];
         final String chatMessage = chatMessageParts[1].trim();
 
-        final Matcher matcherSteamId = squareBracketInsideMatcher.matcher(leftHandString);
+        final Matcher matcherSteamId = Utils.squareBracketInsideMatcher.matcher(leftHandString);
 
         List<String> matchingStrings = new ArrayList<>();
         while (matcherSteamId.find())
@@ -48,7 +44,7 @@ public class DefaultConsoleParser
 
         final String steamId64 = matchingStrings.get(matchingStrings.size() - 1).split("/")[1];
 
-        final Matcher matcherPlayerName = squareBracketOutsideMatcher.matcher(leftHandString);
+        final Matcher matcherPlayerName = Utils.squareBracketOutsideMatcher.matcher(leftHandString);
 
         String playerName = "N/A";
         if (matcherPlayerName.find())
