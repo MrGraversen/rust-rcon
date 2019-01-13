@@ -1,22 +1,22 @@
 package io.graversen.rust.rcon;
 
-import com.google.gson.Gson;
 import io.graversen.rust.rcon.objects.util.Weather;
+import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 
 public class Rcon
 {
     private final IRconClient rconClient;
-    private final Gson gson;
+    private final ISerializer serializer;
 
     private final InventoryRcon inventoryRcon;
     private final AiRcon aiRcon;
     private final EventRcon eventRcon;
     private final SettingsRcon settingsRcon;
 
-    Rcon(IRconClient rconClient, Gson gson)
+    Rcon(IRconClient rconClient, ISerializer serializer)
     {
         this.rconClient = rconClient;
-        this.gson = gson;
+        this.serializer = serializer;
         this.inventoryRcon = new InventoryRcon();
         this.aiRcon = new AiRcon();
         this.eventRcon = new EventRcon();

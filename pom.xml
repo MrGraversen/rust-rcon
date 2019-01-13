@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.github.MrGraversen</groupId>
             <artifactId>Trunk</artifactId>
-            <version>0.0.9</version>
+            <version>0.0.10</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>

@@ -13,6 +13,8 @@ import io.graversen.rust.rcon.listeners.IServerEventListener;
 import io.graversen.rust.rcon.objects.rust.Player;
 import io.graversen.rust.rcon.objects.ws.WsIngoingObject;
 import io.graversen.rust.rcon.objects.ws.WsOutgoingObject;
+import io.graversen.trunk.io.serialization.interfaces.ISerializer;
+import io.graversen.trunk.io.serialization.json.GsonSerializer;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -32,7 +34,7 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
     private final String connectionTuple;
     private final AtomicInteger currentRequestCounter;
     private final Rcon rcon;
-    private final Gson gson;
+    private final ISerializer serializer;
 
     private final List<IConsoleListener> consoleListeners;
     private final List<IServerEventListener> serverEventListeners;
@@ -44,12 +46,10 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
     {
         super(uri);
 
-        GsonBuilder gsonBuilder = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting();
-        this.gson = gsonBuilder.create();
-
+        this.serializer = new GsonSerializer();
         this.connectionTuple = String.format("%s:%d", uri.getHost(), uri.getPort());
         this.currentRequestCounter = new AtomicInteger(1);
-        this.rcon = new Rcon(this, this.gson);
+        this.rcon = new Rcon(this, this.serializer);
         this.consoleListeners = new ArrayList<>();
         this.serverEventListeners = new ArrayList<>();
         this.asyncRequests = new ConcurrentHashMap<>();
@@ -110,7 +110,7 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
 
         wsObjectOptional.ifPresent(wsIngoingObject ->
         {
-            Player[] players = gson.fromJson(wsIngoingObject.getMessage(), Player[].class);
+            Player[] players = serializer.deserialize(wsIngoingObject.getMessage(), Player[].class);
             playerList.addAll(Arrays.asList(players));
         });
 
@@ -139,7 +139,7 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
     {
         final int identifier = currentRequestCounter.getAndIncrement();
         final WsOutgoingObject wsOutgoingObject = new WsOutgoingObject(identifier, command, "rust-rcon");
-        final String json = gson.toJson(wsOutgoingObject);
+        final String json = serializer.serialize(wsOutgoingObject);
         printLog("Sending: %s", json);
         send(json);
 
@@ -269,7 +269,7 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
     {
         try
         {
-            final WsIngoingObject wsOutgoingObject = gson.fromJson(consoleMessage, WsIngoingObject.class);
+            final WsIngoingObject wsOutgoingObject = serializer.deserialize(consoleMessage, WsIngoingObject.class);
             return Optional.of(wsOutgoingObject);
         }
         catch (JsonSyntaxException e)

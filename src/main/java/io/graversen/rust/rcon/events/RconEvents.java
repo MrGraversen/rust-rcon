@@ -24,12 +24,12 @@ public class RconEvents
 
     public <T extends BaseRustEvent> void parse(RconMessages rconMessage, IEventParser<T> eventParser)
     {
-        eventParsers.putIfAbsent(rconMessage, eventParser);
+        eventParsers.put(rconMessage, eventParser);
     }
 
     public <T extends BaseRustEvent> void listen(Class<T> eventClass, IEventListener<T> eventListener)
     {
-        this.eventListeners.putIfAbsent(eventClass, eventListener);
+        this.eventListeners.put(eventClass, eventListener);
     }
 
     public <T extends BaseRustEvent> Optional<IEventParser<T>> eventParser(RconMessages rconMessage)

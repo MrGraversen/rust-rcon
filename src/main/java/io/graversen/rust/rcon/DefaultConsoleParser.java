@@ -107,7 +107,7 @@ public class DefaultConsoleParser
     {
         validateEvent(consoleInput, RconMessages.PLAYER_SPAWNED);
 
-        final Matcher matcherSteamId = squareBracketInsideMatcher.matcher(consoleInput);
+        final Matcher matcherSteamId = Utils.squareBracketInsideMatcher.matcher(consoleInput);
 
         List<String> matchingStrings = new ArrayList<>();
         while (matcherSteamId.find())
