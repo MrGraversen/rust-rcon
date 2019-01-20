@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon;
 
-public class RconException extends Exception
+public class RconException extends RuntimeException
 {
     public RconException(String message)
     {
