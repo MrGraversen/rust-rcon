@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.RconMessages;
+import io.graversen.rust.rcon.RconMessageTypes;
 import io.graversen.rust.rcon.events.types.player.PlayerSpawnedEvent;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ class TestParsePlayerSpawnedEvent extends BaseDefaultParserTest
     @Test
     void test_validation()
     {
-        Arrays.stream(playerSpawnedMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessages.PLAYER_SPAWNED));
+        Arrays.stream(playerSpawnedMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessageTypes.PLAYER_SPAWNED));
     }
 
     @Test

@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.RconMessages;
+import io.graversen.rust.rcon.RconMessageTypes;
 import io.graversen.rust.rcon.events.types.player.PlayerDisconnectedEvent;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ class TestParsePlayerDisconnectedEvent extends BaseDefaultParserTest
     @Test
     void test_validation()
     {
-        Arrays.stream(disconnectMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessages.PLAYER_DISCONNECTED));
+        Arrays.stream(disconnectMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessageTypes.PLAYER_DISCONNECTED));
     }
 
     @Test

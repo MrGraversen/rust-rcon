@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.RconMessages;
+import io.graversen.rust.rcon.RconMessageTypes;
 import io.graversen.rust.rcon.events.types.player.PlayerConnectedEvent;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ class TestParsePlayerConnectedEvent extends BaseDefaultParserTest
     @Test
     void test_validation()
     {
-        Arrays.stream(connectMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessages.PLAYER_CONNECTED));
+        Arrays.stream(connectMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessageTypes.PLAYER_CONNECTED));
     }
 
     @Test

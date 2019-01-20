@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon;
 
-public enum RconMessages implements IRconMessage
+public enum RconMessageTypes implements IRconMessage
 {
     CHAT
             {

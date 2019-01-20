@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.RconMessages;
+import io.graversen.rust.rcon.RconMessageTypes;
 import io.graversen.rust.rcon.events.types.game.SaveEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ public class TestParseSaveEvent extends BaseDefaultParserTest
     @Test
     void test_validation()
     {
-        defaultConsoleParser.validateEvent(EVENT_STRING, RconMessages.SAVE_EVENT);
+        defaultConsoleParser.validateEvent(EVENT_STRING, RconMessageTypes.SAVE_EVENT);
     }
 
     @Test

@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.RconMessages;
+import io.graversen.rust.rcon.RconMessageTypes;
 import io.graversen.rust.rcon.events.types.game.WorldEvent;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ class TestParseWorldEvent extends BaseDefaultParserTest
                 "[event] assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab"
         };
 
-        Arrays.stream(eventMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessages.WORLD_EVENT));
+        Arrays.stream(eventMessages).forEach(s -> defaultConsoleParser.validateEvent(s, RconMessageTypes.WORLD_EVENT));
     }
 
     @Test
