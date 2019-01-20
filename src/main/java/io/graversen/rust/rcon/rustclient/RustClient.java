@@ -2,13 +2,14 @@ package io.graversen.rust.rcon.rustclient;
 
 import io.graversen.fiber.event.bus.DefaultEventBus;
 import io.graversen.fiber.event.bus.IEventBus;
+import io.graversen.rust.rcon.Constants;
+import io.graversen.rust.rcon.RconException;
 import io.graversen.rust.rcon.events.types.BaseRustEvent;
 import io.graversen.rust.rcon.events.types.server.RconClosedEvent;
 import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
 import io.graversen.rust.rcon.events.types.server.RconOpenEvent;
 import io.graversen.rust.rcon.logging.DefaultLogger;
 import io.graversen.rust.rcon.logging.ILogger;
-import io.graversen.rust.rcon.logging.NoOpLogger;
 import io.graversen.rust.rcon.serialization.DefaultSerializer;
 import io.graversen.rust.rcon.websocket.DefaultWebSocketClient;
 import io.graversen.rust.rcon.websocket.IWebSocketClient;
@@ -27,6 +28,9 @@ public class RustClient implements AutoCloseable
     private final IWebSocketListener webSocketListener;
     private final IEventBus eventBus;
 
+    private boolean open;
+    private boolean loggingEnabled;
+
     private RustClient(ILogger logger, ISerializer serializer, IWebSocketClient webSocketClient, IWebSocketListener webSocketListener, IEventBus eventBus)
     {
         this.logger = logger;
@@ -34,10 +38,17 @@ public class RustClient implements AutoCloseable
         this.webSocketClient = webSocketClient;
         this.webSocketListener = webSocketListener;
         this.eventBus = eventBus;
+        this.open = false;
+        this.loggingEnabled = true;
     }
 
     public void open()
     {
+        if (open)
+        {
+            throw new RconException("RustClient has already been opened");
+        }
+
         this.eventBus.start();
         this.webSocketClient.open();
 
@@ -45,11 +56,13 @@ public class RustClient implements AutoCloseable
         {
             ((InternalWebSocketListener) this.webSocketListener).setRustClient(this);
         }
+
+        this.open = true;
     }
 
     public ILogger getLogger()
     {
-        return logger;
+        return (loggingEnabled) ? logger : Constants.noOpLogger();
     }
 
     public ISerializer getSerializer()
@@ -72,11 +85,26 @@ public class RustClient implements AutoCloseable
         return eventBus;
     }
 
-    @Override
-    public void close() throws Exception
+    public void setLoggingEnabled(boolean loggingEnabled)
     {
-        this.webSocketClient.close();
-        this.eventBus.stop();
+        this.loggingEnabled = loggingEnabled;
+    }
+
+    @Override
+    public void close()
+    {
+        try
+        {
+            if (open)
+            {
+                this.webSocketClient.close();
+                this.eventBus.stop();
+            }
+        }
+        catch (Exception e)
+        {
+            // ¯\_(ツ)_/¯
+        }
     }
 
     private static class InternalWebSocketListener implements IWebSocketListener
@@ -92,7 +120,7 @@ public class RustClient implements AutoCloseable
         @Override
         public void onMessage(String message)
         {
-
+            log(message);
         }
 
         @Override
@@ -105,6 +133,11 @@ public class RustClient implements AutoCloseable
         public void onError(Exception e)
         {
             emit(new RconErrorEvent(e));
+        }
+
+        private void log(String message)
+        {
+            rustClient.getLogger().info(message);
         }
 
         private void emit(BaseRustEvent rustEvent)
@@ -170,7 +203,7 @@ public class RustClient implements AutoCloseable
 
         public RustClientBuilder withoutLogger()
         {
-            this.logger = new NoOpLogger();
+            this.logger = Constants.noOpLogger();
             return this;
         }
 
