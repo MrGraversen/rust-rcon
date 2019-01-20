@@ -8,6 +8,7 @@ import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
 import io.graversen.rust.rcon.events.types.server.RconOpenEvent;
 import io.graversen.rust.rcon.logging.DefaultLogger;
 import io.graversen.rust.rcon.logging.ILogger;
+import io.graversen.rust.rcon.logging.NoOpLogger;
 import io.graversen.rust.rcon.serialization.DefaultSerializer;
 import io.graversen.rust.rcon.websocket.DefaultWebSocketClient;
 import io.graversen.rust.rcon.websocket.IWebSocketClient;
@@ -167,6 +168,12 @@ public class RustClient implements AutoCloseable
             return this;
         }
 
+        public RustClientBuilder withoutLogger()
+        {
+            this.logger = new NoOpLogger();
+            return this;
+        }
+
         public RustClientBuilder withSrializer(ISerializer serializer)
         {
             Objects.requireNonNull(serializer, "ISerializer cannot be null");
@@ -183,7 +190,7 @@ public class RustClient implements AutoCloseable
             return this;
         }
 
-        public RustClientBuilder usingEventBus(IEventBus eventBus)
+        public RustClientBuilder withEventBus(IEventBus eventBus)
         {
             Objects.requireNonNull(eventBus, "IEventBus cannot be null");
 
