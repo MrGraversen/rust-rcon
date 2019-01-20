@@ -6,13 +6,14 @@ import io.graversen.rust.rcon.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
 public class ChatMessageEventParser implements IEventParser<ChatMessageEvent>
 {
     @Override
-    public Function<String, ChatMessageEvent> parseEvent()
+    public Function<String, Optional<ChatMessageEvent>> parseEvent()
     {
         return consoleMessage ->
         {
@@ -39,7 +40,7 @@ public class ChatMessageEventParser implements IEventParser<ChatMessageEvent>
                 playerName = matcherPlayerName.group(1).trim();
             }
 
-            return new ChatMessageEvent(playerName, steamId64, chatMessage);
+            return Optional.of(new ChatMessageEvent(playerName, steamId64, chatMessage));
         };
     }
 }

@@ -13,9 +13,9 @@ import java.util.regex.Matcher;
 
 public class DefaultConsoleParser
 {
-    public Optional<RconMessages> parse(String consoleInput)
+    public Optional<RconMessageTypes> parse(String consoleInput)
     {
-        return Arrays.stream(RconMessages.values())
+        return Arrays.stream(RconMessageTypes.values())
                 .filter(rconMessage -> deepMatches(consoleInput, rconMessage))
                 .findFirst();
     }
@@ -27,7 +27,7 @@ public class DefaultConsoleParser
 
     public ChatMessageEvent parseChatMessageEvent(String consoleInput)
     {
-        validateEvent(consoleInput, RconMessages.CHAT);
+        validateEvent(consoleInput, RconMessageTypes.CHAT);
 
         final String[] chatMessageParts = consoleInput.split("\\s:\\s", 2);
 
@@ -57,7 +57,7 @@ public class DefaultConsoleParser
 
     public PlayerConnectedEvent parsePlayerConnectedEvent(String consoleInput)
     {
-        validateEvent(consoleInput, RconMessages.PLAYER_CONNECTED);
+        validateEvent(consoleInput, RconMessageTypes.PLAYER_CONNECTED);
 
         final String[] splitInput = consoleInput.split("/");
 
@@ -90,7 +90,7 @@ public class DefaultConsoleParser
 
     public PlayerDisconnectedEvent parsePlayerDisconnectedEvent(String consoleInput)
     {
-        validateEvent(consoleInput, RconMessages.PLAYER_DISCONNECTED);
+        validateEvent(consoleInput, RconMessageTypes.PLAYER_DISCONNECTED);
 
         final String[] splitInput = consoleInput.split("/");
         final String[] splitInputLastElement = splitInput[2].split("disconnecting:");
@@ -105,7 +105,7 @@ public class DefaultConsoleParser
 
     public PlayerSpawnedEvent parserPlayerSpawnedEvent(String consoleInput)
     {
-        validateEvent(consoleInput, RconMessages.PLAYER_SPAWNED);
+        validateEvent(consoleInput, RconMessageTypes.PLAYER_SPAWNED);
 
         final Matcher matcherSteamId = Utils.squareBracketInsideMatcher.matcher(consoleInput);
 
@@ -141,21 +141,21 @@ public class DefaultConsoleParser
         }
     }
 
-    public void validateEvent(String consoleInput, RconMessages consoleDigest)
+    public void validateEvent(String consoleInput, RconMessageTypes consoleDigest)
     {
         parse(consoleInput)
                 .filter(c -> c.equals(consoleDigest))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid event type for console input"));
     }
 
-    private boolean deepMatches(String consoleInput, RconMessages rconMessage)
+    private boolean deepMatches(String consoleInput, RconMessageTypes rconMessage)
     {
         return rconMessage.matches(consoleInput) && nothingElse(rconMessage, consoleInput);
     }
 
-    private static boolean nothingElse(RconMessages except, String consoleInput)
+    private static boolean nothingElse(RconMessageTypes except, String consoleInput)
     {
-        return Arrays.stream(RconMessages.values())
+        return Arrays.stream(RconMessageTypes.values())
                 .filter(c -> !c.equals(except))
                 .noneMatch(c -> c.matches(consoleInput));
     }
