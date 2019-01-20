@@ -1,5 +1,7 @@
 package io.graversen.rust.rcon.logging;
 
+import java.io.PrintStream;
+
 public class NoOpLogger implements ILogger
 {
     @Override
@@ -18,5 +20,17 @@ public class NoOpLogger implements ILogger
     public void error(String message, Object... args)
     {
         // Shh...
+    }
+
+    @Override
+    public PrintStream out()
+    {
+        return null;
+    }
+
+    @Override
+    public PrintStream error()
+    {
+        return null;
     }
 }

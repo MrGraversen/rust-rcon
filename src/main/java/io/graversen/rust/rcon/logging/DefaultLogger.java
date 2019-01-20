@@ -28,20 +28,32 @@ public class DefaultLogger implements ILogger
     public void info(String message, Object... args)
     {
         final String formattedMessage = String.format(message, args);
-        out.println(String.format(DEFAULT_TEMPLATE, Constants.projectName(), formattedMessage));
+        out().println(String.format(DEFAULT_TEMPLATE, Constants.projectName(), formattedMessage));
     }
 
     @Override
     public void warning(String message, Object... args)
     {
         final String formattedMessage = String.format(message, args);
-        out.println(String.format(WARNING_TEMPLATE, Constants.projectName(), formattedMessage));
+        out().println(String.format(WARNING_TEMPLATE, Constants.projectName(), formattedMessage));
     }
 
     @Override
     public void error(String message, Object... args)
     {
         final String formattedMessage = String.format(message, args);
-        error.println(String.format(DEFAULT_TEMPLATE, Constants.projectName(), formattedMessage));
+        error().println(String.format(DEFAULT_TEMPLATE, Constants.projectName(), formattedMessage));
+    }
+
+    @Override
+    public PrintStream out()
+    {
+        return out;
+    }
+
+    @Override
+    public PrintStream error()
+    {
+        return error;
     }
 }
