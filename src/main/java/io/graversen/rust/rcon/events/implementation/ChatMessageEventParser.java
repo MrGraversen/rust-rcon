@@ -15,9 +15,9 @@ public class ChatMessageEventParser implements IEventParser<ChatMessageEvent>
     @Override
     public Function<String, Optional<ChatMessageEvent>> parseEvent()
     {
-        return consoleMessage ->
+        return rconMessage ->
         {
-            final String[] chatMessageParts = consoleMessage.split("\\s:\\s", 2);
+            final String[] chatMessageParts = rconMessage.split("\\s:\\s", 2);
 
             final String leftHandString = chatMessageParts[0];
             final String chatMessage = chatMessageParts[1].trim();

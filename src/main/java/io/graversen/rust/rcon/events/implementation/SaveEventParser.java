@@ -11,6 +11,6 @@ public class SaveEventParser implements IEventParser<SaveEvent>
     @Override
     public Function<String, Optional<SaveEvent>> parseEvent()
     {
-        return consoleMessage -> Optional.of(new SaveEvent());
+        return rconMessage -> Optional.of(new SaveEvent());
     }
 }
