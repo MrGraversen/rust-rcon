@@ -1,5 +1,7 @@
 package io.graversen.rust.rcon.logging;
 
+import java.io.PrintStream;
+
 @FunctionalInterface
 public interface ISimpleLogger extends ILogger
 {
@@ -16,5 +18,17 @@ public interface ISimpleLogger extends ILogger
     default void error(String message, Object... args)
     {
         info(message, args);
+    }
+
+    @Override
+    default PrintStream out()
+    {
+        return null;
+    }
+
+    @Override
+    default PrintStream error()
+    {
+        return null;
     }
 }
