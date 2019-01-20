@@ -2,8 +2,13 @@ package io.graversen.rust.rcon.rustclient;
 
 import io.graversen.fiber.event.bus.DefaultEventBus;
 import io.graversen.fiber.event.bus.IEventBus;
+import io.graversen.fiber.event.listeners.IEventListener;
 import io.graversen.rust.rcon.Constants;
 import io.graversen.rust.rcon.RconException;
+import io.graversen.rust.rcon.RconMessageTypes;
+import io.graversen.rust.rcon.events.IEventParser;
+import io.graversen.rust.rcon.events.parsers.DefaultRconMessageParser;
+import io.graversen.rust.rcon.events.parsers.IRconMessageParser;
 import io.graversen.rust.rcon.events.types.BaseRustEvent;
 import io.graversen.rust.rcon.events.types.server.RconClosedEvent;
 import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
@@ -16,28 +21,45 @@ import io.graversen.rust.rcon.websocket.IWebSocketClient;
 import io.graversen.rust.rcon.websocket.IWebSocketListener;
 import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 public class RustClient implements AutoCloseable
 {
     private static final int DEFAULT_PORT = 25575;
+    private static final Class[] DEFAULT_EVENT_CLASSES = new Class[]{RconClosedEvent.class, RconErrorEvent.class, RconOpenEvent.class};
 
     private final ILogger logger;
     private final ISerializer serializer;
     private final IWebSocketClient webSocketClient;
     private final IWebSocketListener webSocketListener;
     private final IEventBus eventBus;
+    private final IRconMessageParser rconMessageParser;
+    private final ConcurrentMap<RconMessageTypes, IEventParser<?>> eventParsers;
 
     private boolean open;
     private boolean loggingEnabled;
 
-    private RustClient(ILogger logger, ISerializer serializer, IWebSocketClient webSocketClient, IWebSocketListener webSocketListener, IEventBus eventBus)
+    private RustClient(
+            ILogger logger,
+            ISerializer serializer,
+            IWebSocketClient webSocketClient,
+            IWebSocketListener webSocketListener,
+            IEventBus eventBus,
+            IRconMessageParser rconMessageParser)
     {
         this.logger = logger;
         this.serializer = serializer;
         this.webSocketClient = webSocketClient;
         this.webSocketListener = webSocketListener;
         this.eventBus = eventBus;
+        this.rconMessageParser = rconMessageParser;
+        this.eventParsers = new ConcurrentHashMap<>();
+
         this.open = false;
         this.loggingEnabled = true;
     }
@@ -49,15 +71,31 @@ public class RustClient implements AutoCloseable
             throw new RconException("RustClient has already been opened");
         }
 
-        this.eventBus.start();
-        this.webSocketClient.open();
-
         if (this.webSocketListener instanceof InternalWebSocketListener)
         {
             ((InternalWebSocketListener) this.webSocketListener).setRustClient(this);
         }
 
+        Arrays.stream(DEFAULT_EVENT_CLASSES).forEach(
+                eventClass -> eventBus.registerEventListener(eventClass, event -> getLogger().info(event.getClass().getSimpleName()))
+        );
+
+        this.eventBus.start();
+        this.webSocketClient.open();
+
         this.open = true;
+    }
+
+    public <T extends BaseRustEvent> void addEventHandling(Class<T> eventClass, RconMessageTypes rconMessage, IEventParser<T> eventParser, IEventListener<T> eventListener)
+    {
+        eventParsers.put(rconMessage, eventParser);
+        getEventBus().registerEventListener(eventClass, eventListener);
+    }
+
+    public <T extends BaseRustEvent> Optional<IEventParser<T>> getEventParser(RconMessageTypes rconMessage)
+    {
+        final IEventParser<T> eventParserOrNull = (IEventParser<T>) eventParsers.getOrDefault(rconMessage, null);
+        return Optional.ofNullable(eventParserOrNull);
     }
 
     public ILogger getLogger()
@@ -85,6 +123,11 @@ public class RustClient implements AutoCloseable
         return eventBus;
     }
 
+    public IRconMessageParser getRconMessageParser()
+    {
+        return rconMessageParser;
+    }
+
     public void setLoggingEnabled(boolean loggingEnabled)
     {
         this.loggingEnabled = loggingEnabled;
@@ -107,6 +150,31 @@ public class RustClient implements AutoCloseable
         }
     }
 
+    private void handleRconMessage(String rconMessage)
+    {
+        System.out.println("RustClient.handleRconMessage");
+        final Optional<RconMessageTypes> rconMessageTypeOptional = getRconMessageParser().parseMessage().apply(rconMessage);
+        rconMessageTypeOptional.ifPresent(tryParseRconMessage(rconMessage));
+    }
+
+    private Consumer<RconMessageTypes> tryParseRconMessage(String rconMessage)
+    {
+        System.out.println("RustClient.tryParseRconMessage");
+        return rconMessageType -> getEventParser(rconMessageType).ifPresent(doParseRconMessage(rconMessage));
+    }
+
+    private Consumer<IEventParser<BaseRustEvent>> doParseRconMessage(String rconMessage)
+    {
+        System.out.println("RustClient.doParseRconMessage");
+        return eventParser -> eventParser.safeParseEvent().apply(rconMessage).ifPresent(emitEvent());
+    }
+
+    private Consumer<BaseRustEvent> emitEvent()
+    {
+        System.out.println("RustClient.emitEvent");
+        return getEventBus()::emitEvent;
+    }
+
     private static class InternalWebSocketListener implements IWebSocketListener
     {
         private RustClient rustClient;
@@ -121,6 +189,7 @@ public class RustClient implements AutoCloseable
         public void onMessage(String message)
         {
             log(message);
+            rustClient.handleRconMessage(message);
         }
 
         @Override
@@ -151,7 +220,7 @@ public class RustClient implements AutoCloseable
         }
     }
 
-    private static RustClientBuilder builder()
+    public static RustClientBuilder builder()
     {
         return new RustClientBuilder();
     }
@@ -162,6 +231,7 @@ public class RustClient implements AutoCloseable
         private ISerializer serializer;
         private IWebSocketListener webSocketListener;
         private IEventBus eventBus;
+        private IRconMessageParser rconMessageParser;
 
         private String hostname;
         private String password;
@@ -173,6 +243,7 @@ public class RustClient implements AutoCloseable
             this.serializer = new DefaultSerializer();
             this.webSocketListener = new InternalWebSocketListener();
             this.eventBus = new DefaultEventBus();
+            this.rconMessageParser = new DefaultRconMessageParser();
         }
 
         public RustClientBuilder connectTo(String hostname, String password)
@@ -231,6 +302,14 @@ public class RustClient implements AutoCloseable
             return this;
         }
 
+        public RustClientBuilder withRconMessageParser(IRconMessageParser rconMessageParser)
+        {
+            Objects.requireNonNull(rconMessageParser, "IRconMessageParser cannot be null");
+
+            this.rconMessageParser = rconMessageParser;
+            return this;
+        }
+
         public RustClient build()
         {
             return this.build(DefaultWebSocketClient.usingCredentialsAndListener(hostname, password, port, webSocketListener));
@@ -241,7 +320,7 @@ public class RustClient implements AutoCloseable
             Objects.requireNonNull(webSocketClient, "IWebSocketClient cannot be null");
             Objects.requireNonNull(webSocketListener, "IWebSocketListener cannot be null");
 
-            return new RustClient(logger, serializer, webSocketClient, webSocketListener, eventBus);
+            return new RustClient(logger, serializer, webSocketClient, webSocketListener, eventBus, rconMessageParser);
         }
     }
 }

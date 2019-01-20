@@ -1,6 +1,6 @@
 package io.graversen.rust.rcon.events.parsers;
 
-import io.graversen.rust.rcon.RconMessages;
+import io.graversen.rust.rcon.RconMessageTypes;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -9,21 +9,21 @@ import java.util.function.Function;
 public class DefaultRconMessageParser implements IRconMessageParser
 {
     @Override
-    public Function<String, Optional<RconMessages>> parseMessage()
+    public Function<String, Optional<RconMessageTypes>> parseMessage()
     {
-        return message -> Arrays.stream(RconMessages.values())
+        return message -> Arrays.stream(RconMessageTypes.values())
                 .filter(rconMessage -> deepMatches(message, rconMessage))
                 .findFirst();
     }
 
-    private boolean deepMatches(String consoleInput, RconMessages rconMessage)
+    private boolean deepMatches(String consoleInput, RconMessageTypes rconMessage)
     {
         return rconMessage.matches(consoleInput) && nothingElse(rconMessage, consoleInput);
     }
 
-    private boolean nothingElse(RconMessages except, String consoleInput)
+    private boolean nothingElse(RconMessageTypes except, String consoleInput)
     {
-        return Arrays.stream(RconMessages.values())
+        return Arrays.stream(RconMessageTypes.values())
                 .filter(c -> !c.equals(except))
                 .noneMatch(c -> c.matches(consoleInput));
     }
