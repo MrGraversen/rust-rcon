@@ -1,5 +1,11 @@
 package io.graversen.rust.rcon.rustclient;
 
+import io.graversen.fiber.event.bus.DefaultEventBus;
+import io.graversen.fiber.event.bus.IEventBus;
+import io.graversen.rust.rcon.events.types.BaseRustEvent;
+import io.graversen.rust.rcon.events.types.server.RconClosedEvent;
+import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
+import io.graversen.rust.rcon.events.types.server.RconOpenEvent;
 import io.graversen.rust.rcon.logging.DefaultLogger;
 import io.graversen.rust.rcon.logging.ILogger;
 import io.graversen.rust.rcon.serialization.DefaultSerializer;
@@ -10,7 +16,7 @@ import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 
 import java.util.Objects;
 
-public class RustClient
+public class RustClient implements AutoCloseable
 {
     private static final int DEFAULT_PORT = 25575;
 
@@ -18,13 +24,97 @@ public class RustClient
     private final ISerializer serializer;
     private final IWebSocketClient webSocketClient;
     private final IWebSocketListener webSocketListener;
+    private final IEventBus eventBus;
 
-    private RustClient(ILogger logger, ISerializer serializer, IWebSocketClient webSocketClient, IWebSocketListener webSocketListener)
+    private RustClient(ILogger logger, ISerializer serializer, IWebSocketClient webSocketClient, IWebSocketListener webSocketListener, IEventBus eventBus)
     {
         this.logger = logger;
         this.serializer = serializer;
         this.webSocketClient = webSocketClient;
         this.webSocketListener = webSocketListener;
+        this.eventBus = eventBus;
+    }
+
+    public void open()
+    {
+        this.eventBus.start();
+        this.webSocketClient.open();
+
+        if (this.webSocketListener instanceof InternalWebSocketListener)
+        {
+            ((InternalWebSocketListener) this.webSocketListener).setRustClient(this);
+        }
+    }
+
+    public ILogger getLogger()
+    {
+        return logger;
+    }
+
+    public ISerializer getSerializer()
+    {
+        return serializer;
+    }
+
+    public IWebSocketClient getWebSocketClient()
+    {
+        return webSocketClient;
+    }
+
+    public IWebSocketListener getWebSocketListener()
+    {
+        return webSocketListener;
+    }
+
+    public IEventBus getEventBus()
+    {
+        return eventBus;
+    }
+
+    @Override
+    public void close() throws Exception
+    {
+        this.webSocketClient.close();
+        this.eventBus.stop();
+    }
+
+    private static class InternalWebSocketListener implements IWebSocketListener
+    {
+        private RustClient rustClient;
+
+        @Override
+        public void onOpen()
+        {
+            emit(new RconOpenEvent());
+        }
+
+        @Override
+        public void onMessage(String message)
+        {
+
+        }
+
+        @Override
+        public void onClose(int code, String reason)
+        {
+            emit(new RconClosedEvent(code, reason));
+        }
+
+        @Override
+        public void onError(Exception e)
+        {
+            emit(new RconErrorEvent(e));
+        }
+
+        private void emit(BaseRustEvent rustEvent)
+        {
+            rustClient.getEventBus().emitEvent(rustEvent);
+        }
+
+        private void setRustClient(RustClient rustClient)
+        {
+            this.rustClient = rustClient;
+        }
     }
 
     private static RustClientBuilder builder()
@@ -36,8 +126,8 @@ public class RustClient
     {
         private ILogger logger;
         private ISerializer serializer;
-        private IWebSocketClient webSocketClient;
         private IWebSocketListener webSocketListener;
+        private IEventBus eventBus;
 
         private String hostname;
         private String password;
@@ -47,8 +137,8 @@ public class RustClient
         {
             this.logger = new DefaultLogger();
             this.serializer = new DefaultSerializer();
-            this.webSocketClient = null;
-            this.webSocketListener = null;
+            this.webSocketListener = new InternalWebSocketListener();
+            this.eventBus = new DefaultEventBus();
         }
 
         public RustClientBuilder connectTo(String hostname, String password)
@@ -69,7 +159,7 @@ public class RustClient
             return this;
         }
 
-        public RustClientBuilder usingLogger(ILogger logger)
+        public RustClientBuilder withLogger(ILogger logger)
         {
             Objects.requireNonNull(logger, "ILogger cannot be null");
 
@@ -77,7 +167,7 @@ public class RustClient
             return this;
         }
 
-        public RustClientBuilder usingSerializer(ISerializer serializer)
+        public RustClientBuilder withSrializer(ISerializer serializer)
         {
             Objects.requireNonNull(serializer, "ISerializer cannot be null");
 
@@ -85,11 +175,19 @@ public class RustClient
             return this;
         }
 
-        public RustClientBuilder usingWebSocketListener(IWebSocketListener webSocketListener)
+        public RustClientBuilder withWebSocketListener(IWebSocketListener webSocketListener)
         {
             Objects.requireNonNull(webSocketListener, "IWebSocketListener cannot be null");
 
             this.webSocketListener = webSocketListener;
+            return this;
+        }
+
+        public RustClientBuilder usingEventBus(IEventBus eventBus)
+        {
+            Objects.requireNonNull(eventBus, "IEventBus cannot be null");
+
+            this.eventBus = eventBus;
             return this;
         }
 
@@ -103,7 +201,7 @@ public class RustClient
             Objects.requireNonNull(webSocketClient, "IWebSocketClient cannot be null");
             Objects.requireNonNull(webSocketListener, "IWebSocketListener cannot be null");
 
-            return new RustClient(logger, serializer, webSocketClient, webSocketListener);
+            return new RustClient(logger, serializer, webSocketClient, webSocketListener, eventBus);
         }
     }
 }

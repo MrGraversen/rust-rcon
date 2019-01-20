@@ -64,7 +64,7 @@ public class DefaultWebSocketClient extends BaseWebSocketClient implements IWebS
     }
 
     @Override
-    public boolean connect(URI uri)
+    public boolean open()
     {
         try
         {
