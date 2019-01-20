@@ -1,7 +1,5 @@
 package io.graversen.rust.rcon;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import io.graversen.rust.rcon.events.types.game.WorldEvent;
 import io.graversen.rust.rcon.events.types.player.ChatMessageEvent;
@@ -228,7 +226,7 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
         };
     }
 
-    private Consumer<RconMessages> propagateConsoleDigest(String consoleMessage)
+    private Consumer<RconMessageTypes> propagateConsoleDigest(String consoleMessage)
     {
         return consoleDigest ->
         {

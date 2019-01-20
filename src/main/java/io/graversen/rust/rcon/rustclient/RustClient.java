@@ -15,6 +15,7 @@ import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
 import io.graversen.rust.rcon.events.types.server.RconOpenEvent;
 import io.graversen.rust.rcon.logging.DefaultLogger;
 import io.graversen.rust.rcon.logging.ILogger;
+import io.graversen.rust.rcon.objects.ws.WsIngoingObject;
 import io.graversen.rust.rcon.serialization.DefaultSerializer;
 import io.graversen.rust.rcon.websocket.DefaultWebSocketClient;
 import io.graversen.rust.rcon.websocket.IWebSocketClient;
@@ -150,29 +151,47 @@ public class RustClient implements AutoCloseable
         }
     }
 
-    private void handleRconMessage(String rconMessage)
+    private void handleRconRaw(String rconRaw)
     {
-        System.out.println("RustClient.handleRconMessage");
-        final Optional<RconMessageTypes> rconMessageTypeOptional = getRconMessageParser().parseMessage().apply(rconMessage);
-        rconMessageTypeOptional.ifPresent(tryParseRconMessage(rconMessage));
+        final Optional<WsIngoingObject> wsIngoingObject = tryDeserializeRconMessage(rconRaw);
+        wsIngoingObject.map(WsIngoingObject::getMessage).ifPresent(handleRconMessage());
+    }
+
+    private Consumer<String> handleRconMessage()
+    {
+        return rconMessage ->
+        {
+            final Optional<RconMessageTypes> rconMessageType = getRconMessageParser().parseMessage().apply(rconMessage);
+            rconMessageType.ifPresent(tryParseRconMessage(rconMessage));
+        };
     }
 
     private Consumer<RconMessageTypes> tryParseRconMessage(String rconMessage)
     {
-        System.out.println("RustClient.tryParseRconMessage");
         return rconMessageType -> getEventParser(rconMessageType).ifPresent(doParseRconMessage(rconMessage));
     }
 
     private Consumer<IEventParser<BaseRustEvent>> doParseRconMessage(String rconMessage)
     {
-        System.out.println("RustClient.doParseRconMessage");
         return eventParser -> eventParser.safeParseEvent().apply(rconMessage).ifPresent(emitEvent());
     }
 
     private Consumer<BaseRustEvent> emitEvent()
     {
-        System.out.println("RustClient.emitEvent");
         return getEventBus()::emitEvent;
+    }
+
+    private Optional<WsIngoingObject> tryDeserializeRconMessage(String rconMessage)
+    {
+        try
+        {
+            final WsIngoingObject wsIngoingObject = serializer.deserialize(rconMessage, WsIngoingObject.class);
+            return Optional.ofNullable(wsIngoingObject);
+        }
+        catch (Exception e)
+        {
+            return Optional.empty();
+        }
     }
 
     private static class InternalWebSocketListener implements IWebSocketListener
@@ -189,7 +208,7 @@ public class RustClient implements AutoCloseable
         public void onMessage(String message)
         {
             log(message);
-            rustClient.handleRconMessage(message);
+            rustClient.handleRconRaw(message);
         }
 
         @Override
