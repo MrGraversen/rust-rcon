@@ -1,5 +1,7 @@
 package io.graversen.rust.rcon.rustclient;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import io.graversen.fiber.event.bus.DefaultEventBus;
 import io.graversen.fiber.event.bus.IEventBus;
 import io.graversen.fiber.event.listeners.IEventListener;
@@ -10,6 +12,7 @@ import io.graversen.rust.rcon.events.IEventParser;
 import io.graversen.rust.rcon.events.parsers.DefaultRconMessageParser;
 import io.graversen.rust.rcon.events.parsers.IRconMessageParser;
 import io.graversen.rust.rcon.events.types.BaseRustEvent;
+import io.graversen.rust.rcon.events.types.server.RconMessageEvent;
 import io.graversen.rust.rcon.events.types.server.RconClosedEvent;
 import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
 import io.graversen.rust.rcon.events.types.server.RconOpenEvent;
@@ -26,8 +29,10 @@ import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -47,6 +52,7 @@ public class RustClient implements IRconClient, AutoCloseable
     private boolean open;
     private boolean loggingEnabled;
     private final AtomicInteger currentRequestCounter;
+    private final Cache<Integer, CompletableFuture<RconReceive>> asyncRequests;
 
     private RustClient(
             ILogger logger,
@@ -67,18 +73,34 @@ public class RustClient implements IRconClient, AutoCloseable
         this.open = false;
         this.loggingEnabled = true;
         this.currentRequestCounter = new AtomicInteger(0);
+        this.asyncRequests = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
     }
 
     @Override
-    public int send(String rconMessage)
+    public void send(String rconMessage)
     {
         final int identifier = currentRequestCounter.getAndIncrement();
+        doSend(rconMessage, identifier);
+    }
+
+    @Override
+    public CompletableFuture<RconReceive> sendAsync(String rconMessage)
+    {
+        final int identifier = currentRequestCounter.getAndIncrement();
+        final CompletableFuture<RconReceive> completableFuture = new CompletableFuture<>();
+
+        asyncRequests.put(identifier, completableFuture);
+        doSend(rconMessage, identifier);
+
+        return completableFuture;
+    }
+
+    private void doSend(String rconMessage, int identifier)
+    {
         final RconRequest rconRequest = new RconRequest(identifier, rconMessage, Constants.projectName());
         final String serializedPayload = getSerializer().serialize(rconRequest);
 
         getWebSocketClient().send(serializedPayload);
-
-        return identifier;
     }
 
     public void open()
@@ -96,6 +118,8 @@ public class RustClient implements IRconClient, AutoCloseable
         Arrays.stream(DEFAULT_EVENT_CLASSES).forEach(
                 eventClass -> getEventBus().registerEventListener(eventClass, event -> getLogger().info(event.getClass().getSimpleName()))
         );
+
+        eventBus.registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
 
         getEventBus().start();
         getWebSocketClient().open();
@@ -167,18 +191,33 @@ public class RustClient implements IRconClient, AutoCloseable
         }
     }
 
-    private void handleRconRaw(String rconRaw)
+    private IEventListener<RconMessageEvent> asyncRequestListener()
     {
-        final Optional<RconReceive> wsIngoingObject = tryDeserializeRconMessage(rconRaw);
-        wsIngoingObject.map(RconReceive::getMessage).ifPresent(handleRconMessage());
+        return event ->
+        {
+            final CompletableFuture<RconReceive> completableFuture = asyncRequests.getIfPresent(event.getRconReceive().getIdentifier());
+
+            if (completableFuture != null)
+            {
+                completableFuture.complete(event.getRconReceive());
+            }
+        };
     }
 
-    private Consumer<String> handleRconMessage()
+    private void handleRconRaw(String rconRaw)
     {
-        return rconMessage ->
+        final Optional<RconReceive> rconReceiveOptional = tryDeserializeRconMessage(rconRaw);
+        rconReceiveOptional.ifPresent(handleRconReceive());
+    }
+
+    private Consumer<RconReceive> handleRconReceive()
+    {
+        return rconReceive ->
         {
-            final Optional<RconMessageTypes> rconMessageType = getRconMessageParser().parseMessage().apply(rconMessage);
-            rconMessageType.ifPresent(tryParseRconMessage(rconMessage));
+            emitEvent().accept(new RconMessageEvent(rconReceive));
+
+            final Optional<RconMessageTypes> rconMessageType = getRconMessageParser().parseMessage().apply(rconReceive.getMessage());
+            rconMessageType.ifPresent(tryParseRconMessage(rconReceive.getMessage()));
         };
     }
 
