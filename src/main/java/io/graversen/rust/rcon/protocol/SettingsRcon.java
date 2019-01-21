@@ -1,4 +1,4 @@
-package io.graversen.rust.rcon.implementation;
+package io.graversen.rust.rcon.protocol;
 
 public class SettingsRcon
 {
