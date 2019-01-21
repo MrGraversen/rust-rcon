@@ -72,17 +72,17 @@ public class RustClient implements AutoCloseable
             throw new RconException("RustClient has already been opened");
         }
 
-        if (this.webSocketListener instanceof InternalWebSocketListener)
+        if (getWebSocketListener() instanceof InternalWebSocketListener)
         {
-            ((InternalWebSocketListener) this.webSocketListener).setRustClient(this);
+            ((InternalWebSocketListener) getWebSocketListener()).setRustClient(this);
         }
 
         Arrays.stream(DEFAULT_EVENT_CLASSES).forEach(
-                eventClass -> eventBus.registerEventListener(eventClass, event -> getLogger().info(event.getClass().getSimpleName()))
+                eventClass -> getEventBus().registerEventListener(eventClass, event -> getLogger().info(event.getClass().getSimpleName()))
         );
 
-        this.eventBus.start();
-        this.webSocketClient.open();
+        getEventBus().start();
+        getWebSocketClient().open();
 
         this.open = true;
     }
@@ -141,8 +141,8 @@ public class RustClient implements AutoCloseable
         {
             if (open)
             {
-                this.webSocketClient.close();
-                this.eventBus.stop();
+                getWebSocketClient().close();
+                getEventBus().stop();
             }
         }
         catch (Exception e)
@@ -185,7 +185,7 @@ public class RustClient implements AutoCloseable
     {
         try
         {
-            final WsIngoingObject wsIngoingObject = serializer.deserialize(rconMessage, WsIngoingObject.class);
+            final WsIngoingObject wsIngoingObject = getSerializer().deserialize(rconMessage, WsIngoingObject.class);
             return Optional.ofNullable(wsIngoingObject);
         }
         catch (Exception e)

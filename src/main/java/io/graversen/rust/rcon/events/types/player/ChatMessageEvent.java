@@ -1,7 +1,5 @@
 package io.graversen.rust.rcon.events.types.player;
 
-import io.graversen.rust.rcon.events.types.player.BasePlayerEvent;
-
 public class ChatMessageEvent extends BasePlayerEvent
 {
     private final String chatMessage;
