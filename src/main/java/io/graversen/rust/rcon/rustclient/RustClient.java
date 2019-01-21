@@ -15,7 +15,8 @@ import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
 import io.graversen.rust.rcon.events.types.server.RconOpenEvent;
 import io.graversen.rust.rcon.logging.DefaultLogger;
 import io.graversen.rust.rcon.logging.ILogger;
-import io.graversen.rust.rcon.objects.ws.WsIngoingObject;
+import io.graversen.rust.rcon.objects.RconReceive;
+import io.graversen.rust.rcon.objects.RconRequest;
 import io.graversen.rust.rcon.serialization.DefaultSerializer;
 import io.graversen.rust.rcon.websocket.DefaultWebSocketClient;
 import io.graversen.rust.rcon.websocket.IWebSocketClient;
@@ -27,9 +28,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-public class RustClient implements AutoCloseable
+public class RustClient implements IRconClient, AutoCloseable
 {
     private static final int DEFAULT_PORT = 25575;
     private static final Class[] DEFAULT_EVENT_CLASSES = new Class[]{RconClosedEvent.class, RconErrorEvent.class, RconOpenEvent.class};
@@ -44,6 +46,7 @@ public class RustClient implements AutoCloseable
 
     private boolean open;
     private boolean loggingEnabled;
+    private final AtomicInteger currentRequestCounter;
 
     private RustClient(
             ILogger logger,
@@ -63,6 +66,19 @@ public class RustClient implements AutoCloseable
 
         this.open = false;
         this.loggingEnabled = true;
+        this.currentRequestCounter = new AtomicInteger(0);
+    }
+
+    @Override
+    public int send(String rconMessage)
+    {
+        final int identifier = currentRequestCounter.getAndIncrement();
+        final RconRequest rconRequest = new RconRequest(identifier, rconMessage, Constants.projectName());
+        final String serializedPayload = getSerializer().serialize(rconRequest);
+
+        getWebSocketClient().send(serializedPayload);
+
+        return identifier;
     }
 
     public void open()
@@ -153,8 +169,8 @@ public class RustClient implements AutoCloseable
 
     private void handleRconRaw(String rconRaw)
     {
-        final Optional<WsIngoingObject> wsIngoingObject = tryDeserializeRconMessage(rconRaw);
-        wsIngoingObject.map(WsIngoingObject::getMessage).ifPresent(handleRconMessage());
+        final Optional<RconReceive> wsIngoingObject = tryDeserializeRconMessage(rconRaw);
+        wsIngoingObject.map(RconReceive::getMessage).ifPresent(handleRconMessage());
     }
 
     private Consumer<String> handleRconMessage()
@@ -181,12 +197,12 @@ public class RustClient implements AutoCloseable
         return getEventBus()::emitEvent;
     }
 
-    private Optional<WsIngoingObject> tryDeserializeRconMessage(String rconMessage)
+    private Optional<RconReceive> tryDeserializeRconMessage(String rconMessage)
     {
         try
         {
-            final WsIngoingObject wsIngoingObject = getSerializer().deserialize(rconMessage, WsIngoingObject.class);
-            return Optional.ofNullable(wsIngoingObject);
+            final RconReceive rconReceive = getSerializer().deserialize(rconMessage, RconReceive.class);
+            return Optional.ofNullable(rconReceive);
         }
         catch (Exception e)
         {

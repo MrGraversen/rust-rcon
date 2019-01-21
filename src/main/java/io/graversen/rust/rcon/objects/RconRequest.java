@@ -1,8 +1,8 @@
-package io.graversen.rust.rcon.objects.ws;
+package io.graversen.rust.rcon.objects;
 
 import com.google.gson.annotations.SerializedName;
 
-public class WsOutgoingObject
+public class RconRequest
 {
     @SerializedName("Identifier")
     private int identifier;
@@ -11,7 +11,7 @@ public class WsOutgoingObject
     @SerializedName("Name")
     private String name;
 
-    public WsOutgoingObject(int identifier, String message, String name)
+    public RconRequest(int identifier, String message, String name)
     {
         this.identifier = identifier;
         this.message = message;

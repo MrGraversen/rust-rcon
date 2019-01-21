@@ -9,8 +9,8 @@ import io.graversen.rust.rcon.events.types.player.PlayerDisconnectedEvent;
 import io.graversen.rust.rcon.listeners.IConsoleListener;
 import io.graversen.rust.rcon.listeners.IServerEventListener;
 import io.graversen.rust.rcon.objects.rust.Player;
-import io.graversen.rust.rcon.objects.ws.WsIngoingObject;
-import io.graversen.rust.rcon.objects.ws.WsOutgoingObject;
+import io.graversen.rust.rcon.objects.RconReceive;
+import io.graversen.rust.rcon.objects.RconRequest;
 import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 import io.graversen.trunk.io.serialization.json.GsonSerializer;
 import org.java_websocket.client.WebSocketClient;
@@ -36,7 +36,7 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
 
     private final List<IConsoleListener> consoleListeners;
     private final List<IServerEventListener> serverEventListeners;
-    private final Map<Integer, CompletableFuture<WsIngoingObject>> asyncRequests;
+    private final Map<Integer, CompletableFuture<RconReceive>> asyncRequests;
 
     private final DefaultConsoleParser defaultConsoleParser;
 
@@ -103,21 +103,21 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
     @Override
     public List<Player> getCurrentPlayers()
     {
-        final Optional<WsIngoingObject> wsObjectOptional = sendRawAndWait("playerlist", 5000);
+        final Optional<RconReceive> wsObjectOptional = sendRawAndWait("playerlist", 5000);
         final List<Player> playerList = new ArrayList<>();
 
-        wsObjectOptional.ifPresent(wsIngoingObject ->
+        wsObjectOptional.ifPresent(rconReceive ->
         {
-            Player[] players = serializer.deserialize(wsIngoingObject.getMessage(), Player[].class);
+            Player[] players = serializer.deserialize(rconReceive.getMessage(), Player[].class);
             playerList.addAll(Arrays.asList(players));
         });
 
         return playerList;
     }
 
-    private synchronized Optional<WsIngoingObject> sendRawAndWait(String command, int timeout)
+    private synchronized Optional<RconReceive> sendRawAndWait(String command, int timeout)
     {
-        final CompletableFuture<WsIngoingObject> wsObjectFuture = new CompletableFuture<>();
+        final CompletableFuture<RconReceive> wsObjectFuture = new CompletableFuture<>();
         final int identifier = sendRaw(command);
 
         asyncRequests.put(identifier, wsObjectFuture);
@@ -136,8 +136,8 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
     public int sendRaw(String command)
     {
         final int identifier = currentRequestCounter.getAndIncrement();
-        final WsOutgoingObject wsOutgoingObject = new WsOutgoingObject(identifier, command, "rust-rcon");
-        final String json = serializer.serialize(wsOutgoingObject);
+        final RconRequest rconRequest = new RconRequest(identifier, command, "rust-rcon");
+        final String json = serializer.serialize(rconRequest);
         printLog("Sending: %s", json);
         send(json);
 
@@ -204,7 +204,7 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
     {
         return consoleMessage ->
         {
-            final Optional<WsIngoingObject> wsObjectOptional = tryDeserialize(consoleMessage);
+            final Optional<RconReceive> wsObjectOptional = tryDeserialize(consoleMessage);
             wsObjectOptional.ifPresent(wsOutgoingObject ->
             {
                 if (asyncRequests.containsKey(wsOutgoingObject.getIdentifier()))
@@ -219,7 +219,7 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
     {
         return consoleMessage ->
         {
-            final Optional<WsIngoingObject> wsObjectOptional = tryDeserialize(consoleMessage);
+            final Optional<RconReceive> wsObjectOptional = tryDeserialize(consoleMessage);
             wsObjectOptional.ifPresent(
                     wsOutgoingObject -> defaultConsoleParser.parse(consoleMessage).ifPresent(propagateConsoleDigest(consoleMessage))
             );
@@ -263,11 +263,11 @@ public class RconClient extends WebSocketClient implements IRconClient, AutoClos
         };
     }
 
-    private Optional<WsIngoingObject> tryDeserialize(String consoleMessage)
+    private Optional<RconReceive> tryDeserialize(String consoleMessage)
     {
         try
         {
-            final WsIngoingObject wsOutgoingObject = serializer.deserialize(consoleMessage, WsIngoingObject.class);
+            final RconReceive wsOutgoingObject = serializer.deserialize(consoleMessage, RconReceive.class);
             return Optional.of(wsOutgoingObject);
         }
         catch (JsonSyntaxException e)

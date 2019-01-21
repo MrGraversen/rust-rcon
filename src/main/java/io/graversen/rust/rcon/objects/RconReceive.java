@@ -1,8 +1,8 @@
-package io.graversen.rust.rcon.objects.ws;
+package io.graversen.rust.rcon.objects;
 
 import com.google.gson.annotations.SerializedName;
 
-public class WsIngoingObject
+public class RconReceive
 {
     @SerializedName("Identifier")
     private int identifier;
