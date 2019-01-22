@@ -97,6 +97,11 @@ public class RustClient implements IRconClient, AutoCloseable
 
     private void doSend(String rconMessage, int identifier)
     {
+        if (!open)
+        {
+            throw new RconException("Cannot use RconClient before it has been opened");
+        }
+
         final RconRequest rconRequest = new RconRequest(identifier, rconMessage, Constants.projectName());
         final String serializedPayload = getSerializer().serialize(rconRequest);
 

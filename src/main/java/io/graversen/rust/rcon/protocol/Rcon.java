@@ -1,18 +1,21 @@
 package io.graversen.rust.rcon.protocol;
 
-public class Rcon
+import io.graversen.rust.rcon.rustclient.IRconClient;
+
+public class Rcon extends BaseRcon
 {
     private final AiRcon aiRcon;
     private final EventRcon eventRcon;
     private final InventoryRcon inventoryRcon;
     private final SettingsRcon settingsRcon;
 
-    public Rcon()
+    public Rcon(IRconClient rconClient)
     {
-        this.aiRcon = new AiRcon();
-        this.eventRcon = new EventRcon();
-        this.inventoryRcon = new InventoryRcon();
-        this.settingsRcon = new SettingsRcon();
+        super(rconClient);
+        this.aiRcon = new AiRcon(rconClient);
+        this.eventRcon = new EventRcon(rconClient);
+        this.inventoryRcon = new InventoryRcon(rconClient);
+        this.settingsRcon = new SettingsRcon(rconClient);
     }
 
     public AiRcon ai()
