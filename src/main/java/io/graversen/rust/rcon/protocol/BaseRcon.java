@@ -16,8 +16,8 @@ public class BaseRcon
         return rconClient;
     }
 
-    protected RconEntity rconEntity(String rconMessage)
+    protected RconEntity rconEntity(String rconMessage, Object... args)
     {
-        return new RconEntity(rconMessage, rconClient());
+        return new RconEntity(String.format(rconMessage, args), rconClient());
     }
 }
