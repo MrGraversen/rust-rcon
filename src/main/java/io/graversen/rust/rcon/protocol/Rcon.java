@@ -8,6 +8,7 @@ public class Rcon extends BaseRcon
     private final EventRcon eventRcon;
     private final InventoryRcon inventoryRcon;
     private final SettingsRcon settingsRcon;
+    private final InfoRcon infoRcon;
 
     public Rcon(IRconClient rconClient)
     {
@@ -16,6 +17,7 @@ public class Rcon extends BaseRcon
         this.eventRcon = new EventRcon(rconClient);
         this.inventoryRcon = new InventoryRcon(rconClient);
         this.settingsRcon = new SettingsRcon(rconClient);
+        this.infoRcon = new InfoRcon(rconClient);
     }
 
     public AiRcon ai()
@@ -36,5 +38,10 @@ public class Rcon extends BaseRcon
     public SettingsRcon settings()
     {
         return settingsRcon;
+    }
+
+    public InfoRcon info()
+    {
+        return infoRcon;
     }
 }

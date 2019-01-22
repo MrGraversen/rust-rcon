@@ -15,4 +15,9 @@ public class BaseRcon
     {
         return rconClient;
     }
+
+    protected RconEntity rconEntity(String rconMessage)
+    {
+        return new RconEntity(rconMessage, rconClient());
+    }
 }
