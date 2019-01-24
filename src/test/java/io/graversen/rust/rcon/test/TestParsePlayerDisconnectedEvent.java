@@ -39,4 +39,16 @@ class TestParsePlayerDisconnectedEvent extends BaseDefaultParserTest
         assertEquals("76561197979952036", event.get().getSteamId64());
         assertEquals("82.102.20.168:53998", event.get().getConnectionTuple());
     }
+
+    @Test
+    void test_findCorrectInfo_2()
+    {
+        final Optional<PlayerDisconnectedEvent> event = eventParser.parseEvent().apply(messages[3]);
+
+        assertTrue(event.isPresent());
+        assertEquals("Orion (EN/FR/ES)", event.get().getPlayerName());
+        assertEquals("closing", event.get().getReason());
+        assertEquals("76561198063601715", event.get().getSteamId64());
+        assertEquals("92.171.193.37:52278", event.get().getConnectionTuple());
+    }
 }

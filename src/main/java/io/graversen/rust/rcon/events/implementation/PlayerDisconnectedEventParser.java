@@ -2,6 +2,7 @@ package io.graversen.rust.rcon.events.implementation;
 
 import io.graversen.rust.rcon.events.IEventParser;
 import io.graversen.rust.rcon.events.types.player.PlayerDisconnectedEvent;
+import io.graversen.rust.rcon.util.Utils;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -14,7 +15,7 @@ public class PlayerDisconnectedEventParser implements IEventParser<PlayerDisconn
         return rconMessage ->
         {
             final String[] splitInput = rconMessage.split("/");
-            final String[] splitInputLastElement = splitInput[2].split("disconnecting:");
+            final String[] splitInputLastElement = Utils.partialJoin("/", splitInput, 2, splitInput.length).split("disconnecting:");
 
             final String ipAddress = splitInput[0];
             final String steamId64 = splitInput[1];

@@ -1,5 +1,6 @@
 package io.graversen.rust.rcon.util;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public abstract class Utils
@@ -7,6 +8,12 @@ public abstract class Utils
     public static final Pattern squareBracketInsideMatcher = Pattern.compile("\\[(.*?)\\]");
 
     public static final Pattern squareBracketOutsideMatcher = Pattern.compile("\\](.*?)\\[");
+
+    public static String partialJoin(String delimiter, String[] stringArray, int fromIndex, int toIndex)
+    {
+        final String[] partialStringArray = Arrays.copyOfRange(stringArray, fromIndex, toIndex);
+        return String.join(delimiter, partialStringArray);
+    }
 
     public static int nthIndexOf(String text, char needle, int n)
     {
