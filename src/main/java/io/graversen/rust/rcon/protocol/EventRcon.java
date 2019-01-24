@@ -1,5 +1,6 @@
 package io.graversen.rust.rcon.protocol;
 
+import io.graversen.rust.rcon.objects.rust.ISteamPlayer;
 import io.graversen.rust.rcon.rustclient.IRconClient;
 
 public class EventRcon extends BaseRcon
@@ -19,10 +20,10 @@ public class EventRcon extends BaseRcon
         return rconEntity("heli.call");
     }
 
-    public RconEntity patrolHelicopter(String player)
+    public RconEntity patrolHelicopter(ISteamPlayer steamPlayer)
     {
         patrolHelicopter().execute();
-        return rconEntity("heli.strafe %s", player);
+        return rconEntity("heli.strafe %s", steamPlayer.getSteamId());
     }
 
     public RconEntity resetPatrolHelicopterLifetime()
