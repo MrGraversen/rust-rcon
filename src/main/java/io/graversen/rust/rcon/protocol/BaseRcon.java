@@ -5,11 +5,11 @@ import io.graversen.rust.rcon.rustclient.IRconClient;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class BaseRcon
+class BaseRcon
 {
     private final IRconClient rconClient;
 
-    public BaseRcon(IRconClient rconClient)
+    protected BaseRcon(IRconClient rconClient)
     {
         this.rconClient = rconClient;
     }

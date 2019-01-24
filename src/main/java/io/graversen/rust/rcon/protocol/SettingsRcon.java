@@ -8,4 +8,41 @@ public class SettingsRcon extends BaseRcon
     {
         super(rconClient);
     }
+
+//    public void disableDecay()
+//    {
+//        setDecayScale(0);
+//        setDecayUpkeep(false);
+//    }
+//
+//    public void resetDecay()
+//    {
+//        setDecayScale(100);
+//        setDecayUpkeep(true);
+//    }
+
+    public RconEntity decayScale(int decayPercent)
+    {
+        return rconEntity("decay.scale %d", decayPercent);
+    }
+
+    public RconEntity decayUpkeepEnabled(boolean upkeep)
+    {
+        return rconEntity("decay.upkeep %s", String.valueOf(upkeep));
+    }
+
+    public RconEntity stabilityEnabled(boolean enabled)
+    {
+        return rconEntity("server.stability %s", String.valueOf(enabled));
+    }
+
+    public RconEntity radiationEnabled(boolean enabled)
+    {
+        return rconEntity("server.radiation %s", String.valueOf(enabled));
+    }
+
+    public RconEntity globalChatEnabled(boolean enabled)
+    {
+        return rconEntity("server.globalchat %s", String.valueOf(enabled));
+    }
 }
