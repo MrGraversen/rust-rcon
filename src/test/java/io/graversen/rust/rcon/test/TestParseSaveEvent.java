@@ -1,24 +1,21 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.RconMessageTypes;
+import io.graversen.rust.rcon.events.IEventParser;
+import io.graversen.rust.rcon.events.implementation.SaveEventParser;
 import io.graversen.rust.rcon.events.types.game.SaveEvent;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestParseSaveEvent extends BaseDefaultParserTest
 {
     private static final String EVENT_STRING = "Saving complete";
 
+    private final IEventParser<SaveEvent> eventParser = new SaveEventParser();
+
     @Test
     void test_validation()
     {
-        defaultConsoleParser.validateEvent(EVENT_STRING, RconMessageTypes.SAVE_EVENT);
-    }
-
-    @Test
-    void test_parse()
-    {
-        final SaveEvent saveEvent = defaultConsoleParser.parseSaveEvent(EVENT_STRING);
-        Assertions.assertNotNull(saveEvent);
+        assertTrue(eventParser.parseEvent().apply(EVENT_STRING).isPresent());
     }
 }

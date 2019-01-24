@@ -1,13 +1,8 @@
 package io.graversen.rust.rcon.test;
 
-import io.graversen.rust.rcon.DefaultConsoleParser;
+import io.graversen.rust.rcon.objects.rust.ISteamPlayer;
 
 abstract class BaseDefaultParserTest
 {
-    final DefaultConsoleParser defaultConsoleParser;
-
-    BaseDefaultParserTest()
-    {
-        this.defaultConsoleParser = new DefaultConsoleParser();
-    }
+    protected ISteamPlayer defaultPlayer = () -> "1234";
 }
