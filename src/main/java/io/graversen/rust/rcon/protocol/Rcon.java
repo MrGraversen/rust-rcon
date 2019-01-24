@@ -56,6 +56,26 @@ public class Rcon extends BaseRcon
         return rconEntity("server.readcfg");
     }
 
+    public RconEntity muteChat(ISteamPlayer steamPlayer)
+    {
+        return rconEntity("global.mutechat \"%s\"", steamPlayer.getSteamId());
+    }
+
+    public RconEntity muteVoice(ISteamPlayer steamPlayer)
+    {
+        return rconEntity("global.mutevoice \"%s\"", steamPlayer.getSteamId());
+    }
+
+    public RconEntity unmuteChat(ISteamPlayer steamPlayer)
+    {
+        return rconEntity("global.unmutechat \"%s\"", steamPlayer.getSteamId());
+    }
+
+    public RconEntity unmuteVoice(ISteamPlayer steamPlayer)
+    {
+        return rconEntity("global.unmutevoice \"%s\"", steamPlayer.getSteamId());
+    }
+
     public RconEntity kick(ISteamPlayer steamPlayer)
     {
         return kick(steamPlayer, "");
