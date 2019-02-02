@@ -2,16 +2,20 @@ package io.graversen.rust.rcon.events.types.player;
 
 public class PlayerDeathEvent extends BasePlayerEvent
 {
-    private final String targetEntityName;
+    private final String killed;
+    private final String killer;
+    private final boolean killerIsPlayer;
 
-    public PlayerDeathEvent(String playerName, String steamId64, String targetEntityName)
+    public PlayerDeathEvent(String playerName, String steamId64, String killed, String killer, boolean killerIsPlayer)
     {
         super(playerName, steamId64);
-        this.targetEntityName = targetEntityName;
+        this.killed = killed;
+        this.killer = killer;
+        this.killerIsPlayer = killerIsPlayer;
     }
 
-    public String getTargetEntityName()
+    public String getKilled()
     {
-        return targetEntityName;
+        return killed;
     }
 }
