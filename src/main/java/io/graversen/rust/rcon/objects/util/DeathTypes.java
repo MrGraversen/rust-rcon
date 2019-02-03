@@ -4,5 +4,6 @@ public enum DeathTypes
 {
     PVP,
     PVE,
-    TRAP_KILL
+    TRAP_KILL,
+    UNKNOWN
 }

@@ -2,6 +2,7 @@ package io.graversen.rust.rcon.events.implementation;
 
 import io.graversen.rust.rcon.events.IEventParser;
 import io.graversen.rust.rcon.events.types.custom.PlayerDeathEvent;
+import io.graversen.rust.rcon.objects.util.DeathTypes;
 import io.graversen.rust.rcon.serialization.DefaultSerializer;
 import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 
@@ -82,6 +83,9 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
                 this.killer = this.owner;
             }
 
+            DeathTypes deathType = DeathTypes.UNKNOWN;
+            // TODO: Determine the actual DeathType
+
             return new PlayerDeathEvent(
                     this.victim,
                     this.killer,
@@ -89,7 +93,8 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
                     this.distance,
                     this.hp,
                     this.weapon,
-                    attachments
+                    attachments,
+                    deathType
             );
         }
     }

@@ -1,6 +1,7 @@
 package io.graversen.rust.rcon.events.types.custom;
 
 import io.graversen.rust.rcon.events.types.BaseRustEvent;
+import io.graversen.rust.rcon.objects.util.DeathTypes;
 
 import java.math.BigDecimal;
 
@@ -13,10 +14,11 @@ public class PlayerDeathEvent extends BaseRustEvent
     private final Integer hp;
     private final String weapon;
     private final String[] attachments;
+    private final DeathTypes deathType;
 
     // TODO: Eventually indicate if event is PVP, PVE, or trap
 
-    public PlayerDeathEvent(String victim, String killer, String bodyPart, BigDecimal distance, Integer hp, String weapon, String[] attachments)
+    public PlayerDeathEvent(String victim, String killer, String bodyPart, BigDecimal distance, Integer hp, String weapon, String[] attachments, DeathTypes deathType)
     {
         this.victim = victim;
         this.killer = killer;
@@ -25,6 +27,7 @@ public class PlayerDeathEvent extends BaseRustEvent
         this.hp = hp;
         this.weapon = weapon;
         this.attachments = attachments;
+        this.deathType = deathType;
     }
 
     public String getVictim()
@@ -60,5 +63,10 @@ public class PlayerDeathEvent extends BaseRustEvent
     public String[] getAttachments()
     {
         return attachments;
+    }
+
+    public DeathTypes getDeathType()
+    {
+        return deathType;
     }
 }
