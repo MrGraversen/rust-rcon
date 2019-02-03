@@ -59,4 +59,19 @@ public class TestPlayerDeathEventParser extends BaseDefaultParserTest
         assertEquals("Gun Trap", event.get().getWeapon());
         assertEquals(0, event.get().getAttachments().length);
     }
+
+    @Test
+    void test_findCorrectInfo_3()
+    {
+        final Optional<PlayerDeathEvent> event = eventParser.parseEvent().apply(messages[5]);
+
+        assertTrue(event.isPresent());
+        assertEquals("Josma", event.get().getVictim());
+        assertEquals("Bear", event.get().getKiller());
+        assertEquals("Body", event.get().getBodyPart());
+        assertEquals(new BigDecimal("0.00"), event.get().getDistance());
+        assertNull(event.get().getHp());
+        assertNull(event.get().getWeapon());
+        assertEquals(0, event.get().getAttachments().length);
+    }
 }
