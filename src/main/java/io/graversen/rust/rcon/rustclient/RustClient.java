@@ -73,7 +73,7 @@ public class RustClient implements IRconClient, AutoCloseable
         this.open = false;
         this.loggingEnabled = true;
         this.currentRequestCounter = new AtomicInteger(0);
-        this.asyncRequests = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build();
+        this.asyncRequests = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
     }
 
     @Override

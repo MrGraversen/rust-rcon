@@ -7,7 +7,7 @@ public enum RconMessageTypes implements IRconMessage
                 @Override
                 public boolean matches(String consoleInput)
                 {
-                    return consoleInput.startsWith("[CHAT]");
+                    return consoleInput.startsWith("[CHAT] ");
                 }
             },
     PLAYER_CONNECTED
@@ -23,7 +23,7 @@ public enum RconMessageTypes implements IRconMessage
                 @Override
                 public boolean matches(String consoleInput)
                 {
-                    return consoleInput.contains("disconnecting:");
+                    return consoleInput.contains("disconnecting: ");
                 }
             },
     PLAYER_DEATH
@@ -31,7 +31,7 @@ public enum RconMessageTypes implements IRconMessage
                 @Override
                 public boolean matches(String consoleInput)
                 {
-                    return consoleInput.contains("] was killed by ");
+                    return consoleInput.startsWith("[DeathSON] {\"");
                 }
             },
     PLAYER_SPAWNED
@@ -39,7 +39,7 @@ public enum RconMessageTypes implements IRconMessage
                 @Override
                 public boolean matches(String consoleInput)
                 {
-                    return consoleInput.endsWith("has entered the game");
+                    return consoleInput.endsWith(" has entered the game");
                 }
             },
     WORLD_EVENT
