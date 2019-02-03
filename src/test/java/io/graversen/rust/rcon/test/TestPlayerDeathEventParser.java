@@ -19,7 +19,10 @@ public class TestPlayerDeathEventParser extends BaseDefaultParserTest
             "[DeathSON] {\"victim\":\"SOSA\",\"killer\":\"Gun Trap\",\"bodypart\":\"Body\",\"distance\":\"1.66\",\"owner\":\"Doctor Delete\"}",
             "[DeathSON] {\"victim\":\"soares pt\",\"killer\":\"Doctor Delete\",\"bodypart\":\"Stomach\",\"distance\":\"3.79\",\"hp\":\"100\",\"weapon\":\"M249\",\"attachments\":\"Weapon flashlight, Holosight, Silencer\"}",
             "[DeathSON] {\"victim\":\"Scientist\",\"killer\":\"Doctor Delete\",\"bodypart\":\"Head\",\"distance\":\"118.36\",\"hp\":\"100\",\"weapon\":\"L96 Rifle\",\"attachments\":\"Weapon Lasersight, 8x Zoom Scope, Silencer\"}",
-            "[DeathSON] {\"victim\":\"Josma\",\"killer\":\"Bear\",\"bodypart\":\"Body\",\"distance\":\"0.00\"}"
+            "[DeathSON] {\"victim\":\"Josma\",\"killer\":\"Bear\",\"bodypart\":\"Body\",\"distance\":\"0.00\"}",
+            "[DeathSON] {\"victim\":\"Qwerty\",\"killer\":\"Flame Turret\",\"bodypart\":\"Body\",\"distance\":\"1.07\",\"owner\":\"Doctor Delete\"}",
+            "[DeathSON] {\"victim\":\"Fakorr\",\"killer\":\"Auto Turret\",\"bodypart\":\"Body\",\"distance\":\"2.97\",\"owner\":\"Doctor Delete\"}",
+            "[DeathSON] {\"victim\":\"Larz\",\"killer\":\"Landmine\",\"bodypart\":\"Body\",\"distance\":\"0.87\",\"owner\":\"Doctor Delete\"}"
     };
 
     private final IEventParser<PlayerDeathEvent> eventParser = new PlayerDeathEventParser();
