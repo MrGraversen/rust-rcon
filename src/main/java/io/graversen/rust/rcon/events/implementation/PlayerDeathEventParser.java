@@ -7,6 +7,7 @@ import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -40,13 +41,14 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
 
     private class PlayerDeathPayload
     {
-        private final String victim;
-        private final String killer;
-        private final String bodypart;
-        private final BigDecimal distance;
-        private final Integer hp;
-        private final String weapon;
-        private final String attachments;
+        private String victim;
+        private String killer;
+        private String bodypart;
+        private BigDecimal distance;
+        private Integer hp;
+        private String weapon;
+        private String attachments;
+        private String owner;
 
         public PlayerDeathPayload(
                 String victim,
@@ -55,8 +57,8 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
                 BigDecimal distance,
                 Integer hp,
                 String weapon,
-                String attachments
-        )
+                String attachments,
+                String owner)
         {
             this.victim = victim;
             this.killer = killer;
@@ -65,6 +67,7 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
             this.hp = hp;
             this.weapon = weapon;
             this.attachments = attachments;
+            this.owner = owner;
         }
 
         private PlayerDeathEvent toPlayerDeathEvent()
@@ -72,6 +75,12 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
             final String[] attachments = this.attachments == null
                     ? new String[0]
                     : Arrays.stream(this.attachments.split(",")).map(String::trim).toArray(String[]::new);
+
+            if (Objects.nonNull(owner))
+            {
+                this.weapon = this.killer;
+                this.killer = this.owner;
+            }
 
             return new PlayerDeathEvent(
                     this.victim,

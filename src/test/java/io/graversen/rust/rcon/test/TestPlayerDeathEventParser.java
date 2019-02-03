@@ -9,8 +9,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestPlayerDeathEventParser extends BaseDefaultParserTest
 {
@@ -46,18 +45,18 @@ public class TestPlayerDeathEventParser extends BaseDefaultParserTest
         assertEquals(3, event.get().getAttachments().length);
     }
 
-//    @Test
-//    void test_findCorrectInfo_2()
-//    {
-//        final Optional<PlayerDeathEvent> event = eventParser.parseEvent().apply(messages[2]);
-//
-//        assertTrue(event.isPresent());
-//        assertEquals("SOSA", event.get().getVictim());
-//        assertEquals("Doctor Delete", event.get().getKiller());
-//        assertEquals("Head", event.get().getBodyPart());
-//        assertEquals(new BigDecimal("1.66"), event.get().getDistance());
-//        assertEquals(Integer.valueOf(100), event.get().getHp());
-//        assertEquals("MP5A4", event.get().getWeapon());
-//        assertEquals(3, event.get().getAttachments().length);
-//    }
+    @Test
+    void test_findCorrectInfo_2()
+    {
+        final Optional<PlayerDeathEvent> event = eventParser.parseEvent().apply(messages[2]);
+
+        assertTrue(event.isPresent());
+        assertEquals("SOSA", event.get().getVictim());
+        assertEquals("Doctor Delete", event.get().getKiller());
+        assertEquals("Body", event.get().getBodyPart());
+        assertEquals(new BigDecimal("1.66"), event.get().getDistance());
+        assertNull(event.get().getHp());
+        assertEquals("Gun Trap", event.get().getWeapon());
+        assertEquals(0, event.get().getAttachments().length);
+    }
 }
