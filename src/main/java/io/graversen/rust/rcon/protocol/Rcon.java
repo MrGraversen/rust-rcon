@@ -106,6 +106,11 @@ public class Rcon extends BaseRcon
         return rconEntity("global.unban \"%s\"", steamPlayer.getSteamId());
     }
 
+    public RconEntity deleteAllEntities(ISteamPlayer steamPlayer)
+    {
+        return rconEntity("entity.deleteby \"%s\"", steamPlayer.getSteamId());
+    }
+
     public RconEntity addOwner(ISteamPlayer steamPlayer, String name, String reason)
     {
         return rconEntity("global.ownerid \"%s\" \"%s\" \"%s\"", steamPlayer.getSteamId(), name, reason);
