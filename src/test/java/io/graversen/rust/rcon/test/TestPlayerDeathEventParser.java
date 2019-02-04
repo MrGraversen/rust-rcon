@@ -22,7 +22,8 @@ public class TestPlayerDeathEventParser extends BaseDefaultParserTest
             "[DeathSON] {\"victim\":\"Josma\",\"killer\":\"Bear\",\"bodypart\":\"Body\",\"distance\":\"0.00\"}",
             "[DeathSON] {\"victim\":\"Qwerty\",\"killer\":\"Flame Turret\",\"bodypart\":\"Body\",\"distance\":\"1.07\",\"owner\":\"Doctor Delete\"}",
             "[DeathSON] {\"victim\":\"Fakorr\",\"killer\":\"Auto Turret\",\"bodypart\":\"Body\",\"distance\":\"2.97\",\"owner\":\"Doctor Delete\"}",
-            "[DeathSON] {\"victim\":\"Larz\",\"killer\":\"Landmine\",\"bodypart\":\"Body\",\"distance\":\"0.87\",\"owner\":\"Doctor Delete\"}"
+            "[DeathSON] {\"victim\":\"Larz\",\"killer\":\"Landmine\",\"bodypart\":\"Body\",\"distance\":\"0.87\",\"owner\":\"Doctor Delete\"}",
+            "[DeathSON] {\"victim\":\"Rino_Shikarnyi\"}"
     };
 
     private final IEventParser<PlayerDeathEvent> eventParser = new PlayerDeathEventParser();

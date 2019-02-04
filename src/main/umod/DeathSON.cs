@@ -264,13 +264,22 @@ namespace Oxide.Plugins
                 }
             }
 
-            Puts(JsonConvert.SerializeObject(replacements));
+            // Puts(JsonConvert.SerializeObject(replacements));
+			EmitJsonData(replacements, data);
 
             message = InsertPlaceholderValues(message, replacements);
 
             replacements = null;
             return message;
         }
+
+		private void EmitJsonData(Dictionary<string, string> replacements, DeathData data) {
+			replacements.Add("damageType", data.DamageType.ToString());
+			replacements.Add("killerEntityType", data.KillerEntityType.ToString());
+			replacements.Add("victimEntityType", data.VictimEntityType.ToString());
+
+			Puts(JsonConvert.SerializeObject(replacements));
+		}
 
         private struct DeathData
         {

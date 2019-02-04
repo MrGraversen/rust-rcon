@@ -50,6 +50,9 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
         private String weapon;
         private String attachments;
         private String owner;
+        private String damageType;
+        private String killerEntityType;
+        private String victimEntityType;
 
         public PlayerDeathPayload(
                 String victim,
@@ -59,7 +62,10 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
                 Integer hp,
                 String weapon,
                 String attachments,
-                String owner)
+                String owner, 
+                String damageType,
+                String killerEntityType,
+                String victimEntityType)
         {
             this.victim = victim;
             this.killer = killer;
@@ -69,6 +75,9 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
             this.weapon = weapon;
             this.attachments = attachments;
             this.owner = owner;
+            this.damageType = damageType;
+            this.killerEntityType = killerEntityType;
+            this.victimEntityType = victimEntityType;
         }
 
         private PlayerDeathEvent toPlayerDeathEvent()
