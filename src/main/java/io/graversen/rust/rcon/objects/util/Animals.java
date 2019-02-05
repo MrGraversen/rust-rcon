@@ -10,7 +10,7 @@ public enum Animals
     WOLF,
     UNKNOWN;
 
-    public Animals parse(String string)
+    public static Animals parse(String string)
     {
         try
         {

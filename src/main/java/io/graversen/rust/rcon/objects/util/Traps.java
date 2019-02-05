@@ -8,7 +8,7 @@ public enum Traps
     LANDMINE,
     UNKNOWN;
 
-    public Traps parse(String string)
+    public static Traps parse(String string)
     {
         try
         {
