@@ -2,17 +2,21 @@ package io.graversen.rust.rcon.objects.util;
 
 import java.util.Objects;
 
-public enum Animals
+public enum DamageTypes
 {
-    BEAR,
-    BOAR,
-    CHICKEN,
-    STAG,
-    HORSE,
-    WOLF,
+    BITE,
+    BLUNT,
+    BULLET,
+    COLD,
+    ELECTRIC,
+    EXPLOSION,
+    FALLING,
+    RADIATION,
+    SLASH,
+    STAB,
     UNKNOWN;
 
-    public static Animals parse(String string)
+    public static DamageTypes parse(String string)
     {
         if (Objects.isNull(string))
         {
@@ -21,11 +25,12 @@ public enum Animals
 
         try
         {
-            return Animals.valueOf(string.toUpperCase());
+            return DamageTypes.valueOf(string.toUpperCase());
         }
         catch (IllegalArgumentException e)
         {
             return UNKNOWN;
         }
     }
+
 }

@@ -1,6 +1,7 @@
 package io.graversen.rust.rcon.events.types.custom;
 
 import io.graversen.rust.rcon.events.types.BaseRustEvent;
+import io.graversen.rust.rcon.objects.util.DamageTypes;
 import io.graversen.rust.rcon.objects.util.DeathTypes;
 
 import java.math.BigDecimal;
@@ -15,7 +16,7 @@ public class PlayerDeathEvent extends BaseRustEvent
     private final String weapon;
     private final String[] attachments;
     private final DeathTypes deathType;
-    private final String damageType;
+    private final DamageTypes damageType;
 
     public PlayerDeathEvent(
             String victim,
@@ -26,7 +27,7 @@ public class PlayerDeathEvent extends BaseRustEvent
             String weapon,
             String[] attachments,
             DeathTypes deathType,
-            String damageType
+            DamageTypes damageType
     )
     {
         this.victim = victim;
@@ -80,7 +81,7 @@ public class PlayerDeathEvent extends BaseRustEvent
         return deathType;
     }
 
-    public String getDamageType()
+    public DamageTypes getDamageType()
     {
         return damageType;
     }

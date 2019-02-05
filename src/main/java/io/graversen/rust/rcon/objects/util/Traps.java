@@ -1,5 +1,7 @@
 package io.graversen.rust.rcon.objects.util;
 
+import java.util.Objects;
+
 public enum Traps
 {
     GUN_TRAP,
@@ -10,6 +12,11 @@ public enum Traps
 
     public static Traps parse(String string)
     {
+        if (Objects.isNull(string))
+        {
+            return UNKNOWN;
+        }
+
         try
         {
             return Traps.valueOf(string.toUpperCase().replaceAll("\\s", "_"));
