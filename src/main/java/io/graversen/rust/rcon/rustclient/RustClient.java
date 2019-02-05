@@ -20,6 +20,7 @@ import io.graversen.rust.rcon.logging.DefaultLogger;
 import io.graversen.rust.rcon.logging.ILogger;
 import io.graversen.rust.rcon.objects.RconReceive;
 import io.graversen.rust.rcon.objects.RconRequest;
+import io.graversen.rust.rcon.protocol.Rcon;
 import io.graversen.rust.rcon.serialization.DefaultSerializer;
 import io.graversen.rust.rcon.websocket.DefaultWebSocketClient;
 import io.graversen.rust.rcon.websocket.IWebSocketClient;
@@ -49,11 +50,14 @@ public class RustClient implements IRconClient, AutoCloseable
     private final IRconMessageParser rconMessageParser;
     private final ConcurrentMap<RconMessageTypes, IEventParser<?>> eventParsers;
 
+    private final AtomicInteger currentRequestCounter;
+    private final Cache<Integer, CompletableFuture<RconReceive>> asyncRequests;
+
     private boolean open;
     private boolean defaultEventsRegistered;
     private boolean loggingEnabled;
-    private final AtomicInteger currentRequestCounter;
-    private final Cache<Integer, CompletableFuture<RconReceive>> asyncRequests;
+
+    private Rcon rcon;
 
     private RustClient(
             ILogger logger,
@@ -76,6 +80,16 @@ public class RustClient implements IRconClient, AutoCloseable
         this.loggingEnabled = true;
         this.currentRequestCounter = new AtomicInteger(0);
         this.asyncRequests = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
+    }
+
+    public Rcon rcon()
+    {
+        if (Objects.isNull(rcon))
+        {
+            rcon = new Rcon(this);
+        }
+
+        return rcon;
     }
 
     @Override
