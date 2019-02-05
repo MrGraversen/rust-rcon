@@ -373,7 +373,7 @@ public class RustClient implements IRconClient, AutoCloseable
             return this;
         }
 
-        public RustClientBuilder withSrializer(ISerializer serializer)
+        public RustClientBuilder withSerializer(ISerializer serializer)
         {
             Objects.requireNonNull(serializer, "ISerializer cannot be null");
 
