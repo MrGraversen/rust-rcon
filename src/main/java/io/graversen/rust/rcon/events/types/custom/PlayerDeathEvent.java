@@ -15,10 +15,19 @@ public class PlayerDeathEvent extends BaseRustEvent
     private final String weapon;
     private final String[] attachments;
     private final DeathTypes deathType;
+    private final String damageType;
 
-    // TODO: Eventually indicate if event is PVP, PVE, or trap
-
-    public PlayerDeathEvent(String victim, String killer, String bodyPart, BigDecimal distance, Integer hp, String weapon, String[] attachments, DeathTypes deathType)
+    public PlayerDeathEvent(
+            String victim,
+            String killer,
+            String bodyPart,
+            BigDecimal distance,
+            Integer hp,
+            String weapon,
+            String[] attachments,
+            DeathTypes deathType,
+            String damageType
+    )
     {
         this.victim = victim;
         this.killer = killer;
@@ -28,6 +37,7 @@ public class PlayerDeathEvent extends BaseRustEvent
         this.weapon = weapon;
         this.attachments = attachments;
         this.deathType = deathType;
+        this.damageType = damageType;
     }
 
     public String getVictim()
@@ -68,5 +78,10 @@ public class PlayerDeathEvent extends BaseRustEvent
     public DeathTypes getDeathType()
     {
         return deathType;
+    }
+
+    public String getDamageType()
+    {
+        return damageType;
     }
 }

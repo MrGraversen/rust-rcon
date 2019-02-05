@@ -92,7 +92,7 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
                 this.killer = this.owner;
             }
 
-            final DeathTypes deathType = DeathTypes.resolve(killerEntityType, victimEntityType);½
+            final DeathTypes deathType = DeathTypes.resolve(killerEntityType, victimEntityType);
 
             return new PlayerDeathEvent(
                     this.victim,
@@ -102,8 +102,8 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
                     this.hp,
                     this.weapon,
                     attachments,
-                    deathType
-            );
+                    deathType,
+                    damageType);
         }
     }
 }
