@@ -1,7 +1,7 @@
 package io.graversen.rust.rcon.support;
 
 @FunctionalInterface
-public interface IOxidePermissible
+public interface IUmodPermissible
 {
     String baseName();
 }

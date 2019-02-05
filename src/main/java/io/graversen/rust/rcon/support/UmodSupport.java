@@ -5,7 +5,7 @@ import io.graversen.rust.rcon.rustclient.IRconClient;
 
 import java.util.Arrays;
 
-public class OxideSupport
+public class UmodSupport
 {
     private static final String OXIDE_GRANT = "oxide.grant";
     private static final String OXIDE_REVOKE = "oxide.revoke";
@@ -13,12 +13,12 @@ public class OxideSupport
 
     private final IRconClient rconClient;
 
-    public OxideSupport(IRconClient rconClient)
+    public UmodSupport(IRconClient rconClient)
     {
         this.rconClient = rconClient;
     }
 
-    public void grant(IOxidePermissible oxidePermissible, ISteamPlayer player, String permission)
+    public void grant(IUmodPermissible oxidePermissible, ISteamPlayer player, String permission)
     {
         permission = sanitizePermissionString(oxidePermissible, permission);
         final String command = getCommandString(oxidePermissible, OXIDE_GRANT, player, permission);
@@ -26,7 +26,7 @@ public class OxideSupport
         rconClient.send(command);
     }
 
-    public void revoke(IOxidePermissible oxidePermissible, ISteamPlayer player, String permission)
+    public void revoke(IUmodPermissible oxidePermissible, ISteamPlayer player, String permission)
     {
         permission = sanitizePermissionString(oxidePermissible, permission);
         final String command = getCommandString(oxidePermissible, OXIDE_REVOKE, player, permission);
@@ -44,13 +44,13 @@ public class OxideSupport
         final String command = String.format("%s %s", OXIDE_RELOAD, pluginName);
     }
 
-    private String getCommandString(IOxidePermissible oxidePermissible, String oxidePrefix, ISteamPlayer player, String permission)
+    private String getCommandString(IUmodPermissible oxidePermissible, String oxidePrefix, ISteamPlayer player, String permission)
     {
         final String permissionString = String.format("%s.%s", oxidePermissible.baseName(), permission);
         return String.format("%s user %s %s", oxidePrefix, player.getSteamId(), permissionString);
     }
 
-    private String sanitizePermissionString(IOxidePermissible oxidePermissible, String permission)
+    private String sanitizePermissionString(IUmodPermissible oxidePermissible, String permission)
     {
         if (permission.startsWith(oxidePermissible.baseName()))
         {
