@@ -236,6 +236,7 @@ public class RustClient implements IRconClient, AutoCloseable
             {
                 getWebSocketClient().close();
                 getEventBus().stop();
+                pollers.shutdownNow();
                 open = false;
             }
         }
@@ -245,17 +246,19 @@ public class RustClient implements IRconClient, AutoCloseable
         }
     }
 
-    public void addPlayerPoller(IPlayerPollingListener playerPollingListener, int repeatIntervalMs)
+    public void addPlayerPoller(IPlayerPollingListener playerPollingListener, long repeatInterval, TimeUnit timeUnit)
     {
-        pollers.scheduleAtFixedRate()
-    }
-
-    private Runnable playerPoller()
-    {
-        return () ->
+        if (!open)
         {
-            rcon().info().
+            throw new RconException("Cannot add pollers before the RconClient has opened");
         }
+
+        pollers.scheduleAtFixedRate(
+                () -> playerPollingListener.onResult(rcon().info().getCurrentPlayers()),
+                repeatInterval,
+                repeatInterval,
+                timeUnit
+        );
     }
 
     private IEventListener<RconMessageEvent> asyncRequestListener()

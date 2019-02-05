@@ -60,4 +60,10 @@ public class Player implements ISteamPlayer
     {
         return health;
     }
+
+    @Override
+    public String toString()
+    {
+        return getDisplayName();
+    }
 }

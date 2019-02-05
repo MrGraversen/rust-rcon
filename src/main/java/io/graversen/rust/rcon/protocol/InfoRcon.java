@@ -1,11 +1,44 @@
 package io.graversen.rust.rcon.protocol;
 
+import io.graversen.rust.rcon.objects.RconReceive;
+import io.graversen.rust.rcon.objects.rust.Player;
 import io.graversen.rust.rcon.rustclient.IRconClient;
+import io.graversen.trunk.io.serialization.interfaces.ISerializer;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class InfoRcon extends BaseRcon
 {
-    InfoRcon(IRconClient rconClient)
+    private final ISerializer serializer;
+
+    InfoRcon(IRconClient rconClient, ISerializer serializer)
     {
         super(rconClient);
+        this.serializer = serializer;
+    }
+
+    public List<Player> getCurrentPlayers()
+    {
+        final List<Player> playerList = new ArrayList<>();
+        final RconReceive playerListRcon = rconClient().sendAsyncBlocking("playerlist", 1, TimeUnit.SECONDS);
+
+        if (Objects.nonNull(playerListRcon))
+        {
+            try
+            {
+                final Player[] players = serializer.deserialize(playerListRcon.getMessage(), Player[].class);
+                playerList.addAll(Arrays.asList(players));
+            }
+            catch (Exception e)
+            {
+                // ¯\_(ツ)_/¯
+            }
+        }
+
+        return playerList;
     }
 }
