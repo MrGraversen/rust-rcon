@@ -20,6 +20,7 @@ import io.graversen.rust.rcon.logging.DefaultLogger;
 import io.graversen.rust.rcon.logging.ILogger;
 import io.graversen.rust.rcon.objects.RconReceive;
 import io.graversen.rust.rcon.objects.RconRequest;
+import io.graversen.rust.rcon.polling.IPlayerPollingListener;
 import io.graversen.rust.rcon.protocol.Rcon;
 import io.graversen.rust.rcon.serialization.DefaultSerializer;
 import io.graversen.rust.rcon.websocket.DefaultWebSocketClient;
@@ -30,10 +31,7 @@ import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -52,6 +50,7 @@ public class RustClient implements IRconClient, AutoCloseable
 
     private final AtomicInteger currentRequestCounter;
     private final Cache<Integer, CompletableFuture<RconReceive>> asyncRequests;
+    private final ScheduledExecutorService pollers;
 
     private boolean open;
     private boolean defaultEventsRegistered;
@@ -80,13 +79,14 @@ public class RustClient implements IRconClient, AutoCloseable
         this.loggingEnabled = true;
         this.currentRequestCounter = new AtomicInteger(0);
         this.asyncRequests = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
+        this.pollers = Executors.newSingleThreadScheduledExecutor();
     }
 
     public Rcon rcon()
     {
         if (Objects.isNull(rcon))
         {
-            rcon = new Rcon(this);
+            rcon = new Rcon(this, getSerializer());
         }
 
         return rcon;
@@ -109,6 +109,25 @@ public class RustClient implements IRconClient, AutoCloseable
         doSend(rconMessage, identifier);
 
         return completableFuture;
+    }
+
+    @Override
+    public RconReceive sendAsyncBlocking(String rconMessage)
+    {
+        return sendAsyncBlocking(rconMessage, 3, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public RconReceive sendAsyncBlocking(String rconMessage, long timeout, TimeUnit timeUnit)
+    {
+        try
+        {
+            return sendAsync(rconMessage).get(timeout, timeUnit);
+        }
+        catch (InterruptedException | ExecutionException | TimeoutException e)
+        {
+            return null;
+        }
     }
 
     private void doSend(String rconMessage, int identifier)
@@ -223,6 +242,19 @@ public class RustClient implements IRconClient, AutoCloseable
         catch (Exception e)
         {
             // ¯\_(ツ)_/¯
+        }
+    }
+
+    public void addPlayerPoller(IPlayerPollingListener playerPollingListener, int repeatIntervalMs)
+    {
+        pollers.scheduleAtFixedRate()
+    }
+
+    private Runnable playerPoller()
+    {
+        return () ->
+        {
+            rcon().info().
         }
     }
 
