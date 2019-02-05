@@ -1,7 +1,5 @@
 package io.graversen.rust.rcon.support;
 
-import io.graversen.rust.rcon.IRconClient;
-
 public abstract class BaseModSupport
 {
     private final IRconClient rconClient;
