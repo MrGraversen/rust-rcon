@@ -39,7 +39,7 @@ public enum RconMessageTypes implements IRconMessage
                 @Override
                 public boolean matches(String consoleInput)
                 {
-                    return consoleInput.endsWith(" has entered the game");
+                    return consoleInput.endsWith("] has entered the game");
                 }
             },
     WORLD_EVENT

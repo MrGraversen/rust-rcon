@@ -50,6 +50,7 @@ public class RustClient implements IRconClient, AutoCloseable
     private final ConcurrentMap<RconMessageTypes, IEventParser<?>> eventParsers;
 
     private boolean open;
+    private boolean defaultEventsRegistered;
     private boolean loggingEnabled;
     private final AtomicInteger currentRequestCounter;
     private final Cache<Integer, CompletableFuture<RconReceive>> asyncRequests;
@@ -71,6 +72,7 @@ public class RustClient implements IRconClient, AutoCloseable
         this.eventParsers = new ConcurrentHashMap<>();
 
         this.open = false;
+        this.defaultEventsRegistered = false;
         this.loggingEnabled = true;
         this.currentRequestCounter = new AtomicInteger(0);
         this.asyncRequests = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
@@ -120,11 +122,15 @@ public class RustClient implements IRconClient, AutoCloseable
             ((InternalWebSocketListener) getWebSocketListener()).setRustClient(this);
         }
 
-        Arrays.stream(DEFAULT_EVENT_CLASSES).forEach(
-                eventClass -> getEventBus().registerEventListener(eventClass, event -> getLogger().info(event.getClass().getSimpleName()))
-        );
+        if (!defaultEventsRegistered)
+        {
+            Arrays.stream(DEFAULT_EVENT_CLASSES).forEach(
+                    eventClass -> getEventBus().registerEventListener(eventClass, event -> getLogger().info(event.getClass().getSimpleName()))
+            );
 
-        eventBus.registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
+            eventBus.registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
+            defaultEventsRegistered = true;
+        }
 
         getEventBus().start();
         getWebSocketClient().open();
@@ -188,6 +194,7 @@ public class RustClient implements IRconClient, AutoCloseable
             {
                 getWebSocketClient().close();
                 getEventBus().stop();
+                open = false;
             }
         }
         catch (Exception e)
