@@ -2,6 +2,7 @@ package io.graversen.rust.rcon.protocol;
 
 import io.graversen.rust.rcon.objects.rust.ISteamPlayer;
 import io.graversen.rust.rcon.rustclient.IRconClient;
+import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 
 public class Rcon extends BaseRcon
 {
@@ -11,14 +12,14 @@ public class Rcon extends BaseRcon
     private final SettingsRcon settingsRcon;
     private final InfoRcon infoRcon;
 
-    public Rcon(IRconClient rconClient)
+    public Rcon(IRconClient rconClient, ISerializer serializer)
     {
         super(rconClient);
         this.aiRcon = new AiRcon(rconClient);
         this.eventRcon = new EventRcon(rconClient);
         this.inventoryRcon = new InventoryRcon(rconClient);
         this.settingsRcon = new SettingsRcon(rconClient);
-        this.infoRcon = new InfoRcon(rconClient);
+        this.infoRcon = new InfoRcon(rconClient, serializer);
     }
 
     public AiRcon ai()
