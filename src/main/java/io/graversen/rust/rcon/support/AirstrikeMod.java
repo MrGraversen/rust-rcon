@@ -1,7 +1,7 @@
 package io.graversen.rust.rcon.support;
 
-import io.graversen.rust.rcon.IRconClient;
 import io.graversen.rust.rcon.objects.rust.Player;
+import io.graversen.rust.rcon.rustclient.IRconClient;
 
 public class AirstrikeMod extends BaseModSupport implements IOxidePermissible
 {
@@ -45,19 +45,19 @@ public class AirstrikeMod extends BaseModSupport implements IOxidePermissible
     public void callStrikeRandom(StrikeTypes strikeType)
     {
         final String command = String.format("%s %s random", BASE_COMMAND, strikeType.name().toLowerCase());
-        rconClient().sendRaw(command);
+        rconClient().send(command);
     }
 
     public void callStrike(StrikeTypes strikeType, String player)
     {
         final String command = String.format("%s %s %s", BASE_COMMAND, strikeType.name().toLowerCase(), player);
-        rconClient().sendRaw(command);
+        rconClient().send(command);
     }
 
     public void callStrike(StrikeTypes strikeType, Player player)
     {
         final String command = String.format("%s %s %s", BASE_COMMAND, strikeType.name().toLowerCase(), player.getDisplayName());
-        rconClient().sendRaw(command);
+        rconClient().send(command);
     }
 
     @Override

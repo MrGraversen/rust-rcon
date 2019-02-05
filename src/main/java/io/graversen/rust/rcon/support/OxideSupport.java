@@ -1,7 +1,7 @@
 package io.graversen.rust.rcon.support;
 
-import io.graversen.rust.rcon.IRconClient;
 import io.graversen.rust.rcon.objects.rust.ISteamPlayer;
+import io.graversen.rust.rcon.rustclient.IRconClient;
 
 import java.util.Arrays;
 
@@ -23,7 +23,7 @@ public class OxideSupport
         permission = sanitizePermissionString(oxidePermissible, permission);
         final String command = getCommandString(oxidePermissible, OXIDE_GRANT, player, permission);
 
-        rconClient.sendRaw(command);
+        rconClient.send(command);
     }
 
     public void revoke(IOxidePermissible oxidePermissible, ISteamPlayer player, String permission)
@@ -31,7 +31,7 @@ public class OxideSupport
         permission = sanitizePermissionString(oxidePermissible, permission);
         final String command = getCommandString(oxidePermissible, OXIDE_REVOKE, player, permission);
 
-        rconClient.sendRaw(command);
+        rconClient.send(command);
     }
 
     public void reloadAll()
