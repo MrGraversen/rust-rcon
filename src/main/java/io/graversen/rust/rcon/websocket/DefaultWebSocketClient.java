@@ -84,4 +84,10 @@ public class DefaultWebSocketClient extends BaseWebSocketClient implements IWebS
 
         return false;
     }
+
+    @Override
+    public String connectionUriMasked()
+    {
+        return connectionUriMasked;
+    }
 }

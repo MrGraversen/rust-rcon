@@ -7,4 +7,6 @@ public interface IWebSocketClient extends AutoCloseable
     boolean open();
 
     void send(String payload);
+
+    String connectionUriMasked();
 }

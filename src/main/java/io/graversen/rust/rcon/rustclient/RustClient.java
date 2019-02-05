@@ -112,6 +112,8 @@ public class RustClient implements IRconClient, AutoCloseable
 
     public void open()
     {
+        getLogger().info("Attempting to open RCON: %s", webSocketClient.connectionUriMasked());
+
         if (open)
         {
             throw new RconException("RustClient has already been opened");
@@ -132,9 +134,13 @@ public class RustClient implements IRconClient, AutoCloseable
             defaultEventsRegistered = true;
         }
 
+        getLogger().info("Starting EventBus instance...");
         getEventBus().start();
+
+        getLogger().info("Connecting to remote socket...");
         getWebSocketClient().open();
 
+        getLogger().info("Successfully opened RustClient!");
         this.open = true;
     }
 
@@ -182,12 +188,15 @@ public class RustClient implements IRconClient, AutoCloseable
 
     public void setLoggingEnabled(boolean loggingEnabled)
     {
+        if (!loggingEnabled) getLogger().warning("Logging has been disabled");
         this.loggingEnabled = loggingEnabled;
     }
 
     @Override
     public void close()
     {
+        getLogger().info("Closing RCON");
+
         try
         {
             if (open)
@@ -325,7 +334,7 @@ public class RustClient implements IRconClient, AutoCloseable
 
         RustClientBuilder()
         {
-            this.logger = new DefaultLogger();
+            this.logger = new DefaultLogger(RustClient.class);
             this.serializer = new DefaultSerializer();
             this.webSocketListener = new InternalWebSocketListener();
             this.eventBus = new DefaultEventBus();
