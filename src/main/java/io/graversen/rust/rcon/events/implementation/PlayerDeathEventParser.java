@@ -62,7 +62,7 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
                 Integer hp,
                 String weapon,
                 String attachments,
-                String owner, 
+                String owner,
                 String damageType,
                 String killerEntityType,
                 String victimEntityType)
@@ -92,8 +92,7 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
                 this.killer = this.owner;
             }
 
-            DeathTypes deathType = DeathTypes.UNKNOWN;
-            // TODO: Determine the actual DeathType
+            final DeathTypes deathType = DeathTypes.resolve(killerEntityType, victimEntityType);½
 
             return new PlayerDeathEvent(
                     this.victim,
