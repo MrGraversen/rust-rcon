@@ -56,3 +56,7 @@ The purpose of this category of events is to provide special-case enriched event
 
 ## :alembic: Examples :zap:
 The following examples are also found in the `io.graversen.examples.rust.rcon` package.
+
+## :memo: Useful Resources
+* https://steamid.io/ - translate between Steam IDs
+* https://www.corrosionhour.com/rust-item-list/ - all Rust items, including shortcodes required by inventory rcon
