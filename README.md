@@ -8,6 +8,28 @@ The key difference being working with websockts means that the Rust server will 
 
 Console messages from the Rust server are not currently in a machine-readable format *(sigh)*, therefore this library will perform a great deal of string inspection to determine what is going on - these parsers are extensively unit-test covered.
 
+## Installation
+
+You may use JitPack to install this from the GitHub releases.  
+Add the following to your `pom.xml` if using Maven (click the little JitPack badge for other build systems):
+
+```xml
+<repositories>
+	<repository>
+		<id>jitpack.io</id>
+		<url>https://jitpack.io</url>
+	</repository>
+</repositories>
+```
+
+```xml
+<dependency>
+	<groupId>com.github.MrGraversen</groupId>
+	<artifactId>rust-rcon</artifactId>
+	<version>Tag</version>
+</dependency>
+```
+
 ## Features
 
 * Simple interface to connect to Rust server
@@ -40,7 +62,7 @@ Below is a description of events raised by *rust-rcon*. The player-centric event
 The purpose of this category of events is to provide special-case enriched events for interesting occurrences.  
 *These are normally only supported by extra effort - for example installing a uMod plugin.*
 * **PlayerDeathEvent**: Represents a player in-game death with many different details - example:
-```
+```json
 {
     "victim": "victory",
     "killer": "Doctor Delete",
@@ -79,8 +101,8 @@ final RustClient rustClient = RustClient.builder()
     .withRconMessageParser(new DefaultRconMessageParser())
     .build();
 
-    // Let's connect!
-    rustClient.open();
+// Let's connect!
+rustClient.open();
 ```
 
 ### Example 3 - let's increase the God Complex
