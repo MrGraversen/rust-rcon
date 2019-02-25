@@ -16,6 +16,6 @@ public class AiRcon extends BaseRcon
 
     public RconEntity move(boolean move)
     {
-        return rconEntity("ai.move %s", String.valueOf(think));
+        return rconEntity("ai.move %s", String.valueOf(move));
     }
 }
