@@ -12,10 +12,7 @@ import io.graversen.rust.rcon.events.IEventParser;
 import io.graversen.rust.rcon.events.parsers.DefaultRconMessageParser;
 import io.graversen.rust.rcon.events.parsers.IRconMessageParser;
 import io.graversen.rust.rcon.events.types.BaseRustEvent;
-import io.graversen.rust.rcon.events.types.server.RconClosedEvent;
-import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
-import io.graversen.rust.rcon.events.types.server.RconMessageEvent;
-import io.graversen.rust.rcon.events.types.server.RconOpenEvent;
+import io.graversen.rust.rcon.events.types.server.*;
 import io.graversen.rust.rcon.logging.DefaultLogger;
 import io.graversen.rust.rcon.logging.ILogger;
 import io.graversen.rust.rcon.objects.RconReceive;
@@ -160,13 +157,18 @@ public class RustClient implements IRconClient, AutoCloseable
             ((InternalWebSocketListener) getWebSocketListener()).setRustClient(this);
         }
 
+        if (!defaultEventsRegistered)
+        {
+            eventBus.registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
+            eventBus.registerEventListener(RconErrorEvent.class, this::rconErrorListener);
+        }
+
         if (registerDebugListeners && !defaultEventsRegistered)
         {
             Arrays.stream(DEFAULT_EVENT_CLASSES).forEach(
                     eventClass -> getEventBus().registerEventListener(eventClass, event -> getLogger().debug(event.getClass().getSimpleName()))
             );
 
-            eventBus.registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
             defaultEventsRegistered = true;
         }
 
@@ -178,6 +180,11 @@ public class RustClient implements IRconClient, AutoCloseable
 
         getLogger().info("Successfully opened RustClient!");
         this.open = true;
+    }
+
+    public <T extends BaseServerEvent> void addServerEventListener(Class<T> eventClass, IEventListener<T> eventListener)
+    {
+        getEventBus().registerEventListener(eventClass, eventListener);
     }
 
     public <T extends BaseRustEvent> void addEventHandling(Class<T> eventClass, RconMessageTypes rconMessage, IEventParser<T> eventParser, IEventListener<T> eventListener)
@@ -322,6 +329,11 @@ public class RustClient implements IRconClient, AutoCloseable
         }
     }
 
+    private IEventListener<RconErrorEvent> rconErrorListener()
+    {
+        return event -> event.getException().printStackTrace();
+    }
+
     private static class InternalWebSocketListener implements IWebSocketListener
     {
         private RustClient rustClient;
@@ -353,7 +365,7 @@ public class RustClient implements IRconClient, AutoCloseable
 
         private void log(String message)
         {
-            rustClient.getLogger().info(message);
+            rustClient.getLogger().debug(message);
         }
 
         private void emit(BaseRustEvent rustEvent)

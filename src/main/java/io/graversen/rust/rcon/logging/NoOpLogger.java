@@ -5,6 +5,12 @@ import java.io.PrintStream;
 public class NoOpLogger implements ILogger
 {
     @Override
+    public void debug(String message, Object... args)
+    {
+        // Shh...
+    }
+
+    @Override
     public void info(String message, Object... args)
     {
         // Shh...
@@ -20,6 +26,12 @@ public class NoOpLogger implements ILogger
     public void error(String message, Object... args)
     {
         // Shh...
+    }
+
+    @Override
+    public void logLevelEnabled(LogLevels logLevel, boolean enabled)
+    {
+        // Nothing to see here
     }
 
     @Override
