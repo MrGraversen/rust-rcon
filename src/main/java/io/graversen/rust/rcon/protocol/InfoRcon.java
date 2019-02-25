@@ -1,6 +1,7 @@
 package io.graversen.rust.rcon.protocol;
 
 import io.graversen.rust.rcon.objects.RconReceive;
+import io.graversen.rust.rcon.objects.rust.BuildInfo;
 import io.graversen.rust.rcon.objects.rust.Player;
 import io.graversen.rust.rcon.rustclient.IRconClient;
 import io.graversen.trunk.io.serialization.interfaces.ISerializer;
@@ -40,5 +41,21 @@ public class InfoRcon extends BaseRcon
         }
 
         return playerList;
+    }
+
+    public BuildInfo getBuildInfo()
+    {
+        final RconReceive buildInfoRcon = rconClient().sendAsyncBlocking("global.buildinfo", 1, TimeUnit.SECONDS);
+
+        try
+        {
+            return serializer.deserialize(buildInfoRcon.getMessage(), BuildInfo.class);
+        }
+        catch (Exception e)
+        {
+            // ¯\_(ツ)_/¯
+        }
+
+        return null;
     }
 }
