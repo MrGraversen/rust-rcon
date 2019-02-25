@@ -8,4 +8,14 @@ public class AiRcon extends BaseRcon
     {
         super(rconClient);
     }
+
+    public RconEntity think(boolean think)
+    {
+        return rconEntity("ai.think %s", String.valueOf(think));
+    }
+
+    public RconEntity move(boolean move)
+    {
+        return rconEntity("ai.move %s", String.valueOf(think));
+    }
 }

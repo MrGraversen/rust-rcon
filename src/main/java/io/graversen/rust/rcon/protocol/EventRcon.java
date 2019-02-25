@@ -22,7 +22,6 @@ public class EventRcon extends BaseRcon
 
     public RconEntity patrolHelicopter(ISteamPlayer steamPlayer)
     {
-        patrolHelicopter().execute();
         return rconEntity("heli.strafe %s", steamPlayer.getSteamId());
     }
 
