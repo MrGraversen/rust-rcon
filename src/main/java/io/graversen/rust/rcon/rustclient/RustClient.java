@@ -12,9 +12,9 @@ import io.graversen.rust.rcon.events.IEventParser;
 import io.graversen.rust.rcon.events.parsers.DefaultRconMessageParser;
 import io.graversen.rust.rcon.events.parsers.IRconMessageParser;
 import io.graversen.rust.rcon.events.types.BaseRustEvent;
-import io.graversen.rust.rcon.events.types.server.RconMessageEvent;
 import io.graversen.rust.rcon.events.types.server.RconClosedEvent;
 import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
+import io.graversen.rust.rcon.events.types.server.RconMessageEvent;
 import io.graversen.rust.rcon.events.types.server.RconOpenEvent;
 import io.graversen.rust.rcon.logging.DefaultLogger;
 import io.graversen.rust.rcon.logging.ILogger;
@@ -46,6 +46,7 @@ public class RustClient implements IRconClient, AutoCloseable
     private final IWebSocketListener webSocketListener;
     private final IEventBus eventBus;
     private final IRconMessageParser rconMessageParser;
+    private final boolean registerDebugListeners;
     private final ConcurrentMap<RconMessageTypes, IEventParser<?>> eventParsers;
 
     private final AtomicInteger currentRequestCounter;
@@ -64,7 +65,8 @@ public class RustClient implements IRconClient, AutoCloseable
             IWebSocketClient webSocketClient,
             IWebSocketListener webSocketListener,
             IEventBus eventBus,
-            IRconMessageParser rconMessageParser)
+            IRconMessageParser rconMessageParser,
+            boolean registerDebugListeners)
     {
         this.logger = logger;
         this.serializer = serializer;
@@ -72,6 +74,7 @@ public class RustClient implements IRconClient, AutoCloseable
         this.webSocketListener = webSocketListener;
         this.eventBus = eventBus;
         this.rconMessageParser = rconMessageParser;
+        this.registerDebugListeners = registerDebugListeners;
         this.eventParsers = new ConcurrentHashMap<>();
 
         this.open = false;
@@ -157,10 +160,10 @@ public class RustClient implements IRconClient, AutoCloseable
             ((InternalWebSocketListener) getWebSocketListener()).setRustClient(this);
         }
 
-        if (!defaultEventsRegistered)
+        if (registerDebugListeners && !defaultEventsRegistered)
         {
             Arrays.stream(DEFAULT_EVENT_CLASSES).forEach(
-                    eventClass -> getEventBus().registerEventListener(eventClass, event -> getLogger().info(event.getClass().getSimpleName()))
+                    eventClass -> getEventBus().registerEventListener(eventClass, event -> getLogger().debug(event.getClass().getSimpleName()))
             );
 
             eventBus.registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
@@ -381,6 +384,8 @@ public class RustClient implements IRconClient, AutoCloseable
         private String password;
         private int port;
 
+        private boolean registerDebugListeners;
+
         RustClientBuilder()
         {
             this.logger = new DefaultLogger(RustClient.class);
@@ -388,6 +393,7 @@ public class RustClient implements IRconClient, AutoCloseable
             this.webSocketListener = new InternalWebSocketListener();
             this.eventBus = new DefaultEventBus();
             this.rconMessageParser = new DefaultRconMessageParser();
+            this.registerDebugListeners = false;
         }
 
         public RustClientBuilder connectTo(String hostname, String password)
@@ -454,6 +460,12 @@ public class RustClient implements IRconClient, AutoCloseable
             return this;
         }
 
+        public RustClientBuilder registerDebugListeners()
+        {
+            this.registerDebugListeners = true;
+            return this;
+        }
+
         public RustClient build()
         {
             return this.build(DefaultWebSocketClient.usingCredentialsAndListener(hostname, password, port, webSocketListener));
@@ -464,7 +476,7 @@ public class RustClient implements IRconClient, AutoCloseable
             Objects.requireNonNull(webSocketClient, "IWebSocketClient cannot be null");
             Objects.requireNonNull(webSocketListener, "IWebSocketListener cannot be null");
 
-            return new RustClient(logger, serializer, webSocketClient, webSocketListener, eventBus, rconMessageParser);
+            return new RustClient(logger, serializer, webSocketClient, webSocketListener, eventBus, rconMessageParser, registerDebugListeners);
         }
     }
 }
