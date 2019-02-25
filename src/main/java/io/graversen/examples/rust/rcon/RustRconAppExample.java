@@ -33,6 +33,7 @@ public class RustRconAppExample
                     .connectTo("localhost", "awesome_rcon")
                     .build();
 
+            // Let's connect!
             rustClient.open();
         }
     }
@@ -49,6 +50,7 @@ public class RustRconAppExample
                     .withRconMessageParser(new DefaultRconMessageParser())
                     .build();
 
+            // Let's connect!
             rustClient.open();
         }
     }
@@ -69,7 +71,7 @@ public class RustRconAppExample
             inventory.giveTo(() -> "76561197979952036", "metal.refined", 1000).execute();
 
             // Actually - all players are awesome!
-            inventory.giveAll("xmas.present.large", 1);
+            inventory.giveAll("xmas.present.large", 1).execute();
         }
     }
 

@@ -1,7 +1,5 @@
 package io.graversen.rust.rcon.logging;
 
-import io.graversen.rust.rcon.Constants;
-
 import java.io.PrintStream;
 
 public class DefaultLogger implements ILogger
