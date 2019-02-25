@@ -9,6 +9,12 @@ public interface ISimpleLogger extends ILogger
     void info(String message, Object... args);
 
     @Override
+    default void debug(String message, Object... args)
+    {
+        info(message, args);
+    }
+
+    @Override
     default void warning(String message, Object... args)
     {
         info(message, args);
@@ -18,6 +24,12 @@ public interface ISimpleLogger extends ILogger
     default void error(String message, Object... args)
     {
         info(message, args);
+    }
+
+    @Override
+    default void logLevelEnabled(LogLevels logLevel, boolean enabled)
+    {
+        // Hey, it's nothing!
     }
 
     @Override
