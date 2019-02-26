@@ -11,6 +11,7 @@ public class Rcon extends BaseRcon
     private final InventoryRcon inventoryRcon;
     private final SettingsRcon settingsRcon;
     private final InfoRcon infoRcon;
+    private final CustomRcon customRcon;
 
     public Rcon(IRconClient rconClient, ISerializer serializer)
     {
@@ -20,6 +21,7 @@ public class Rcon extends BaseRcon
         this.inventoryRcon = new InventoryRcon(rconClient);
         this.settingsRcon = new SettingsRcon(rconClient);
         this.infoRcon = new InfoRcon(rconClient, serializer);
+        this.customRcon = new CustomRcon(rconClient);
     }
 
     public AiRcon ai()
@@ -45,6 +47,11 @@ public class Rcon extends BaseRcon
     public InfoRcon info()
     {
         return infoRcon;
+    }
+
+    public CustomRcon custom()
+    {
+        return customRcon;
     }
 
     public RconEntity writeConfig()
