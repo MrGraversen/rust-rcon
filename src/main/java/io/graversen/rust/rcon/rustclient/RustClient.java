@@ -15,6 +15,7 @@ import io.graversen.rust.rcon.events.types.BaseRustEvent;
 import io.graversen.rust.rcon.events.types.server.*;
 import io.graversen.rust.rcon.logging.DefaultLogger;
 import io.graversen.rust.rcon.logging.ILogger;
+import io.graversen.rust.rcon.logging.LogLevels;
 import io.graversen.rust.rcon.objects.RconReceive;
 import io.graversen.rust.rcon.objects.RconRequest;
 import io.graversen.rust.rcon.polling.IPlayerPollingListener;
@@ -401,7 +402,8 @@ public class RustClient implements IRconClient, AutoCloseable
         private String password;
         private int port;
 
-        private boolean registerDebugListeners;
+        private boolean debugMode;
+        private boolean quietMode;
 
         RustClientBuilder()
         {
@@ -410,7 +412,8 @@ public class RustClient implements IRconClient, AutoCloseable
             this.webSocketListener = new InternalWebSocketListener();
             this.eventBus = new DefaultEventBus();
             this.rconMessageParser = new DefaultRconMessageParser();
-            this.registerDebugListeners = false;
+            this.debugMode = false;
+            this.quietMode = false;
         }
 
         public RustClientBuilder connectTo(String hostname, String password)
@@ -477,9 +480,15 @@ public class RustClient implements IRconClient, AutoCloseable
             return this;
         }
 
-        public RustClientBuilder registerDebugListeners()
+        public RustClientBuilder debugMode()
         {
-            this.registerDebugListeners = true;
+            this.debugMode = true;
+            return this;
+        }
+
+        public RustClientBuilder quietMode()
+        {
+            this.quietMode = true;
             return this;
         }
 
@@ -493,7 +502,25 @@ public class RustClient implements IRconClient, AutoCloseable
             Objects.requireNonNull(webSocketClient, "IWebSocketClient cannot be null");
             Objects.requireNonNull(webSocketListener, "IWebSocketListener cannot be null");
 
-            return new RustClient(logger, serializer, webSocketClient, webSocketListener, eventBus, rconMessageParser, registerDebugListeners);
+            final RustClient rustClient =
+                    new RustClient(logger, serializer, webSocketClient, webSocketListener, eventBus, rconMessageParser, debugMode);
+
+            return postProcess(rustClient);
+        }
+
+        private RustClient postProcess(RustClient rustClient)
+        {
+            if (debugMode)
+            {
+                rustClient.getLogger().logLevelEnabled(LogLevels.DEBUG, true);
+            }
+
+            if (quietMode)
+            {
+                rustClient.setLoggingEnabled(false);
+            }
+
+            return rustClient;
         }
     }
 }

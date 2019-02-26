@@ -5,6 +5,7 @@ import io.graversen.fiber.event.common.IEvent;
 import io.graversen.rust.rcon.RconException;
 import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
 import io.graversen.rust.rcon.events.types.server.RconMessageEvent;
+import io.graversen.rust.rcon.logging.LogLevels;
 import io.graversen.rust.rcon.rustclient.RustClient;
 import io.graversen.rust.rcon.websocket.IWebSocketClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,5 +87,23 @@ public class TestRustClient
         assertThrows(NullPointerException.class, () -> RustClient.builder().connectTo("x", null));
         assertThrows(IllegalArgumentException.class, () -> RustClient.builder().connectTo("x", "x", 1));
         assertThrows(IllegalArgumentException.class, () -> RustClient.builder().connectTo("x", "x", 100000));
+    }
+
+    @Test
+    void test_debugMode()
+    {
+        final RustClient rustClient = RustClient.builder().withEventBus(eventBus).build(webSocketClient);
+
+        assertFalse(rustClient.getLogger().isLogLevelEnabled(LogLevels.DEBUG));
+        assertTrue(rustClient.getLogger().isLogLevelEnabled(LogLevels.INFO));
+        assertTrue(rustClient.getLogger().isLogLevelEnabled(LogLevels.WARNING));
+        assertTrue(rustClient.getLogger().isLogLevelEnabled(LogLevels.ERROR));
+
+        final RustClient rustClientDebug = RustClient.builder().withEventBus(eventBus).debugMode().build(webSocketClient);
+
+        assertTrue(rustClientDebug.getLogger().isLogLevelEnabled(LogLevels.DEBUG));
+        assertTrue(rustClientDebug.getLogger().isLogLevelEnabled(LogLevels.INFO));
+        assertTrue(rustClientDebug.getLogger().isLogLevelEnabled(LogLevels.WARNING));
+        assertTrue(rustClientDebug.getLogger().isLogLevelEnabled(LogLevels.ERROR));
     }
 }

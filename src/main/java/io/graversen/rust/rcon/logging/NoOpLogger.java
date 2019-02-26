@@ -35,6 +35,12 @@ public class NoOpLogger implements ILogger
     }
 
     @Override
+    public boolean isLogLevelEnabled(LogLevels logLevel)
+    {
+        return false;
+    }
+
+    @Override
     public PrintStream out()
     {
         return null;

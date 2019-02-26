@@ -14,6 +14,8 @@ public interface ILogger
 
     void logLevelEnabled(LogLevels logLevel, boolean enabled);
 
+    boolean isLogLevelEnabled(LogLevels logLevel);
+
     PrintStream out();
 
     PrintStream error();

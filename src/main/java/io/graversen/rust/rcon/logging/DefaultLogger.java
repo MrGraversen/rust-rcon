@@ -29,7 +29,7 @@ public class DefaultLogger implements ILogger
         this.error = error;
 
         this.logLevelsEnabled = new ConcurrentHashMap<>();
-        Arrays.stream(LogLevels.values()).forEach(level -> this.logLevelsEnabled.put(level, true));
+        Arrays.stream(LogLevels.values()).forEach(level -> this.logLevelsEnabled.put(level, level.defaultState()));
     }
 
     @Override
@@ -76,6 +76,12 @@ public class DefaultLogger implements ILogger
     public void logLevelEnabled(LogLevels logLevel, boolean enabled)
     {
         logLevelsEnabled.put(logLevel, enabled);
+    }
+
+    @Override
+    public boolean isLogLevelEnabled(LogLevels logLevel)
+    {
+        return logLevelsEnabled.getOrDefault(logLevel, false);
     }
 
     @Override

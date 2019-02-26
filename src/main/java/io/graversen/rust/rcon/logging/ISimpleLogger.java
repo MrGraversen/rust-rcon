@@ -33,6 +33,12 @@ public interface ISimpleLogger extends ILogger
     }
 
     @Override
+    default boolean isLogLevelEnabled(LogLevels logLevel)
+    {
+        return logLevel == LogLevels.INFO;
+    }
+
+    @Override
     default PrintStream out()
     {
         return null;

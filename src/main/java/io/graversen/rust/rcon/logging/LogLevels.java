@@ -2,8 +2,20 @@ package io.graversen.rust.rcon.logging;
 
 public enum LogLevels
 {
-    DEBUG,
-    INFO,
-    WARNING,
-    ERROR
+    DEBUG(false),
+    INFO(true),
+    WARNING(true),
+    ERROR(true);
+
+    private final boolean defaultState;
+
+    LogLevels(boolean defaultState)
+    {
+        this.defaultState = defaultState;
+    }
+
+    public boolean defaultState()
+    {
+        return defaultState;
+    }
 }
