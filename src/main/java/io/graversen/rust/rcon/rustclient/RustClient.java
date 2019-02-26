@@ -145,7 +145,7 @@ public class RustClient implements IRconClient, AutoCloseable
 
     public void open()
     {
-        getLogger().info("Attempting to open RCON: %s", webSocketClient.connectionUriMasked());
+        getLogger().info("Attempting to open RCON: %s", getWebSocketClient().connectionUriMasked());
 
         if (open)
         {
@@ -159,8 +159,8 @@ public class RustClient implements IRconClient, AutoCloseable
 
         if (!defaultEventsRegistered)
         {
-            eventBus.registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
-            eventBus.registerEventListener(RconErrorEvent.class, this::rconErrorListener);
+            getEventBus().registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
+            getEventBus().registerEventListener(RconErrorEvent.class, this::rconErrorListener);
         }
 
         if (registerDebugListeners && !defaultEventsRegistered)
@@ -180,6 +180,11 @@ public class RustClient implements IRconClient, AutoCloseable
 
         getLogger().info("Successfully opened RustClient!");
         this.open = true;
+    }
+
+    public boolean isOpen()
+    {
+        return open;
     }
 
     public <T extends BaseServerEvent> void addServerEventListener(Class<T> eventClass, IEventListener<T> eventListener)

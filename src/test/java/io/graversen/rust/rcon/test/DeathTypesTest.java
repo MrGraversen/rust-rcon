@@ -34,4 +34,11 @@ public class DeathTypesTest
         final DeathTypes deathType = DeathTypes.resolve(null, null);
         assertEquals(DeathTypes.UNKNOWN, deathType);
     }
+
+    @Test
+    void test_resolve_5()
+    {
+        final DeathTypes deathType = DeathTypes.resolve("Hello", "World");
+        assertEquals(DeathTypes.UNKNOWN, deathType);
+    }
 }
