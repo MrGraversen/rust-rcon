@@ -55,6 +55,8 @@ public class RustClient implements IRconClient, AutoCloseable
     private boolean defaultEventsRegistered;
     private boolean loggingEnabled;
 
+    private boolean closing = false;
+
     private Rcon rcon;
 
     private RustClient(
@@ -162,6 +164,7 @@ public class RustClient implements IRconClient, AutoCloseable
         {
             getEventBus().registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
             getEventBus().registerEventListener(RconErrorEvent.class, this::rconErrorListener);
+            getEventBus().registerEventListener(RconClosedEvent.class, this::rconClosedListener);
         }
 
         if (registerDebugListeners && !defaultEventsRegistered)
@@ -177,10 +180,11 @@ public class RustClient implements IRconClient, AutoCloseable
         getEventBus().start();
 
         getLogger().info("Connecting to remote socket...");
-        getWebSocketClient().open();
+        final boolean wsOpen = getWebSocketClient().open();
 
-        getLogger().info("Successfully opened RustClient!");
-        this.open = true;
+        getLogger().info(wsOpen ? "Successfully opened RustClient!" : "Could not open RustClient!");
+
+        this.open = wsOpen;
     }
 
     public boolean isOpen()
@@ -242,23 +246,28 @@ public class RustClient implements IRconClient, AutoCloseable
     }
 
     @Override
-    public void close()
+    public synchronized void close()
     {
-        getLogger().info("Closing RCON");
-
-        try
+        if (!closing)
         {
-            if (open)
+            closing = true;
+            getLogger().info("Closing RustClient");
+
+            try
             {
-                getWebSocketClient().close();
+                if (open)
+                {
+                    getWebSocketClient().close();
+                }
+
                 getEventBus().stop();
                 pollers.shutdownNow();
                 open = false;
             }
-        }
-        catch (Exception e)
-        {
-            // ¯\_(ツ)_/¯
+            catch (Exception e)
+            {
+                // ¯\_(ツ)_/¯
+            }
         }
     }
 
@@ -338,6 +347,11 @@ public class RustClient implements IRconClient, AutoCloseable
     private IEventListener<RconErrorEvent> rconErrorListener()
     {
         return event -> event.getException().printStackTrace();
+    }
+
+    private IEventListener<RconClosedEvent> rconClosedListener()
+    {
+        return event -> close();
     }
 
     private static class InternalWebSocketListener implements IWebSocketListener
