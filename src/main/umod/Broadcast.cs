@@ -4,24 +4,36 @@ using System;
 
 namespace Oxide.Plugins
 {
-    [Info("Broadcast", "Martin Graversen", "0.0.1", ResourceId = 1)]
-    [Description("Broadcast a message to the server")]
+    [Info("Broadcast (Ownzone)", "Ownzone", "0.0.1")]
+    [Description("Broadcast a message to the server, or to a player")]
     class Broadcast : RustPlugin
     {
-        [ConsoleCommand("broadcast")]
-        private void cmdConsoleBroadcast(ConsoleSystem.Arg arg) {
+        readonly ulong ChatIcon = 1337;
+
+        [ConsoleCommand("broadcast_all")]
+        private void cmdConsoleBroadcastTest(ConsoleSystem.Arg arg) {
             if (arg.Connection != null || (arg.Args == null || arg.Args.Length == 0)) return;
-            PrintToChat(arg.Args[0]);
+
+            Puts($"Broadcasting message \"{arg.Args[0]}\" to all players");
+            Server.Broadcast(arg.Args[0], ChatIcon);
         }
 
-        [ConsoleCommand("broadcastto")]
+        [ConsoleCommand("broadcast_to")]
         private void cmdConsoleBroadcastTo(ConsoleSystem.Arg arg) {
-            if (arg.Connection != null || (arg.Args == null || arg.Args.Length == 0)) return;
+            if (arg.Connection != null || arg.Args == null) return;
 
-            var player = BasePlayer.FindByID(Convert.ToUInt64(arg.Args[0]));
+            if (arg.Args.Length == 1 || arg.Args[1] == null || string.IsNullOrEmpty(arg.Args[1])) {
+                Puts("Remember to specify a target player (SteamID64)!");
+                return;
+            }
+
+            var player = BasePlayer.FindByID(Convert.ToUInt64(arg.Args[1]));
 
             if (player != null) {
-                PrintToChat(player, arg.Args[1]);
+                Puts($"Sending message \"{arg.Args[0]}\" to player with id \"{arg.Args[1]}\"");
+                Player.Message(player, arg.Args[0], null, ChatIcon);
+            } else {
+                Puts($"Not sending message to player with id \"{arg.Args[1]}\" because they are not online");
             }
         }
     }
