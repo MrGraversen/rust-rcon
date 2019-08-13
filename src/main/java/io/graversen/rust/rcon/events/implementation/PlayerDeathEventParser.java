@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
 {
+    public static final String MESSAGE_PREFIX = "[Undertaker (Ownzone)]";
     private final ISerializer serializer;
 
     public PlayerDeathEventParser()
@@ -27,7 +28,7 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
     {
         return rconMessage ->
         {
-            rconMessage = rconMessage.substring(10).trim();
+            rconMessage = rconMessage.substring(MESSAGE_PREFIX.length()).trim();
 
             try
             {
@@ -41,7 +42,7 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
         };
     }
 
-    private class PlayerDeathPayload
+    static class PlayerDeathPayload
     {
         private String victim;
         private String killer;

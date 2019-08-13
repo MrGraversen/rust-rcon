@@ -11,19 +11,19 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestPlayerDeathEventParser extends BaseDefaultParserTest
+class TestPlayerDeathEventParser extends BaseDefaultParserTest
 {
     private final String[] messages = {
-            "[DeathSON] {\"victim\":\"Bear\",\"killer\":\"Doctor Delete\",\"bodypart\":\"Chest\",\"distance\":\"4.02\",\"hp\":\"100\",\"weapon\":\"MP5A4\",\"attachments\":\"Silencer, Weapon Lasersight, Holosight\"}",
-            "[DeathSON] {\"victim\":\"szok99\",\"killer\":\"Doctor Delete\",\"bodypart\":\"Head\",\"distance\":\"0.74\",\"hp\":\"100\",\"weapon\":\"MP5A4\",\"attachments\":\"Silencer, Weapon Lasersight, Holosight\"}",
-            "[DeathSON] {\"victim\":\"SOSA\",\"killer\":\"Gun Trap\",\"bodypart\":\"Body\",\"distance\":\"1.66\",\"owner\":\"Doctor Delete\"}",
-            "[DeathSON] {\"victim\":\"soares pt\",\"killer\":\"Doctor Delete\",\"bodypart\":\"Stomach\",\"distance\":\"3.79\",\"hp\":\"100\",\"weapon\":\"M249\",\"attachments\":\"Weapon flashlight, Holosight, Silencer\"}",
-            "[DeathSON] {\"victim\":\"Scientist\",\"killer\":\"Doctor Delete\",\"bodypart\":\"Head\",\"distance\":\"118.36\",\"hp\":\"100\",\"weapon\":\"L96 Rifle\",\"attachments\":\"Weapon Lasersight, 8x Zoom Scope, Silencer\"}",
-            "[DeathSON] {\"victim\":\"Josma\",\"killer\":\"Bear\",\"bodypart\":\"Body\",\"distance\":\"0.00\"}",
-            "[DeathSON] {\"victim\":\"Qwerty\",\"killer\":\"Flame Turret\",\"bodypart\":\"Body\",\"distance\":\"1.07\",\"owner\":\"Doctor Delete\"}",
-            "[DeathSON] {\"victim\":\"Fakorr\",\"killer\":\"Auto Turret\",\"bodypart\":\"Body\",\"distance\":\"2.97\",\"owner\":\"Doctor Delete\"}",
-            "[DeathSON] {\"victim\":\"Larz\",\"killer\":\"Landmine\",\"bodypart\":\"Body\",\"distance\":\"0.87\",\"owner\":\"Doctor Delete\"}",
-            "[DeathSON] {\"victim\":\"Rino_Shikarnyi\"}"
+            "[Undertaker (Ownzone)] {\"victim\":\"Bear\",\"killer\":\"Doctor Delete\",\"bodypart\":\"Chest\",\"distance\":\"4.02\",\"hp\":\"100\",\"weapon\":\"MP5A4\",\"attachments\":\"Silencer, Weapon Lasersight, Holosight\"}",
+            "[Undertaker (Ownzone)] {\"victim\":\"szok99\",\"killer\":\"Doctor Delete\",\"bodypart\":\"Head\",\"distance\":\"0.74\",\"hp\":\"100\",\"weapon\":\"MP5A4\",\"attachments\":\"Silencer, Weapon Lasersight, Holosight\"}",
+            "[Undertaker (Ownzone)] {\"victim\":\"SOSA\",\"killer\":\"Gun Trap\",\"bodypart\":\"Body\",\"distance\":\"1.66\",\"owner\":\"Doctor Delete\"}",
+            "[Undertaker (Ownzone)] {\"victim\":\"soares pt\",\"killer\":\"Doctor Delete\",\"bodypart\":\"Stomach\",\"distance\":\"3.79\",\"hp\":\"100\",\"weapon\":\"M249\",\"attachments\":\"Weapon flashlight, Holosight, Silencer\"}",
+            "[Undertaker (Ownzone)] {\"victim\":\"Scientist\",\"killer\":\"Doctor Delete\",\"bodypart\":\"Head\",\"distance\":\"118.36\",\"hp\":\"100\",\"weapon\":\"L96 Rifle\",\"attachments\":\"Weapon Lasersight, 8x Zoom Scope, Silencer\"}",
+            "[Undertaker (Ownzone)] {\"victim\":\"Josma\",\"killer\":\"Bear\",\"bodypart\":\"Body\",\"distance\":\"0.00\"}",
+            "[Undertaker (Ownzone)] {\"victim\":\"Qwerty\",\"killer\":\"Flame Turret\",\"bodypart\":\"Body\",\"distance\":\"1.07\",\"owner\":\"Doctor Delete\"}",
+            "[Undertaker (Ownzone)] {\"victim\":\"Fakorr\",\"killer\":\"Auto Turret\",\"bodypart\":\"Body\",\"distance\":\"2.97\",\"owner\":\"Doctor Delete\"}",
+            "[Undertaker (Ownzone)] {\"victim\":\"Larz\",\"killer\":\"Landmine\",\"bodypart\":\"Body\",\"distance\":\"0.87\",\"owner\":\"Doctor Delete\"}",
+            "[Undertaker (Ownzone)] {\"victim\":\"Rino_Shikarnyi\"}"
     };
 
     private final IEventParser<PlayerDeathEvent> eventParser = new PlayerDeathEventParser();

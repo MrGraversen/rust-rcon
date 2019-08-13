@@ -1,5 +1,7 @@
 package io.graversen.rust.rcon;
 
+import io.graversen.rust.rcon.events.implementation.PlayerDeathEventParser;
+
 public enum RconMessageTypes implements IRconMessage
 {
     CHAT
@@ -31,7 +33,7 @@ public enum RconMessageTypes implements IRconMessage
                 @Override
                 public boolean matches(String consoleInput)
                 {
-                    return consoleInput.startsWith("[DeathSON] {\"");
+                    return consoleInput.startsWith(PlayerDeathEventParser.MESSAGE_PREFIX);
                 }
             },
     PLAYER_SPAWNED
