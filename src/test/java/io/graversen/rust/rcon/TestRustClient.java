@@ -1,4 +1,4 @@
-package io.graversen.rust.rcon.test;
+package io.graversen.rust.rcon;
 
 import io.graversen.fiber.event.bus.IEventBus;
 import io.graversen.fiber.event.common.IEvent;

@@ -1,4 +1,4 @@
-package io.graversen.rust.rcon.test;
+package io.graversen.rust.rcon;
 
 import io.graversen.rust.rcon.objects.util.DeathTypes;
 import org.junit.jupiter.api.Test;
