@@ -9,6 +9,7 @@ import io.graversen.rust.rcon.Constants;
 import io.graversen.rust.rcon.RconException;
 import io.graversen.rust.rcon.RconMessageTypes;
 import io.graversen.rust.rcon.events.IEventParser;
+import io.graversen.rust.rcon.events.RustEvents;
 import io.graversen.rust.rcon.events.parsers.DefaultRconMessageParser;
 import io.graversen.rust.rcon.events.parsers.IRconMessageParser;
 import io.graversen.rust.rcon.events.types.BaseRustEvent;
@@ -26,6 +27,7 @@ import io.graversen.rust.rcon.websocket.IWebSocketClient;
 import io.graversen.rust.rcon.websocket.IWebSocketListener;
 import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 
+import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -146,7 +148,7 @@ public class RustClient implements IRconClient, AutoCloseable
         getWebSocketClient().send(serializedPayload);
     }
 
-    public void open()
+    public boolean open()
     {
         getLogger().info("Attempting to open RCON: %s", getWebSocketClient().connectionUriMasked());
 
@@ -185,6 +187,7 @@ public class RustClient implements IRconClient, AutoCloseable
         getLogger().info(wsOpen ? "Successfully opened RustClient!" : "Could not open RustClient!");
 
         this.open = wsOpen;
+        return this.open;
     }
 
     public boolean isOpen()
@@ -197,10 +200,10 @@ public class RustClient implements IRconClient, AutoCloseable
         getEventBus().registerEventListener(eventClass, eventListener);
     }
 
-    public <T extends BaseRustEvent> void addEventHandling(Class<T> eventClass, RconMessageTypes rconMessage, IEventParser<T> eventParser, IEventListener<T> eventListener)
+    public <T extends BaseRustEvent> void addEventHandling(RustEvents rustEvent, IEventParser<T> eventParser, IEventListener<T> eventListener)
     {
-        eventParsers.put(rconMessage, eventParser);
-        getEventBus().registerEventListener(eventClass, eventListener);
+        eventParsers.put(rustEvent.rconMessageType(), eventParser);
+        getEventBus().registerEventListener(rustEvent.eventClass(), eventListener);
     }
 
     public <T extends BaseRustEvent> Optional<IEventParser<T>> getEventParser(RconMessageTypes rconMessage)
