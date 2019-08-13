@@ -12,7 +12,7 @@ public class PlayerDeathEvent extends BaseRustEvent
     private final String killer;
     private final String bodyPart;
     private final BigDecimal distance;
-    private final Integer hp;
+    private final BigDecimal hp;
     private final String weapon;
     private final String[] attachments;
     private final DeathTypes deathType;
@@ -23,7 +23,7 @@ public class PlayerDeathEvent extends BaseRustEvent
             String killer,
             String bodyPart,
             BigDecimal distance,
-            Integer hp,
+            BigDecimal hp,
             String weapon,
             String[] attachments,
             DeathTypes deathType,
@@ -61,7 +61,7 @@ public class PlayerDeathEvent extends BaseRustEvent
         return distance;
     }
 
-    public Integer getHp()
+    public BigDecimal getHp()
     {
         return hp;
     }

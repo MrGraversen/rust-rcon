@@ -47,8 +47,8 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
         private String victim;
         private String killer;
         private String bodypart;
-        private BigDecimal distance;
-        private Integer hp;
+        private String distance;
+        private String hp;
         private String weapon;
         private String attachments;
         private String owner;
@@ -60,14 +60,15 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
                 String victim,
                 String killer,
                 String bodypart,
-                BigDecimal distance,
-                Integer hp,
+                String distance,
+                String hp,
                 String weapon,
                 String attachments,
                 String owner,
                 String damageType,
                 String killerEntityType,
-                String victimEntityType)
+                String victimEntityType
+        )
         {
             this.victim = victim;
             this.killer = killer;
@@ -97,12 +98,14 @@ public class PlayerDeathEventParser implements IEventParser<PlayerDeathEvent>
             final DeathTypes deathType = DeathTypes.resolve(killerEntityType, victimEntityType);
             final DamageTypes damageType = DamageTypes.parse(this.damageType);
 
+            this.distance = this.distance.replaceAll("[^\\d.]", "");
+
             return new PlayerDeathEvent(
                     this.victim,
                     this.killer,
                     this.bodypart,
-                    this.distance,
-                    this.hp,
+                    new BigDecimal(this.distance),
+                    new BigDecimal(this.hp),
                     this.weapon,
                     attachments,
                     deathType,
