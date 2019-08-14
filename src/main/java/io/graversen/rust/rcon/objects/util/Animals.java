@@ -4,13 +4,25 @@ import java.util.Objects;
 
 public enum Animals
 {
-    BEAR,
-    BOAR,
-    CHICKEN,
-    STAG,
-    HORSE,
-    WOLF,
-    UNKNOWN;
+    BEAR(2),
+    BOAR(5),
+    CHICKEN(3),
+    STAG(3),
+    RIDABLEHORSE(1),
+    WOLF(2),
+    UNKNOWN(0);
+
+    private final int defaultPopulation;
+
+    Animals(int defaultPopulation)
+    {
+        this.defaultPopulation = defaultPopulation;
+    }
+
+    public int defaultPopulation()
+    {
+        return defaultPopulation;
+    }
 
     public static Animals parse(String string)
     {
