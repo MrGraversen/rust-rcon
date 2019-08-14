@@ -27,7 +27,6 @@ import io.graversen.rust.rcon.websocket.IWebSocketClient;
 import io.graversen.rust.rcon.websocket.IWebSocketListener;
 import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 
-import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -144,6 +143,11 @@ public class RustClient implements IRconClient, AutoCloseable
 
         final RconRequest rconRequest = new RconRequest(identifier, rconMessage, Constants.projectName());
         final String serializedPayload = getSerializer().serialize(rconRequest);
+
+        if (registerDebugListeners)
+        {
+            getLogger().debug("Sending: %s", serializedPayload);
+        }
 
         getWebSocketClient().send(serializedPayload);
     }

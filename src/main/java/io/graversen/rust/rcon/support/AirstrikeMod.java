@@ -50,13 +50,13 @@ public class AirstrikeMod extends BaseModSupport implements IUmodPermissible
 
     public void callStrike(StrikeTypes strikeType, String player)
     {
-        final String command = String.format("%s %s %s", BASE_COMMAND, strikeType.name().toLowerCase(), player);
+        final String command = String.format("%s %s \"%s\"", BASE_COMMAND, strikeType.name().toLowerCase(), player);
         rconClient().send(command);
     }
 
     public void callStrike(StrikeTypes strikeType, Player player)
     {
-        final String command = String.format("%s %s %s", BASE_COMMAND, strikeType.name().toLowerCase(), player.getDisplayName());
+        final String command = String.format("%s %s \"%s\"", BASE_COMMAND, strikeType.name().toLowerCase(), player.getDisplayName());
         rconClient().send(command);
     }
 
