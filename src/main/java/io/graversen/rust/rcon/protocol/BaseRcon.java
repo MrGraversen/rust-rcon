@@ -5,7 +5,7 @@ import io.graversen.rust.rcon.rustclient.IRconClient;
 import java.util.Arrays;
 import java.util.Objects;
 
-class BaseRcon
+abstract class BaseRcon
 {
     private final IRconClient rconClient;
 
