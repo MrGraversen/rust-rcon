@@ -1,6 +1,7 @@
 package io.graversen.rust.rcon.protocol;
 
 import io.graversen.rust.rcon.objects.util.Animals;
+import io.graversen.rust.rcon.objects.util.Vehicles;
 import io.graversen.rust.rcon.rustclient.IRconClient;
 
 public class SettingsRcon extends BaseRcon
@@ -53,5 +54,13 @@ public class SettingsRcon extends BaseRcon
     public RconEntity adjustPopulation(Animals animal, int population)
     {
         return rconEntity("%s.population %s", animal.name().toLowerCase(), String.valueOf(population));
+    }
+
+    /**
+     * @param population Population active on the server, per square km
+     */
+    public RconEntity adjustPopulation(Vehicles vehicles, int population)
+    {
+        return rconEntity("%s.population %s", vehicles.name().toLowerCase(), String.valueOf(population));
     }
 }
