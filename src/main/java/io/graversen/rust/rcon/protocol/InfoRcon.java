@@ -4,6 +4,7 @@ import io.graversen.rust.rcon.objects.RconReceive;
 import io.graversen.rust.rcon.objects.rust.BanInfo;
 import io.graversen.rust.rcon.objects.rust.BuildInfo;
 import io.graversen.rust.rcon.objects.rust.Player;
+import io.graversen.rust.rcon.objects.rust.ServerInfo;
 import io.graversen.rust.rcon.rustclient.IRconClient;
 import io.graversen.trunk.io.serialization.interfaces.ISerializer;
 
@@ -70,6 +71,22 @@ public class InfoRcon extends BaseRcon
         {
             final BanInfo[] banInfos = serializer.deserialize(banInfoRcon.getMessage(), BanInfo[].class);
             return List.of(banInfos);
+        }
+        catch (Exception e)
+        {
+            // ¯\_(ツ)_/¯
+        }
+
+        return null;
+    }
+
+    public ServerInfo getServerInfo()
+    {
+        final RconReceive banInfoRcon = rconClient().sendAsyncBlocking("global.serverinfo", DEFAULT_TIMEOUT.getSeconds(), TimeUnit.SECONDS);
+
+        try
+        {
+            return serializer.deserialize(banInfoRcon.getMessage(), ServerInfo.class);
         }
         catch (Exception e)
         {
