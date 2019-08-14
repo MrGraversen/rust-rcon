@@ -10,8 +10,21 @@ namespace Oxide.Plugins
     {
         readonly ulong ChatIcon = 1337;
 
+        [ConsoleCommand("broadcast_hack")]
+        private void BroadcastHack(ConsoleSystem.Arg arg) {
+            if (arg.Connection != null || (arg.Args == null || arg.Args.Length == 0)) return;
+
+            if (arg.Args.Length == 1 || arg.Args[1] == null || string.IsNullOrEmpty(arg.Args[1])) {
+                Puts("Remember to specify a target player icon (SteamID64)!");
+                return;
+            }
+
+            Puts($"Broadcasting message \"{arg.Args[0]}\" to all players, impersonating SteamID \"{arg.Args[1]}\"");
+            Server.Broadcast(arg.Args[0], ulong.Parse(arg.Args[1]));
+        }
+
         [ConsoleCommand("broadcast_all")]
-        private void cmdConsoleBroadcastTest(ConsoleSystem.Arg arg) {
+        private void BroadcastAll(ConsoleSystem.Arg arg) {
             if (arg.Connection != null || (arg.Args == null || arg.Args.Length == 0)) return;
 
             Puts($"Broadcasting message \"{arg.Args[0]}\" to all players");
@@ -19,7 +32,7 @@ namespace Oxide.Plugins
         }
 
         [ConsoleCommand("broadcast_to")]
-        private void cmdConsoleBroadcastTo(ConsoleSystem.Arg arg) {
+        private void BroadcastTo(ConsoleSystem.Arg arg) {
             if (arg.Connection != null || arg.Args == null) return;
 
             if (arg.Args.Length == 1 || arg.Args[1] == null || string.IsNullOrEmpty(arg.Args[1])) {

@@ -82,11 +82,11 @@ public class InfoRcon extends BaseRcon
 
     public ServerInfo getServerInfo()
     {
-        final RconReceive banInfoRcon = rconClient().sendAsyncBlocking("global.serverinfo", DEFAULT_TIMEOUT.getSeconds(), TimeUnit.SECONDS);
+        final RconReceive serverInfoRcon = rconClient().sendAsyncBlocking("global.serverinfo", DEFAULT_TIMEOUT.getSeconds(), TimeUnit.SECONDS);
 
         try
         {
-            return serializer.deserialize(banInfoRcon.getMessage(), ServerInfo.class);
+            return serializer.deserialize(serverInfoRcon.getMessage(), ServerInfo.class);
         }
         catch (Exception e)
         {

@@ -25,6 +25,17 @@ public class Player implements ISteamPlayer
     @SerializedName("Health")
     private double health;
 
+    public Player()
+    {
+
+    }
+
+    public Player(String steamId, String displayName)
+    {
+        this.steamId = steamId;
+        this.displayName = displayName;
+    }
+
     @Override
     public String getSteamId()
     {
