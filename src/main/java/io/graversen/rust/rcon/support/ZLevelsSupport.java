@@ -50,6 +50,12 @@ public class ZLevelsSupport extends BaseModSupport
         return "https://umod.org/plugins/ZLevelsRemastered.cs";
     }
 
+    @Override
+    public boolean requiresModification()
+    {
+        return true;
+    }
+
     public PlayerInfo info(ISteamPlayer steamPlayer)
     {
         final String command = String.format("zl.json %s", steamPlayer.getSteamId());
@@ -96,7 +102,7 @@ public class ZLevelsSupport extends BaseModSupport
         }
     }
 
-    public class PlayerInfo
+    public static class PlayerInfo
     {
         private final ISteamPlayer steamPlayer;
         private final Map<Skills, Integer> levels;

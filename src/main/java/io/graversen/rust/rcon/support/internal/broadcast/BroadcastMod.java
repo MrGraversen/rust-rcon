@@ -46,6 +46,12 @@ public class BroadcastMod extends BaseModSupport
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean requiresModification()
+    {
+        return false;
+    }
+
     public void broadcastAll(IMessage message)
     {
         final String command = String.format("%s \"%s\"", BROADCAST_ALL_COMMAND, message.message());

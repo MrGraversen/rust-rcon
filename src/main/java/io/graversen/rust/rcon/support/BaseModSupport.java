@@ -25,4 +25,6 @@ public abstract class BaseModSupport
     public abstract String umodLink();
 
     public abstract String umodDirectLink();
+
+    public abstract boolean requiresModification();
 }

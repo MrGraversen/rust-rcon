@@ -42,6 +42,12 @@ public class AirstrikeMod extends BaseModSupport implements IUmodPermissible
         return "https://umod.org/plugins/Airstrike.cs";
     }
 
+    @Override
+    public boolean requiresModification()
+    {
+        return false;
+    }
+
     public void callStrikeRandom(StrikeTypes strikeType)
     {
         final String command = String.format("%s %s random", BASE_COMMAND, strikeType.name().toLowerCase());
