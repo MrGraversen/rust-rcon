@@ -20,11 +20,11 @@ void InfoCJsonCommand(ConsoleSystem.Arg arg)
     }
 
     var data = new Dictionary<string, string> {
-        { "WCL", playerData.WCL.ToString() },
-        { "ML", playerData.ML.ToString() },
-        { "SL", playerData.SL.ToString() },
-        { "AL", playerData.AL.ToString() },
-        { "CL", playerData.CL.ToString() }
+        { "WOODCUTTING", playerData.WCL.ToString() },
+        { "MINING", playerData.ML.ToString() },
+        { "SKINNING", playerData.SL.ToString() },
+        { "ACQUIRE", playerData.AL.ToString() },
+        { "CRAFTING", playerData.CL.ToString() }
     };
 
     Puts(JsonConvert.SerializeObject(data));
