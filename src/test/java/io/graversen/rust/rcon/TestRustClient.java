@@ -2,7 +2,6 @@ package io.graversen.rust.rcon;
 
 import io.graversen.fiber.event.bus.IEventBus;
 import io.graversen.fiber.event.common.IEvent;
-import io.graversen.rust.rcon.RconException;
 import io.graversen.rust.rcon.events.types.server.RconErrorEvent;
 import io.graversen.rust.rcon.events.types.server.RconMessageEvent;
 import io.graversen.rust.rcon.logging.LogLevels;

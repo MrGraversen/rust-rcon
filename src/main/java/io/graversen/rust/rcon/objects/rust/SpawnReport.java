@@ -1,6 +1,5 @@
 package io.graversen.rust.rcon.objects.rust;
 
-import com.google.common.base.CaseFormat;
 import io.graversen.rust.rcon.objects.util.Animals;
 import io.graversen.rust.rcon.objects.util.Population;
 import org.apache.commons.lang3.StringUtils;
@@ -21,9 +20,9 @@ public class SpawnReport
         return rawReport;
     }
 
-    public Population getPopulationByAnimal(Animals animals)
+    public Population getPopulationByAnimal(Animals animal)
     {
-        final var capitalizedAnimal = StringUtils.capitalize(animals.name().toLowerCase());
+        final var capitalizedAnimal = StringUtils.capitalize(animal.name().toLowerCase());
         return rawReport.getOrDefault(String.format("%s.Population", capitalizedAnimal), null);
     }
 }

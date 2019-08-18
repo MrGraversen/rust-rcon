@@ -2,7 +2,6 @@ package io.graversen.rust.rcon;
 
 import io.graversen.rust.rcon.events.IEventParser;
 import io.graversen.rust.rcon.events.implementation.PlayerSuicideEventParser;
-import io.graversen.rust.rcon.events.types.player.PlayerSpawnedEvent;
 import io.graversen.rust.rcon.events.types.player.PlayerSuicideEvent;
 import io.graversen.rust.rcon.objects.util.SuicideCauses;
 import org.junit.jupiter.api.Test;

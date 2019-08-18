@@ -1,9 +1,9 @@
 package io.graversen.rust.rcon.listeners;
 
+import io.graversen.rust.rcon.events.types.custom.PlayerDeathEvent;
 import io.graversen.rust.rcon.events.types.game.WorldEvent;
 import io.graversen.rust.rcon.events.types.player.ChatMessageEvent;
 import io.graversen.rust.rcon.events.types.player.PlayerConnectedEvent;
-import io.graversen.rust.rcon.events.types.custom.PlayerDeathEvent;
 import io.graversen.rust.rcon.events.types.player.PlayerDisconnectedEvent;
 
 public interface IServerEventListener
