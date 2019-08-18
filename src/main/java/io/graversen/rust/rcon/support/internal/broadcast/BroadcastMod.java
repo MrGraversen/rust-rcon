@@ -101,6 +101,12 @@ public class BroadcastMod extends BaseModSupport
             return this;
         }
 
+        public MessageBuilder indent()
+        {
+            this.messageBuilder.append(" \t ");
+            return this;
+        }
+
         public MessageBuilder italic(String text)
         {
             this.messageBuilder.append("<i>").append(text).append("</i>");

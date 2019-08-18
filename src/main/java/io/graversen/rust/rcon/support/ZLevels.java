@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class ZLevelsSupport extends BaseModSupport
+public class ZLevels extends BaseModSupport
 {
     private static final String JSON_PREFIX = "[ZLevelsRemastered] ";
     private final ISerializer serializer;
 
-    public ZLevelsSupport(IRconClient rconClient, ISerializer serializer)
+    public ZLevels(IRconClient rconClient, ISerializer serializer)
     {
         super(rconClient);
         this.serializer = serializer;
