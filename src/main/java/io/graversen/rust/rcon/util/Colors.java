@@ -39,6 +39,11 @@ public class Colors
         return String.format(COLOR_TEMPLATE, "#ffa500ff", message);
     }
 
+    public static String grey(String message)
+    {
+        return String.format(COLOR_TEMPLATE, "#808080ff", message);
+    }
+
     public static String chat(String message)
     {
         return String.format(COLOR_TEMPLATE, "#55AAFF", message);

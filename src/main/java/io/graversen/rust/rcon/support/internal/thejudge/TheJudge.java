@@ -70,7 +70,7 @@ public class TheJudge extends BaseModSupport
 
     public void suffocate(ISteamPlayer steamPlayer)
     {
-        rconClient().send(String.format("judge.starve %s", steamPlayer.getSteamId()));
+        rconClient().send(String.format("judge.suffocate %s", steamPlayer.getSteamId()));
     }
 
     public void cook(ISteamPlayer steamPlayer)
@@ -80,7 +80,7 @@ public class TheJudge extends BaseModSupport
 
     public void freeze(ISteamPlayer steamPlayer)
     {
-        rconClient().send(String.format("judge.starve %s", steamPlayer.getSteamId()));
+        rconClient().send(String.format("judge.freeze %s", steamPlayer.getSteamId()));
     }
 
     public void poison(ISteamPlayer steamPlayer, int amount)
