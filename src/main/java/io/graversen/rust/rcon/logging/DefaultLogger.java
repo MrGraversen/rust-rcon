@@ -3,6 +3,7 @@ package io.graversen.rust.rcon.logging;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultLogger implements ILogger
@@ -67,6 +68,7 @@ public class DefaultLogger implements ILogger
     {
         if (logLevelsEnabled.getOrDefault(LogLevels.ERROR, false))
         {
+            message = Objects.requireNonNullElse(message, "null");
             final String formattedMessage = String.format(message, args);
             error().println(String.format(WARNING_TEMPLATE, ofClass.getSimpleName(), formattedMessage));
         }

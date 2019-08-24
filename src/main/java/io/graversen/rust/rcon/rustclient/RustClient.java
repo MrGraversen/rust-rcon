@@ -168,9 +168,17 @@ public class RustClient implements IRconClient, AutoCloseable
 
         if (!defaultEventsRegistered)
         {
-            getEventBus().registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
-            getEventBus().registerEventListener(RconErrorEvent.class, this::rconErrorListener);
-            getEventBus().registerEventListener(RconClosedEvent.class, this::rconClosedListener);
+            if (!getEventBus().hasEventListener(RconMessageEvent.class)) {
+                getEventBus().registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
+            }
+
+            if (!getEventBus().hasEventListener(RconErrorEvent.class)) {
+                getEventBus().registerEventListener(RconErrorEvent.class, this::rconErrorListener);
+            }
+
+            if (!getEventBus().hasEventListener(RconClosedEvent.class)) {
+                getEventBus().registerEventListener(RconClosedEvent.class, this::rconClosedListener);
+            }
         }
 
         if (registerDebugListeners && !defaultEventsRegistered)
@@ -178,11 +186,12 @@ public class RustClient implements IRconClient, AutoCloseable
             Arrays.stream(DEFAULT_EVENT_CLASSES).forEach(
                     eventClass -> getEventBus().registerEventListener(eventClass, event -> getLogger().debug(event.getClass().getSimpleName()))
             );
-
-            defaultEventsRegistered = true;
         }
 
+        defaultEventsRegistered = true;
+
         getLogger().info("Starting EventBus instance...");
+
         getEventBus().start();
 
         getLogger().info("Connecting to remote socket...");
@@ -267,7 +276,7 @@ public class RustClient implements IRconClient, AutoCloseable
                     getWebSocketClient().close();
                 }
 
-                getEventBus().stop();
+                getEventBus().stop(false);
                 pollers.shutdownNow();
                 open = false;
             }
@@ -353,7 +362,15 @@ public class RustClient implements IRconClient, AutoCloseable
 
     private IEventListener<RconErrorEvent> rconErrorListener()
     {
-        return event -> event.getException().printStackTrace();
+        return event ->
+        {
+            getLogger().error(event.getException().getMessage());
+
+            if (registerDebugListeners)
+            {
+                event.getException().printStackTrace();
+            }
+        };
     }
 
     private IEventListener<RconClosedEvent> rconClosedListener()
