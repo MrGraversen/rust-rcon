@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/MrGraversen/rust-rcon.svg)](https://jitpack.io/#MrGraversen/rust-rcon)
+
 # rust-rcon
 An async Rust RCON client in Java.
 
