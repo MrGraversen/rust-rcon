@@ -155,6 +155,7 @@ public class RustClient implements IRconClient, AutoCloseable
     public boolean open()
     {
         getLogger().info("Attempting to open RCON: %s", getWebSocketClient().connectionUriMasked());
+        getEventBus().unregisterAllEventListeners();
 
         if (open)
         {
@@ -168,23 +169,31 @@ public class RustClient implements IRconClient, AutoCloseable
 
         if (!defaultEventsRegistered)
         {
-            if (!getEventBus().hasEventListener(RconMessageEvent.class)) {
+            if (!getEventBus().hasEventListener(RconMessageEvent.class))
+            {
                 getEventBus().registerEventListener(RconMessageEvent.class, this::asyncRequestListener);
             }
 
-            if (!getEventBus().hasEventListener(RconErrorEvent.class)) {
+            if (!getEventBus().hasEventListener(RconErrorEvent.class))
+            {
                 getEventBus().registerEventListener(RconErrorEvent.class, this::rconErrorListener);
             }
 
-            if (!getEventBus().hasEventListener(RconClosedEvent.class)) {
+            if (!getEventBus().hasEventListener(RconClosedEvent.class))
+            {
                 getEventBus().registerEventListener(RconClosedEvent.class, this::rconClosedListener);
             }
         }
 
         if (registerDebugListeners && !defaultEventsRegistered)
         {
-            Arrays.stream(DEFAULT_EVENT_CLASSES).forEach(
-                    eventClass -> getEventBus().registerEventListener(eventClass, event -> getLogger().debug(event.getClass().getSimpleName()))
+            Arrays.stream(DEFAULT_EVENT_CLASSES).forEach(eventClass ->
+                    {
+                        if (!getEventBus().hasEventListener(eventClass))
+                        {
+                            getEventBus().registerEventListener(eventClass, event -> getLogger().debug(event.getClass().getSimpleName()));
+                        }
+                    }
             );
         }
 
