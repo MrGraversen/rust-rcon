@@ -13,7 +13,7 @@ import io.graversen.v1.rust.rcon.events.RustEvents;
 import io.graversen.v1.rust.rcon.events.parsers.DefaultRconMessageParser;
 import io.graversen.v1.rust.rcon.events.parsers.IRconMessageParser;
 import io.graversen.v1.rust.rcon.events.types.BaseRustEvent;
-import io.graversen.rust.rcon.events.types.server.*;
+import io.graversen.v1.rust.rcon.events.types.server.*;
 import io.graversen.v1.rust.rcon.logging.DefaultLogger;
 import io.graversen.v1.rust.rcon.logging.ILogger;
 import io.graversen.v1.rust.rcon.logging.LogLevels;

@@ -1,7 +1,7 @@
 package io.graversen.v1.rust.rcon.protocol;
 
 import io.graversen.v1.rust.rcon.objects.RconReceive;
-import io.graversen.rust.rcon.objects.rust.*;
+import io.graversen.v1.rust.rcon.objects.rust.*;
 import io.graversen.v1.rust.rcon.objects.rust.*;
 import io.graversen.v1.rust.rcon.objects.util.Population;
 import io.graversen.v1.rust.rcon.rustclient.IRconClient;

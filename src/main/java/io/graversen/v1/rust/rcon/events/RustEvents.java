@@ -5,7 +5,7 @@ import io.graversen.v1.rust.rcon.events.types.BaseRustEvent;
 import io.graversen.v1.rust.rcon.events.types.custom.PlayerDeathEvent;
 import io.graversen.v1.rust.rcon.events.types.game.SaveEvent;
 import io.graversen.v1.rust.rcon.events.types.game.WorldEvent;
-import io.graversen.rust.rcon.events.types.player.*;
+import io.graversen.v1.rust.rcon.events.types.player.*;
 import io.graversen.v1.rust.rcon.events.types.player.*;
 
 public enum RustEvents
