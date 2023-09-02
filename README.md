@@ -1,186 +1,93 @@
 [![](https://jitpack.io/v/MrGraversen/rust-rcon.svg)](https://jitpack.io/#MrGraversen/rust-rcon)
 
-# rust-rcon
-An async Rust RCON client in Java.
+# Rust RCON :video_game:
+An asynchronous, fault-tolerant Rust RCON client built in Java.  
+Seamlessly integrates with Rust's RCON request-response semantics using websocket connections.  
+Ideal for those looking to harness the power of Rust's RCON with Java's portability and ease.
 
-## About
-Rust pendant to my **[minecraft-rcon](https://github.com/MrGraversen/minecraft-rcon)** library, but mostly non-equivalent because Rust internally has switched to an async websocket network infrastructure - and of course the instruction set differs greatly from that of MineCraft.
+## About :pencil:
 
-The key difference being working with websockts means that the Rust server will also push all console messages down the socket, from which we can extrapolate interesting events, representing what is happening on the server in real-time.
+This library serves as a Rust (the video game) counterpart to the [**`minecraft-rcon`**](https://github.com/MrGraversen/minecraft-rcon) library.
 
-Console messages from the Rust server are not currently in a machine-readable format *(sigh)*, therefore this library will perform a great deal of string inspection to determine what is going on - these parsers are extensively unit-test covered.
+It empowers applications with easy integration capabilities with a Rust game server via RCON, translating internal server details into actionable events.
 
-## Installation
+By interfacing with Rust's native RCON payloads, the library efficiently captures and translates in-game occurrences, such as player interactions including connections, chats, combats, and more, into events. This reactive design allows user-code to be promptly informed of player-driven actions.
 
-You may use JitPack to install this from the GitHub releases.  
-Add the following to your `pom.xml` if using Maven (click the little JitPack badge for other build systems):
+Additionally, Rust RCON manages connection states intelligently, eliminating concerns about game server restarts. The connection is resilient; if the game server goes offline, it seamlessly recovers once the server becomes available again.
+
+### About RCON
+
+RCON (Remote Console) is a protocol that allows for remote game server management.  
+In the context of Rust, RCON serves as a potent tool for administrators and third-party applications to interact with and control game servers. Whether it's for issuing commands, retrieving information, or automating tasks, Rust's RCON implementation provides a secure and efficient interface for these operations, all without requiring direct access to the game server. This library, Rust RCON, simplifies and enhances the interaction with Rust's RCON system, offering a robust solution for various use cases.
+
+## Installation :floppy_disk:
+
+Rust RCON is available through Maven from GitHub Packages. To install:
+
+1. First, add the GitHub Packages repository in your `pom.xml`:
 
 ```xml
 <repositories>
-	<repository>
-		<id>jitpack.io</id>
-		<url>https://jitpack.io</url>
-	</repository>
+    <repository>
+        <id>github</id>
+        <url>https://maven.pkg.github.com/yourusername/RustRCON</url>
+    </repository>
 </repositories>
 ```
 
+2. Next, add the Rust RCON dependency:
+
 ```xml
 <dependency>
-	<groupId>com.github.MrGraversen</groupId>
-	<artifactId>rust-rcon</artifactId>
-	<version>Tag</version>
+    <groupId>io.graversen</groupId>
+    <artifactId>rust-rcon</artifactId>
+    <version>${io.graversen.rust.rcon-version}</version>
 </dependency>
 ```
 
-## Features
+3. Now you can use Rust RCON in your Java project!
 
-* Simple interface to connect to Rust server
-* Exposes common RCON commands as Java methods
-* Raises common Rust server mechanics as events
-* Oxide/uMod permission system support
-* Support for extending with mod support
-* :construction: Comes with (C#) uMod plugins for player combat data and broadcasting pretty messages to players 
+## Events :rocket:
 
-## Events
-Below is a description of events raised by *rust-rcon*. The player-centric events will contain basic information, such as the player's name, 64-bit Steam ID, etc.
+Rust RCON offers a plethora of events that give developers a detailed insight into various facets of the Rust game server. Below is a categorized breakdown of these events:
 
-#### Game
-* **SaveEvent**: The server has auto-saved (world data has been flushed to disk)
-* **WorldEvent**: Represents interesting world events, e.g. patrol helicopter, air drop, etc.
+### Oxide
 
-#### Player
-* **PlayerConnectedEvent**: Occurs when a player joins the server
-* **PlayerDisconnectedEvent**: Occurs when a player leaves the server
-* **ChatMessageEvent**: Occurs when a player sends a chat message (contains the message)
-* **PlayerSpawnedEvent**: Occurs after a player has spawned (e.g. after death or connecting)
+- **OxidePluginEvent**: Pertains to activities and notifications related to Oxide plugins.
 
-#### Server
-* **RconOpenEvent**: First thing raised upon opening the client
-* **RconMessageEvent**: Represents a raw downpipe rcon message
-* **RconErrorEvent**: Usually related to the underlying websocket connection
-* **RconClosedEvent**: The rcon connection has been terminated
+### Player
 
-#### Custom
-The purpose of this category of events is to provide special-case enriched events for interesting occurrences.  
-*These are normally only supported by extra effort - for example installing a uMod plugin.*
-* **PlayerDeathEvent**: Represents a player in-game death with many different details - example:
-```json
-{
-    "victim": "victory",
-    "killer": "Doctor Delete",
-    "bodyPart": "Head",
-    "distance": 139.09,
-    "hp": 100,
-    "weapon": "L96 Rifle",
-    "attachments": ["8x Zoom Scope", "Weapon Lasersight"],
-    "deathType": "PVP",
-    "damageType": "BULLET",
-}
-```
+- **PlayerChatEvent**: Triggered when a player sends a chat message in the game.
+- **PlayerConnectedEvent**: Fired when a player successfully connects to the server.
+- **PlayerDeathEvent**: Captured when a player meets their demise in the game.
+- **PlayerDisconnectedEvent**: Emitted when a player disconnects from the server.
+- **PlayerMiniCopterCrashedEvent**: Indicates when a player's mini-copter crashes.
+- **PlayerSuicideEvent**: Signaled when a player deliberately ends their in-game life.
 
-## :alembic: Examples :zap:
-The following examples are also found in the `io.graversen.examples.rust.rcon` package.
+### RCON
 
-### Example 1 - Getting to know your Rust server
-In the followig example I demonstrate the most barebones possible way of attaching to a remote or local Rust server.
-```java
-final RustClient rustClient = RustClient.builder()
-    .connectTo("localhost", "awesome_rcon")
-    .build();
+- **RconProtocolExchangeEvent**: Deals with the exchange of protocol-specific data via RCON.
+- **RconReceivedEvent**: Emitted when the server sends a response or data through RCON.
 
-// Let's connect!
-rustClient.open();
-```
+### Server
 
-### Example 2 - a more advanced example
-This example is effectively equivalent to *Example 1*; it demonstrates the extensibility of the `RustClient`. You can specify custom implementations of essentially all the inner workings of the `RustClient`.
-```java
-final RustClient rustClient = RustClient.builder()
-    .connectTo("localhost", "awesome_rcon", 12345)
-    .withSerializer(new DefaultSerializer())
-    .withEventBus(new DefaultEventBus())
-    .withLogger(new DefaultLogger(RustClient.class))
-    .withRconMessageParser(new DefaultRconMessageParser())
-    .build();
+- **EasyAntiCheatEvent**: Relates to notifications and details stemming from the EasyAntiCheat system.
+- **ItemDisappearedEvent**: Triggered when an in-game item disappears due to various reasons.
+- **SaveEvent**: Captured whenever there's a save action on the server, be it automatic or manual.
+- **WorldEvent**: Encompasses events related to the overall game world and its elements.
+- **ServerEvent**: General server-related events not categorized under other specific events.
 
-// Let's connect!
-rustClient.open();
-```
+### Websocket
 
-### Example 3 - let's increase the God Complex
-We can manage items using Rust's internal "shortcode" system.
-```java
-final InventoryRcon inventory = rustClient.rcon().inventory();
+- **WsOpenedEvent**: Signaled when a new websocket connection is successfully established.
+- **WsMessageEvent**: Fired when a message is received over the websocket connection.
+- **WsErrorEvent**: Triggered when there's an error in the websocket communication.
+- **WsClosedEvent**: Emitted when the websocket connection is closed, either due to errors or deliberate actions.
 
-// Let's give this player a reward for being awesome
-inventory.giveTo(() -> "76561197979952036", "metal.refined", 1000).execute();
+## Examples :alembic:
 
-// Actually - all players are awesome!
-inventory.giveAll("xmas.present.large", 1).execute();
-```
+*Coming soon*
 
-### Example 4 - extrapolating cool stuff from the Rust server
-We can subscribe to events representing interesting occurrences on the Rust server. You can specify custom parsers for Rust's internal messages.
-
-```java
-// Subscribe to "PlayerSpawnedEvent" using the default parser and a simple listener
-rustClient.addEventHandling(
-    PlayerSpawnedEvent.class,
-    RconMessageTypes.PLAYER_SPAWNED,
-    new PlayerSpawnedEventParser(),
-    ExampleFour::logPlayerSpawned
-);
-
-// Subscriber to "PlayerDeathEvent" using the default parser and a simple listener
-rustClient.addEventHandling(
-    PlayerDeathEvent.class,
-    RconMessageTypes.PLAYER_DEATH,
-    new PlayerDeathEventParser(),
-    ExampleFour::logPlayerFight
-);
-
-```
-
-```java
-private static void logPlayerSpawned(PlayerSpawnedEvent event)
-{
-    // Log player joins and respawns. Who joined the server most during this month?
-    System.out.printf("An awesome player named %s has just joined!", event.getPlayerName());
-}
-```
-
-```java
-private static void logPlayerFight(PlayerDeathEvent event)
-{
-    // Generate boards displaying the most violent and peaceful players
-    // Or the most popular weapons and attachment combinations
-    // Who died the most, and who should you put a bounty on?
-    System.out.printf("%s shot %s using a %s!", event.getKiller(), event.getVictim(), event.getWeapon());
-}
-```
-
-### Example 5 - keeping track of players
-We may continuously poll the server and receive callbacks for player listings 
-
-```java
-// You will get a callback invocation at the specified interval
-rustClient.addPlayerPoller(playerPollingListener(), 5000, TimeUnit.MILLISECONDS);
-```
-
-```java
-private static IPlayerPollingListener playerPollingListener()
-{
-    return players -> players.forEach(ExampleFive::logPlayerStatus);
-}
-
-private static void logPlayerStatus(Player player)
-{
-    // You can get really creative here.
-    // Maybe a NRT dashboard displaying current players and graphing their network latencies?
-    System.out.printf("Player %s has ping %d ms.\n", player.getDisplayName(), player.getPing());
-}
-```
-
-## :memo: Useful Resources
+## Useful Resources
 * https://steamid.io/ - translate between Steam IDs
 * https://www.corrosionhour.com/rust-item-list/ - all Rust items, including shortcodes required by inventory rcon
