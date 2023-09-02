@@ -1,0 +1,2 @@
+payload,steamId,playerName,reason
+[EAC] Kicking 76561198075300933 / PenetrationsKonsulten (Authentication timed out (1/2)),76561198075300933,PenetrationsKonsulten,Authentication timed out (1/2)
