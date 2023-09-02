@@ -28,7 +28,7 @@ Rust RCON is available through Maven from GitHub Packages. To install:
 <repositories>
     <repository>
         <id>github</id>
-        <url>https://maven.pkg.github.com/yourusername/RustRCON</url>
+        <url>https://maven.pkg.github.com/MrGraversen/rust-rcon</url>
     </repository>
 </repositories>
 ```
