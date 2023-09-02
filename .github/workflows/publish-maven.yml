@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: adopt
-          java-version: 11
+          java-version: 17
       - name: Set maven artifact versions
         run: mvn versions:set -DnewVersion=$RELEASE_TAG
       - name: Publish package
