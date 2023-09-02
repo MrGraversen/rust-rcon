@@ -31,6 +31,14 @@
         <maven.compiler.release>${java.version}</maven.compiler.release>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/MrGraversen/rust-rcon</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <!-- V2 -->
         <dependency>
