@@ -71,7 +71,7 @@ public class DefaultRustRconClient implements RustRconClient {
         return rustRconResponseDTO -> new RustRconResponse(
                 Objects.requireNonNullElse(rustRconResponseDTO.getIdentifier(), -1),
                 rustRconResponseDTO.getMessage(),
-                rustRconResponseDTO.getStackTrace(),
+                rustRconResponseDTO.getType(),
                 rustServer.get()
         );
     }
