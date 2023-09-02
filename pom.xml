@@ -87,28 +87,6 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- V1 -->
-        <dependency>
-            <groupId>com.github.MrGraversen</groupId>
-            <artifactId>Fiber</artifactId>
-            <version>0.0.10</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.MrGraversen</groupId>
-            <artifactId>Trunk</artifactId>
-            <version>0.0.10</version>
-        </dependency>
-        <dependency>
-            <groupId>net.jodah</groupId>
-            <artifactId>failsafe</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.6</version>
-        </dependency>
     </dependencies>
 
     <build>
