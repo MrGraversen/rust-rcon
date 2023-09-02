@@ -1,0 +1,2 @@
+payload;steamId;playerName
+IamNoobDontCry[76561198983152618] was killed by minicopter.entity (entity) at (968.1, 24.7, -1792.2);76561198983152618;IamNoobDontCry

@@ -1,0 +1,11 @@
+payload;steamId;playerName;message
+[CHAT] Doctor Delete[76561197979952036] : Hello;76561197979952036;Doctor Delete;Hello
+[CHAT] Doctor Delete[76561197979952036] : I saw you got a new house;76561197979952036;Doctor Delete;I saw you got a new house
+[CHAT] Pope of the Nope[76561197979952036] : ssss;76561197979952036;Pope of the Nope;ssss
+[CHAT] DarkDouchebag[76561198046357656] : Don't know waht to write :o;76561198046357656;DarkDouchebag;Don't know waht to write :o
+[CHAT] DarkDouchebag[76561198046357656] : [Server] Kan jo ikke huske hvordan den laver det;76561198046357656;DarkDouchebag;[Server] Kan jo ikke huske hvordan den laver det
+[CHAT] DarkDouchebag[76561198046357656] : [DarkDouchebag] [Server] Hello mate;76561198046357656;DarkDouchebag;[DarkDouchebag] [Server] Hello mate
+[CHAT] DarkDouchebag[76561198046357656] : PLain old text, PLain old text, PLain old text, PLain old text, PLain old text, PLain old text, PLai;76561198046357656;DarkDouchebag;PLain old text, PLain old text, PLain old text, PLain old text, PLain old text, PLain old text, PLai
+[CHAT] DarkDouchebag[76561198046357656] : [CHAT] dont know hwat to write \\:o :o;76561198046357656;DarkDouchebag;[CHAT] dont know hwat to write \\:o :o
+[CHAT] DarkDouchebag[76561198046357656] : This message : will not work : haha;76561198046357656;DarkDouchebag;This message : will not work : haha
+[CHAT] BP123[76561198813879070] : Yeah. Thought i might tell you that way :D;76561198813879070;BP123;Yeah. Thought i might tell you that way :D
