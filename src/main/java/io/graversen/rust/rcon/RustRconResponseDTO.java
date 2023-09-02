@@ -2,7 +2,6 @@ package io.graversen.rust.rcon;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

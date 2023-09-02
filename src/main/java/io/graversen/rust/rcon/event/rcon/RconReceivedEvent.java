@@ -1,7 +1,7 @@
 package io.graversen.rust.rcon.event.rcon;
 
-import io.graversen.rust.rcon.event.RustEvent;
 import io.graversen.rust.rcon.RustRconResponse;
+import io.graversen.rust.rcon.event.RustEvent;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

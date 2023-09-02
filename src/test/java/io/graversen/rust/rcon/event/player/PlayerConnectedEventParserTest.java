@@ -1,7 +1,6 @@
 package io.graversen.rust.rcon.event.player;
 
 import io.graversen.rust.rcon.TestRustRconResponse;
-import io.graversen.rust.rcon.event.player.PlayerConnectedEventParser;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 

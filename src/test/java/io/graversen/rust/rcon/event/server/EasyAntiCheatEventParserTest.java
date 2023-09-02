@@ -4,7 +4,8 @@ import io.graversen.rust.rcon.TestRustRconResponse;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EasyAntiCheatEventParserTest {
     private final EasyAntiCheatEventParser easyAntiCheatEventParser = new EasyAntiCheatEventParser();
