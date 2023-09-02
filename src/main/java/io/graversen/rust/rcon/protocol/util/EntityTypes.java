@@ -1,7 +1,5 @@
 package io.graversen.rust.rcon.protocol.util;
 
-import io.graversen.v1.rust.rcon.objects.util.Animals;
-import io.graversen.v1.rust.rcon.objects.util.Traps;
 import lombok.NonNull;
 
 import java.util.Objects;
