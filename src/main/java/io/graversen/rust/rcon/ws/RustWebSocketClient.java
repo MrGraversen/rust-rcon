@@ -89,6 +89,11 @@ public class RustWebSocketClient extends WebSocketClient implements Closeable, E
         return serverUriRedacted;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s[%s]", getClass().getSimpleName(), getServerUri());
+    }
+
     protected void log(@NonNull String message, Object... args) {
         log(log::info, message, args);
     }

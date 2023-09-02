@@ -154,6 +154,11 @@ public class DefaultRustRconClient implements RustRconClient {
         eventBus.register(subscriber);
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s[%s]", getClass().getSimpleName(), getRustServer().getServerUri());
+    }
+
     private RustServer getRustServer() {
         return new SimpleRustServer(name(), webSocketClient.getServerUri());
     }
