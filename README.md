@@ -1,5 +1,3 @@
-[![](https://jitpack.io/v/MrGraversen/rust-rcon.svg)](https://jitpack.io/#MrGraversen/rust-rcon)
-
 # Rust RCON :video_game:
 An asynchronous, fault-tolerant Rust RCON client built in Java.  
 Seamlessly integrates with Rust's RCON request-response semantics using websocket connections.  
