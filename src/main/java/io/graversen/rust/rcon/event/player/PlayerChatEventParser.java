@@ -10,8 +10,12 @@ import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PlayerChatEventParser extends BaseRustEventParser<PlayerChatEvent> {
+    private final Pattern CHAT_PATTERN = Pattern.compile("\\[CHAT\\] (.+)\\[(\\d+)\\] : (.+)");
+
     @Override
     public boolean supports(@NonNull RustRconResponse payload) {
         return payload.getMessage().startsWith("[CHAT] ");
@@ -27,32 +31,22 @@ public class PlayerChatEventParser extends BaseRustEventParser<PlayerChatEvent> 
         return rconResponse -> {
             final var message = rconResponse.getMessage();
 
-            final var chatMessageParts = message.split("\\s:\\s", 2);
+            final var matcher = CHAT_PATTERN.matcher(message);
 
-            final var leftHandString = chatMessageParts[0];
-            final var chatMessage = chatMessageParts[1].trim();
+            if (matcher.find()) {
+                final var playerName = matcher.group(1).trim();
+                final var steamId64 = matcher.group(2).trim();
+                final var chatMessage = matcher.group(3).trim();
 
-            final var matcherSteamId = CommonUtils.SQUARE_BRACKET_INSIDE_MATCHER.matcher(leftHandString);
+                final var playerChatEvent = new PlayerChatEvent(
+                        new SteamId64(steamId64),
+                        PlayerName.ofNullable(playerName),
+                        chatMessage
+                );
 
-            final var matchingStrings = new ArrayList<String>();
-            while (matcherSteamId.find()) {
-                matchingStrings.add(matcherSteamId.group(1));
+                return Optional.of(playerChatEvent);
             }
-
-            final var steamId64 = matchingStrings.get(matchingStrings.size() - 1);
-            final var matcherPlayerName = CommonUtils.SQUARE_BRACKET_OUTSIDE_MATCHER.matcher(leftHandString);
-
-            final String playerName = matcherPlayerName.find()
-                    ? matcherPlayerName.group(1).trim()
-                    : null;
-
-            final var playerChatEvent = new PlayerChatEvent(
-                    new SteamId64(steamId64),
-                    PlayerName.ofNullable(playerName),
-                    chatMessage
-            );
-
-            return Optional.of(playerChatEvent);
+            return Optional.empty();
         };
     }
 }

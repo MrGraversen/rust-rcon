@@ -9,3 +9,4 @@ payload;steamId;playerName;message
 [CHAT] DarkDouchebag[76561198046357656] : [CHAT] dont know hwat to write \\:o :o;76561198046357656;DarkDouchebag;[CHAT] dont know hwat to write \\:o :o
 [CHAT] DarkDouchebag[76561198046357656] : This message : will not work : haha;76561198046357656;DarkDouchebag;This message : will not work : haha
 [CHAT] BP123[76561198813879070] : Yeah. Thought i might tell you that way :D;76561198813879070;BP123;Yeah. Thought i might tell you that way :D
+[CHAT] [RTA]PenetrationsKonsulten[76561198075300933] : y0;76561198075300933;[RTA]PenetrationsKonsulten;y0
