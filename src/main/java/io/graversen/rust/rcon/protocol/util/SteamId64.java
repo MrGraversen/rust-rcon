@@ -25,6 +25,10 @@ public class SteamId64 implements Supplier<String> {
         return Optional.of(new SteamId64(value));
     }
 
+    public static SteamId64 parseOrFail(@Nullable String value) {
+        return SteamId64.parse(value).orElseThrow(() -> new IllegalArgumentException(String.format("Could not parse Steam ID: %s", value)));
+    }
+
     @Override
     public String get() {
         return value;

@@ -31,11 +31,7 @@ public class AutoConfiguringRustEventService extends BaseEventHandler implements
                 .map(eventParser -> eventParser.parseEvent(payload))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .peek(parsedEvent -> log.debug(
-                        "Emitting {} instance from payload: {}",
-                        parsedEvent.getClass().getSimpleName(),
-                        payload.getMessage()
-                ))
+                .peek(parsedEvent -> log.debug("Emitting event {} from payload: {}", parsedEvent, payload.getMessage()))
                 .forEach(eventBus::post);
     }
 
