@@ -1,0 +1,2 @@
+[ENTCMD] Doctor Delete/76561197979952036 used *kill* on ent: assets/content/vehicles/mlrs/mlrs.entity.prefab,Doctor Delete/76561197979952036 used *kill* on ent: assets/content/vehicles/mlrs/mlrs.entity.prefab
+[ENTCMD] Doctor Delete/76561197979952036 used *kill* on ent: assets/rust.ai/agents/boar/boar.prefab,Doctor Delete/76561197979952036 used *kill* on ent: assets/rust.ai/agents/boar/boar.prefab
