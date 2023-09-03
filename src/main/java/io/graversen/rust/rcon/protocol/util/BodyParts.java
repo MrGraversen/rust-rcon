@@ -8,6 +8,7 @@ public enum BodyParts {
     LEG,
     HAND,
     STOMACH,
+    CHEST,
     UNKNOWN;
 
     public static BodyParts parse(String bodyPart) {
