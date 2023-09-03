@@ -9,6 +9,7 @@ public enum EntityTypes {
     ANIMAL,
     TRAP,
     SCIENTIST,
+    SENTRY,
     UNKNOWN;
 
     public static EntityTypes parse(String killerEntityType) {
@@ -24,6 +25,8 @@ public enum EntityTypes {
             return TRAP;
         } else if (EntityTypes.isScientist(killerEntityType)) {
             return SCIENTIST;
+        } else if (EntityTypes.isSentry(killerEntityType)) {
+            return SENTRY;
         } else {
             return UNKNOWN;
         }
@@ -45,7 +48,11 @@ public enum EntityTypes {
         return killerEntityType.equalsIgnoreCase("scientist");
     }
 
+    public static boolean isSentry(@NonNull String killerEntityType) {
+        return killerEntityType.equalsIgnoreCase("sentry");
+    }
+
     public static boolean isNonPlayerCharacter(@NonNull String killerEntityType) {
-        return EntityTypes.isScientist(killerEntityType) || EntityTypes.isAnimal(killerEntityType);
+        return EntityTypes.isScientist(killerEntityType) || EntityTypes.isAnimal(killerEntityType) || EntityTypes.isSentry(killerEntityType);
     }
 }
