@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @RequiredArgsConstructor
-public class DefaultRustRconService implements RustRconService, EventEmitter {
+public class DefaultRustRconService implements RustRconService {
     private final AtomicBoolean isRconLogEnabled = new AtomicBoolean(false);
 
     private final @NonNull RustRconConfiguration configuration;
