@@ -10,6 +10,7 @@ public enum EntityTypes {
     TRAP,
     SCIENTIST,
     SENTRY,
+    BRADLEY,
     UNKNOWN;
 
     public static EntityTypes parse(String killerEntityType) {
@@ -27,6 +28,8 @@ public enum EntityTypes {
             return SCIENTIST;
         } else if (EntityTypes.isSentry(killerEntityType)) {
             return SENTRY;
+        } else if (EntityTypes.isBradley(killerEntityType)) {
+            return BRADLEY;
         } else {
             return UNKNOWN;
         }
@@ -52,7 +55,14 @@ public enum EntityTypes {
         return killerEntityType.equalsIgnoreCase("sentry");
     }
 
-    public static boolean isNonPlayerCharacter(@NonNull String killerEntityType) {
-        return EntityTypes.isScientist(killerEntityType) || EntityTypes.isAnimal(killerEntityType) || EntityTypes.isSentry(killerEntityType);
+    public static boolean isBradley(@NonNull String killerEntityType) {
+        return killerEntityType.equalsIgnoreCase("bradley");
+    }
+
+    public static boolean isNonPlayerCharacter(@NonNull String entityType) {
+        return EntityTypes.isScientist(entityType)
+                || EntityTypes.isAnimal(entityType)
+                || EntityTypes.isSentry(entityType)
+                || EntityTypes.isBradley(entityType);
     }
 }
