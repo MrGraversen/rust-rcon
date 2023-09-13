@@ -108,4 +108,10 @@ public class DefaultAdminCodec extends DefaultRustCodec implements AdminCodec {
         );
         return send(rconMessage);
     }
+
+    @Override
+    public CompletableFuture<RustRconResponse> serverInfo() {
+        final var rconMessage = compile(SERVER_INFO);
+        return send(rconMessage);
+    }
 }

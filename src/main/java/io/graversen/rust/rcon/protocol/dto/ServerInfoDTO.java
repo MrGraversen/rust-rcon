@@ -1,12 +1,10 @@
 package io.graversen.rust.rcon.protocol.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 public class ServerInfoDTO {
@@ -28,8 +26,8 @@ public class ServerInfoDTO {
     @JsonProperty("EntityCount")
     private final Integer entityCount;
 
-//    @JsonProperty("GameTime")
-//    private final String gameDateTime;
+    @JsonProperty("GameTime")
+    private final String gameDateTime;
 
     @JsonProperty("Uptime")
     private final Long uptimeSeconds;
@@ -63,5 +61,4 @@ public class ServerInfoDTO {
 
     @JsonProperty("Protocol")
     private final String protocol;
-
 }

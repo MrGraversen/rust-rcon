@@ -24,4 +24,6 @@ public interface AdminCodec {
     CompletableFuture<RustRconResponse> mutePlayer(@NonNull SteamId64 steamId64);
 
     CompletableFuture<RustRconResponse> unmutePlayer(@NonNull SteamId64 steamId64);
+
+    CompletableFuture<RustRconResponse> serverInfo();
 }

@@ -48,5 +48,6 @@ public class RustProtocolTemplates {
         public static final String REMOVE_OWNER = "global.removeowner \"" + STEAM_ID_64 + "\"";
         public static final String MUTE_PLAYER = "global.mute \"" + STEAM_ID_64 + "\"";
         public static final String UNMUTE_PLAYER = "global.unmute \"" + STEAM_ID_64 + "\"";
+        public static final String SERVER_INFO = "global.serverinfo";
     }
 }
