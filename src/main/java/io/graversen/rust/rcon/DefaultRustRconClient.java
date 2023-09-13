@@ -93,6 +93,11 @@ public class DefaultRustRconClient implements RustRconClient {
     }
 
     @Override
+    public RustServer rustServer() {
+        return getRustServer();
+    }
+
+    @Override
     @SneakyThrows
     public void close() throws IOException {
         if (isInitialized.get()) {

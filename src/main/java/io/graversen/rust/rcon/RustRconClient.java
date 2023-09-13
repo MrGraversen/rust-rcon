@@ -19,6 +19,8 @@ public interface RustRconClient extends EventEmitter, Closeable {
 
     void connect();
 
+    RustServer rustServer();
+
     default String name() {
         return "rust-rcon";
     }
