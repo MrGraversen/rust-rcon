@@ -22,16 +22,19 @@ import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @RequiredArgsConstructor
 public class DefaultRustRconService implements RustRconService {
     private final AtomicBoolean isRconLogEnabled = new AtomicBoolean(false);
+    private final AtomicReference<RustDiagnostics> diagnostics;
 
     private final @NonNull RustRconConfiguration configuration;
 
@@ -84,6 +87,11 @@ public class DefaultRustRconService implements RustRconService {
     }
 
     @Override
+    public Optional<RustDiagnostics> diagnostics() {
+        return Optional.ofNullable(diagnostics.get());
+    }
+
+    @Override
     public void registerEvents(@NonNull Object subscriber) {
         eventBus.get().register(subscriber);
     }
@@ -101,6 +109,7 @@ public class DefaultRustRconService implements RustRconService {
                 eventBus.get()::post
         );
         registerInternalTask(serverInfoEmitTask, Duration.ofSeconds(5));
+        registerRustDiagnosticsListener();
     }
 
     protected ScheduledExecutorService createScheduledExecutorService() {
@@ -171,6 +180,11 @@ public class DefaultRustRconService implements RustRconService {
         log.info("Registering task: {} (Every {} seconds)", task.getClass().getSimpleName(), fixedDelay.getSeconds());
         final var initialDelay = Objects.requireNonNullElse(defaultTaskInitialDelay(), Duration.ofSeconds(5));
         schedule(task, fixedDelay, initialDelay);
+    }
+
+    private void registerRustDiagnosticsListener() {
+        log.info("Registering {}", ServerInfoDiagnosticsEventListener.class);
+        registerEvents(new ServerInfoDiagnosticsEventListener(diagnostics::set));
     }
 
     private void runConfigure() {

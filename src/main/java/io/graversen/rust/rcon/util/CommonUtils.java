@@ -5,6 +5,8 @@ import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 import java.net.URI;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -13,6 +15,14 @@ public class CommonUtils {
     public static final Pattern SQUARE_BRACKET_INSIDE_MATCHER = Pattern.compile("\\[(.*?)\\]");
 
     public static final Pattern SQUARE_BRACKET_OUTSIDE_MATCHER = Pattern.compile("\\](.*?)\\[");
+
+    public static ZonedDateTime now() {
+        return ZonedDateTime.now(utc());
+    }
+
+    public static ZoneId utc() {
+        return ZoneId.of("UTC");
+    }
 
     public static String partialJoin(String delimiter, String[] stringArray, int fromIndex, int toIndex) {
         final String[] partialStringArray = Arrays.copyOfRange(stringArray, fromIndex, toIndex);
