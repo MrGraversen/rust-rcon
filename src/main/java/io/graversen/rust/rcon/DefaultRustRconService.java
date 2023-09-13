@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 public class DefaultRustRconService implements RustRconService {
     private final AtomicBoolean isRconLogEnabled = new AtomicBoolean(false);
-    private final AtomicReference<RustDiagnostics> diagnostics;
+    private final AtomicReference<RustDiagnostics> diagnostics = new AtomicReference<>(null);
 
     private final @NonNull RustRconConfiguration configuration;
 
@@ -183,7 +183,7 @@ public class DefaultRustRconService implements RustRconService {
     }
 
     private void registerRustDiagnosticsListener() {
-        log.info("Registering {}", ServerInfoDiagnosticsEventListener.class);
+        log.info("Registering {}", ServerInfoDiagnosticsEventListener.class.getSimpleName());
         registerEvents(new ServerInfoDiagnosticsEventListener(diagnostics::set));
     }
 
