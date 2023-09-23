@@ -11,6 +11,7 @@ import io.graversen.rust.rcon.protocol.dto.ServerInfoDTO;
 import io.graversen.rust.rcon.protocol.oxide.DefaultOxideManagement;
 import io.graversen.rust.rcon.protocol.oxide.OxideManagement;
 import io.graversen.rust.rcon.tasks.RconTask;
+import io.graversen.rust.rcon.tasks.RustPlayersEmitTask;
 import io.graversen.rust.rcon.tasks.ServerInfoEmitTask;
 import io.graversen.rust.rcon.util.DefaultJsonMapper;
 import io.graversen.rust.rcon.util.Lazy;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -37,6 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DefaultRustRconService implements RustRconService {
     private final AtomicBoolean isRconLogEnabled = new AtomicBoolean(false);
     private final AtomicReference<RustDiagnostics> diagnostics = new AtomicReference<>(null);
+    private final AtomicReference<List<RustPlayer>> rustPlayers = new AtomicReference<>(List.of());
 
     private final @NonNull RustRconConfiguration configuration;
 
@@ -100,6 +103,11 @@ public class DefaultRustRconService implements RustRconService {
     }
 
     @Override
+    public List<RustPlayer> rustPlayers() {
+        return rustPlayers.get();
+    }
+
+    @Override
     public void registerEvents(@NonNull Object subscriber) {
         eventBus.get().register(subscriber);
     }
@@ -117,7 +125,14 @@ public class DefaultRustRconService implements RustRconService {
                 eventBus.get()::post
         );
         registerInternalTask(serverInfoEmitTask, Duration.ofSeconds(5));
+        final var rustPlayersEmitTask = new RustPlayersEmitTask(
+                rustRconClient.get().rustServer(),
+                () -> codec().admin().playerList().thenApply(rustDtoMappers.get().mapRustPlayers()),
+                eventBus.get()::post
+        );
+        registerInternalTask(rustPlayersEmitTask, Duration.ofSeconds(3));
         registerRustDiagnosticsListener();
+        registerRustPlayerEventListener();
     }
 
     protected ScheduledExecutorService createScheduledExecutorService() {
@@ -197,6 +212,11 @@ public class DefaultRustRconService implements RustRconService {
     private void registerRustDiagnosticsListener() {
         log.info("Registering {}", ServerInfoDiagnosticsEventListener.class.getSimpleName());
         registerEvents(new ServerInfoDiagnosticsEventListener(diagnostics::set));
+    }
+
+    private void registerRustPlayerEventListener() {
+        log.info("Registering {}", RustPlayerEventListener.class.getSimpleName());
+        registerEvents(new RustPlayerEventListener(rustPlayers::set));
     }
 
     private void runConfigure() {

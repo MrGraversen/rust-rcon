@@ -9,6 +9,7 @@ import lombok.NonNull;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,4 +27,6 @@ public interface RustRconService extends EventEmitter {
     void schedule(@NonNull RconTask task, @NonNull Duration fixedDelay, @Nullable Duration initialDelay);
 
     Optional<RustDiagnostics> diagnostics();
+
+    List<RustPlayer> rustPlayers();
 }

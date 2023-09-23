@@ -6,6 +6,8 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 
+import java.util.List;
+
 public class DefaultJsonMapper implements JsonMapper {
     private ObjectMapper objectMapper;
 
@@ -19,6 +21,13 @@ public class DefaultJsonMapper implements JsonMapper {
     @SneakyThrows
     public <T> T fromJson(@NonNull String json, @NonNull Class<T> toClass) {
         return getObjectMapper().readValue(json, toClass);
+    }
+
+    @Override
+    @SneakyThrows
+    public <T> List<T> fromJsonArray(@NonNull String json, @NonNull Class<T> toClass) {
+        final T[] jsonArray = (T[]) getObjectMapper().readValue(json, toClass.arrayType());
+        return List.of(jsonArray);
     }
 
     @Synchronized

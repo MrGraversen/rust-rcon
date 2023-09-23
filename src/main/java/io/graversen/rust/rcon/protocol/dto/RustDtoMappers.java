@@ -27,4 +27,8 @@ public class RustDtoMappers {
     public Function<RustRconResponse, ServerInfoDTO> mapServerInfo() {
         return rconResponse -> jsonMapper.fromJson(rconResponse.getMessage(), ServerInfoDTO.class);
     }
+
+    public Function<RustRconResponse, List<RustPlayerDTO>> mapRustPlayers() {
+        return rconResponse -> jsonMapper.fromJsonArray(rconResponse.getMessage(), RustPlayerDTO.class);
+    }
 }
