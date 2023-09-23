@@ -1,6 +1,7 @@
 package io.graversen.rust.rcon.protocol;
 
 import io.graversen.rust.rcon.RustRconResponse;
+import io.graversen.rust.rcon.protocol.oxide.OxideCodec;
 import lombok.NonNull;
 
 import java.util.Map;
@@ -13,6 +14,8 @@ public interface Codec {
     SettingsCodec settings();
 
     EventCodec event();
+
+    OxideCodec oxide();
 
     CompletableFuture<RustRconResponse> send(@NonNull RustRconMessage rustRconMessage);
 

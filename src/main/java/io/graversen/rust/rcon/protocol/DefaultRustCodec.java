@@ -2,6 +2,8 @@ package io.graversen.rust.rcon.protocol;
 
 import io.graversen.rust.rcon.RustRconResponse;
 import io.graversen.rust.rcon.RustRconRouter;
+import io.graversen.rust.rcon.protocol.oxide.DefaultOxideCodec;
+import io.graversen.rust.rcon.protocol.oxide.OxideCodec;
 import io.graversen.rust.rcon.util.Lazy;
 import lombok.NonNull;
 import org.apache.commons.text.StringSubstitutor;
@@ -15,12 +17,14 @@ public class DefaultRustCodec implements Codec {
     private final @NonNull Lazy<AdminCodec> adminCodec;
     private final @NonNull Lazy<SettingsCodec> settingsCodec;
     private final @NonNull Lazy<EventCodec> eventCodec;
+    private final @NonNull Lazy<OxideCodec> oxideCodec;
 
     public DefaultRustCodec(@NonNull RustRconRouter rustRconRouter) {
         this.rustRconRouter = rustRconRouter;
         this.adminCodec = Lazy.of(() -> new DefaultAdminCodec(rustRconRouter));
         this.settingsCodec = Lazy.of(() -> new DefaultSettingsCodec(rustRconRouter));
         this.eventCodec = Lazy.of(() -> new DefaultEventCodec(rustRconRouter));
+        this.oxideCodec = Lazy.of(() -> new DefaultOxideCodec(rustRconRouter));
     }
 
     @Override
@@ -36,6 +40,11 @@ public class DefaultRustCodec implements Codec {
     @Override
     public EventCodec event() {
         return eventCodec.get();
+    }
+
+    @Override
+    public OxideCodec oxide() {
+        return oxideCodec.get();
     }
 
     @Override

@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import static io.graversen.rust.rcon.protocol.RustProtocolTemplates.Placeholders.*;
+import static io.graversen.rust.rcon.protocol.RustProtocolTemplates.Placeholders.OxidePlaceholders.*;
 
 @UtilityClass
 public class RustProtocolTemplates {
@@ -16,6 +17,12 @@ public class RustProtocolTemplates {
         public static final String ANIMAL = "${animal}";
         public static final String VEHICLE = "${vehicle}";
         public static final String REASON = "${reason}";
+
+        public static class OxidePlaceholders {
+            public static final String PERMISSION_TYPE = "${permissionType}";
+            public static final String NAME = "${name}";
+            public static final String PERMISSION = "${permission}";
+        }
 
         public static String stripped(@NonNull String placeholder) {
             return placeholder.substring(2, placeholder.length() - 1);
@@ -49,5 +56,11 @@ public class RustProtocolTemplates {
         public static final String MUTE_PLAYER = "global.mute \"" + STEAM_ID_64 + "\"";
         public static final String UNMUTE_PLAYER = "global.unmute \"" + STEAM_ID_64 + "\"";
         public static final String SERVER_INFO = "global.serverinfo";
+    }
+
+    public static class OxideProtocol {
+        public static final String PLUGINS = "oxide.plugins";
+        public static final String GRANT = "oxide.grant " + PERMISSION_TYPE + " " + NAME + " " + PERMISSION;
+        public static final String REVOKE = "oxide.revoke " + PERMISSION_TYPE + " " + NAME + " " + PERMISSION;
     }
 }
