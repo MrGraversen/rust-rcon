@@ -25,7 +25,7 @@
         <jackson-databind.version>2.13.3</jackson-databind.version>
         <reflections.version>0.9.12</reflections.version>
         <junit.version>5.9.2</junit.version>
-        <mockito.version>2.23.4</mockito.version>
+        <mockito.version>5.3.1</mockito.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.release>${java.version}</maven.compiler.release>
