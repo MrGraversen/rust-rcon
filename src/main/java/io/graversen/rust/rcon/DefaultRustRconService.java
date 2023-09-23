@@ -8,6 +8,8 @@ import io.graversen.rust.rcon.protocol.Codec;
 import io.graversen.rust.rcon.protocol.DefaultRustCodec;
 import io.graversen.rust.rcon.protocol.dto.RustDtoMappers;
 import io.graversen.rust.rcon.protocol.dto.ServerInfoDTO;
+import io.graversen.rust.rcon.protocol.oxide.DefaultOxideManagement;
+import io.graversen.rust.rcon.protocol.oxide.OxideManagement;
 import io.graversen.rust.rcon.tasks.RconTask;
 import io.graversen.rust.rcon.tasks.ServerInfoEmitTask;
 import io.graversen.rust.rcon.util.DefaultJsonMapper;
@@ -46,6 +48,7 @@ public class DefaultRustRconService implements RustRconService {
     private final Lazy<RustRconClient> rustRconClient = Lazy.of(this::createRustRconClient);
     private final Lazy<RustRconRouter> rustRconRouter = Lazy.of(this::createRustRconRouter);
     private final Lazy<Codec> codec = Lazy.of(this::createCodec);
+    private final Lazy<OxideManagement> oxideManagement = Lazy.of(this::createOxideManagement);
 
     @Override
     public Codec codec() {
@@ -72,7 +75,12 @@ public class DefaultRustRconService implements RustRconService {
 
     @Override
     public CompletableFuture<ServerInfoDTO> serverInfo() {
-        return codec().admin().serverInfo().thenApplyAsync(rustDtoMappers.get().mapServerInfo());
+        return codec().admin().serverInfo().thenApply(rustDtoMappers.get().mapServerInfo());
+    }
+
+    @Override
+    public OxideManagement oxideManagement() {
+        return oxideManagement.get();
     }
 
     @Override
@@ -124,6 +132,10 @@ public class DefaultRustRconService implements RustRconService {
         return new DefaultRustCodec(
                 rustRconRouter.get()
         );
+    }
+
+    protected OxideManagement createOxideManagement() {
+        return new DefaultOxideManagement(codec().oxide());
     }
 
     protected RustWebSocketClient createWebSocketClient() {

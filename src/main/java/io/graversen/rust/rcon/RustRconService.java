@@ -2,6 +2,7 @@ package io.graversen.rust.rcon;
 
 import io.graversen.rust.rcon.protocol.Codec;
 import io.graversen.rust.rcon.protocol.dto.ServerInfoDTO;
+import io.graversen.rust.rcon.protocol.oxide.OxideManagement;
 import io.graversen.rust.rcon.tasks.RconTask;
 import io.graversen.rust.rcon.util.EventEmitter;
 import lombok.NonNull;
@@ -19,6 +20,8 @@ public interface RustRconService extends EventEmitter {
     void stop();
 
     CompletableFuture<ServerInfoDTO> serverInfo();
+
+    OxideManagement oxideManagement();
 
     void schedule(@NonNull RconTask task, @NonNull Duration fixedDelay, @Nullable Duration initialDelay);
 
