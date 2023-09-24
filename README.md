@@ -22,7 +22,28 @@ In the context of Rust, RCON serves as a potent tool for administrators and thir
 
 Rust RCON is available through Maven from GitHub Packages. To install:
 
-1. First, add the GitHub Packages repository in your `pom.xml`:
+:warning: **Even though this project is public, you still need to authenticate properly with GitHub Packages**
+
+From the documentation:
+> If you want to download and use a package from a public repository, you don't need access to the repository. However, you must be authenticated to GitHub Packages under a user account that has a GitHub Free plan.
+
+You must create a GitHub Personal Access Token to facilitate this access. It must have at least the `read:packages` scope.
+
+[**Click here**](https://github.com/settings/tokens/new?scopes=read:packages&description=Rust+Rcon+GitHub+Packages+Access) to easily create one.
+
+1. Configure Maven settings.xml: Place this token in your ~/.m2/settings.xml (or the equivalent on your system).
+
+```xml
+<servers>
+  <server>
+    <id>github</id>
+    <username>YOUR_GITHUB_USERNAME</username>
+    <password>YOUR_PERSONAL_ACCESS_TOKEN</password>
+  </server>
+</servers>
+```
+
+2. Add the GitHub Packages repository in your `pom.xml`:
 
 ```xml
 <repositories>
