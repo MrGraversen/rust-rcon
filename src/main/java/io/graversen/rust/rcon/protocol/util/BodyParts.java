@@ -6,6 +6,7 @@ public enum BodyParts {
     HEAD,
     BODY,
     LEG,
+    ARM,
     HAND,
     STOMACH,
     CHEST,
