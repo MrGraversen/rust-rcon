@@ -19,6 +19,11 @@ public class OxidePluginEventParser extends BaseRustEventParser<OxidePluginEvent
             final var message = payload.getMessage();
             final var pluginName = message.substring(message.indexOf('[') + 1, message.indexOf(']')).trim();
             final var pluginMessage = message.substring(pluginName.length() + 2).trim();
+
+            if (pluginName.isEmpty() || pluginMessage.isEmpty()) {
+                return Optional.empty();
+            }
+
             final var oxidePluginEvent = new OxidePluginEvent(pluginName, pluginMessage);
             return Optional.of(oxidePluginEvent);
         };
