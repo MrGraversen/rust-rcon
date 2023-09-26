@@ -71,7 +71,7 @@ public class PlayerDeathEventParser extends BaseRustEventParser<PlayerDeathEvent
             final var victimEntity = EntityTypes.parse(playerDeath.getVictimEntityType());
             final var killerEntity = EntityTypes.parse(playerDeath.getKillerEntityType());
             final var bodyPart = BodyParts.parse(playerDeath.getBodyPart());
-            final var combatType = CombatTypes.resolve(playerDeath.getKillerEntityType(), playerDeath.getVictimEntityType());
+            final var combatType = resolveCombatType(playerDeath);
             final var damageType = DamageTypes.parse(playerDeath.getDamageType());
             final var distance = playerDeath.getDistance().replaceAll("[^\\d.]", "");
 
@@ -95,5 +95,15 @@ public class PlayerDeathEventParser extends BaseRustEventParser<PlayerDeathEvent
                     damageType
             );
         };
+    }
+
+    CombatTypes resolveCombatType(@NonNull PlayerDeathDTO playerDeath) {
+        if (playerDeath.getKillerId() != null && playerDeath.getVictimId() != null) {
+            if (Objects.equals(playerDeath.getKillerId(), playerDeath.getVictimId())) {
+                return CombatTypes.SUICIDE;
+            }
+        }
+
+        return CombatTypes.resolve(playerDeath.getKillerEntityType(), playerDeath.getVictimEntityType());
     }
 }
