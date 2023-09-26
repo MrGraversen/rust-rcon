@@ -11,6 +11,7 @@ public enum EntityTypes {
     SCIENTIST,
     SENTRY,
     BRADLEY,
+    UNDERWATER_DWELLER,
     UNKNOWN;
 
     public static EntityTypes parse(String killerEntityType) {
@@ -26,6 +27,8 @@ public enum EntityTypes {
             return TRAP;
         } else if (EntityTypes.isScientist(killerEntityType)) {
             return SCIENTIST;
+        } else if (EntityTypes.isUnderwaterDweller(killerEntityType)) {
+            return UNDERWATER_DWELLER;
         } else if (EntityTypes.isSentry(killerEntityType)) {
             return SENTRY;
         } else if (EntityTypes.isBradley(killerEntityType)) {
@@ -51,6 +54,10 @@ public enum EntityTypes {
         return killerEntityType.equalsIgnoreCase("scientist");
     }
 
+    public static boolean isUnderwaterDweller(@NonNull String killerEntityType) {
+        return killerEntityType.equalsIgnoreCase("underwaterdweller");
+    }
+
     public static boolean isSentry(@NonNull String killerEntityType) {
         return killerEntityType.equalsIgnoreCase("sentry");
     }
@@ -63,6 +70,7 @@ public enum EntityTypes {
         return EntityTypes.isScientist(entityType)
                 || EntityTypes.isAnimal(entityType)
                 || EntityTypes.isSentry(entityType)
+                || EntityTypes.isUnderwaterDweller(entityType)
                 || EntityTypes.isBradley(entityType);
     }
 }
