@@ -13,6 +13,9 @@ public class OxidePluginEventParser extends BaseRustEventParser<OxidePluginEvent
     private static final String CHAT_EVENT_PREFIX = "[CHAT]";
     private static final String TEAM_CHAT_EVENT_PREFIX = "[TEAM CHAT]";
     private static final String ENTITY_COMMAND_EVENT_PREFIX = "[ENTCMD]";
+    private static final String GENERIC_SUFFIX = "(Generic)";
+    private static final String DESTROYING_SUFFIX = "(destroying)";
+    private static final String NETWORK_GROUP_NULL_SUFFIX = "network group to null";
 
     @Override
     protected Function<RustRconResponse, Optional<OxidePluginEvent>> eventParser() {
@@ -35,6 +38,10 @@ public class OxidePluginEventParser extends BaseRustEventParser<OxidePluginEvent
         final var message = payload.getMessage();
 
         if (message.isBlank()) {
+            return false;
+        }
+
+        if (message.endsWith(GENERIC_SUFFIX) || message.endsWith(DESTROYING_SUFFIX) || message.endsWith(NETWORK_GROUP_NULL_SUFFIX)) {
             return false;
         }
 
