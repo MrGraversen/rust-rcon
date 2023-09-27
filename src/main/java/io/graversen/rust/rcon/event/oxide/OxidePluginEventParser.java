@@ -11,6 +11,7 @@ public class OxidePluginEventParser extends BaseRustEventParser<OxidePluginEvent
     private static final String EVENT_PATTERN = "^\\[(.*?)\\].*";
     private static final String NATIVE_EVENT_PREFIX = "[event]";
     private static final String CHAT_EVENT_PREFIX = "[CHAT]";
+    private static final String TEAM_CHAT_EVENT_PREFIX = "[TEAM CHAT]";
     private static final String ENTITY_COMMAND_EVENT_PREFIX = "[ENTCMD]";
 
     @Override
@@ -32,9 +33,17 @@ public class OxidePluginEventParser extends BaseRustEventParser<OxidePluginEvent
     @Override
     public boolean supports(@NonNull RustRconResponse payload) {
         final var message = payload.getMessage();
+
+        if (message.isBlank()) {
+            return false;
+        }
+
         if (message.matches(EVENT_PATTERN)) {
             final var prefix = message.substring(message.indexOf('['), message.indexOf(']') + 1);
-            return !prefix.equals(NATIVE_EVENT_PREFIX) && !prefix.equals(CHAT_EVENT_PREFIX) && !prefix.equals(ENTITY_COMMAND_EVENT_PREFIX);
+            return !prefix.equals(NATIVE_EVENT_PREFIX)
+                    && !prefix.equals(CHAT_EVENT_PREFIX)
+                    && !prefix.equals(TEAM_CHAT_EVENT_PREFIX)
+                    && !prefix.equals(ENTITY_COMMAND_EVENT_PREFIX);
         }
 
         return false;
