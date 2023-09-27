@@ -18,7 +18,7 @@ public abstract class BaseRustEventParser<T extends RustEvent> {
                     log.error(
                             "{} could not parse event even though it indicated to support payload: {}",
                             eventParser.getClass().getSimpleName(),
-                            payload.getMessage()
+                            payload
                     );
                 }
                 return event;
