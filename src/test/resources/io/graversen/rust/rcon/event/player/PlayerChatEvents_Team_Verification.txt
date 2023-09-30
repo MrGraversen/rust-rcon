@@ -1,0 +1,2 @@
+payload;steamId;playerName;message
+[TEAM CHAT] Doctor Delete[76561197979952036] : Test;76561197979952036;Doctor Delete;Test
