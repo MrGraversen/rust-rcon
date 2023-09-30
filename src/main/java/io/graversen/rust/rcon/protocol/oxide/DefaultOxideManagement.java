@@ -15,7 +15,6 @@ public class DefaultOxideManagement implements OxideManagement {
     private static final String PLUGINS_REGEX_STRING = "\\d+\\s+\"(.*?)\"\\s+\\((.*?)\\)\\s+by\\s+(.*?)\\s+\\(.*?\\)\\s+-\\s+(.*?)$";
     private static final Pattern PLUGINS_REGEX = Pattern.compile(PLUGINS_REGEX_STRING, Pattern.MULTILINE);
 
-
     private final @NonNull OxideCodec oxideCodec;
 
     @Override

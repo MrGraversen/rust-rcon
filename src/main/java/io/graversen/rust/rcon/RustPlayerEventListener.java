@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class RustPlayerEventListener {
-    private final @NonNull Consumer<List<RustPlayer>> rustPlayersConsumer;
+    private final @NonNull Consumer<List<FullRustPlayer>> rustPlayersConsumer;
 
     @Subscribe
     public void onServerInfo(RustPlayersEvent rustPlayersEvent) {
@@ -25,7 +25,7 @@ public class RustPlayerEventListener {
         rustPlayersConsumer.accept(rustPlayers);
     }
 
-    Function<RustPlayersEvent, List<RustPlayer>> mapRustPlayers() {
+    Function<RustPlayersEvent, List<FullRustPlayer>> mapRustPlayers() {
         return rustPlayersEvent -> {
             final var rustPlayers = rustPlayersEvent.getRustPlayers();
             return rustPlayers.stream()
@@ -34,8 +34,8 @@ public class RustPlayerEventListener {
         };
     }
 
-    Function<RustPlayerDTO, RustPlayer> mapRustPlayer() {
-        return rustPlayerDTO -> new RustPlayer(
+    Function<RustPlayerDTO, FullRustPlayer> mapRustPlayer() {
+        return rustPlayerDTO -> new FullRustPlayer(
                 SteamId64.parseOrFail(rustPlayerDTO.getSteamId()),
                 new PlayerName(rustPlayerDTO.getPlayerName()),
                 rustPlayerDTO.getPing(),

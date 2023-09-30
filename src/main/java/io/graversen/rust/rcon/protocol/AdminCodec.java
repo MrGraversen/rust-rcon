@@ -28,4 +28,6 @@ public interface AdminCodec {
     CompletableFuture<RustRconResponse> serverInfo();
 
     CompletableFuture<RustRconResponse> playerList();
+
+    CompletableFuture<RustRconResponse> sleepingPlayers();
 }

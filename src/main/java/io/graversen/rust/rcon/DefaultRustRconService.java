@@ -10,6 +10,8 @@ import io.graversen.rust.rcon.protocol.dto.RustDtoMappers;
 import io.graversen.rust.rcon.protocol.dto.ServerInfoDTO;
 import io.graversen.rust.rcon.protocol.oxide.DefaultOxideManagement;
 import io.graversen.rust.rcon.protocol.oxide.OxideManagement;
+import io.graversen.rust.rcon.protocol.player.DefaultPlayerManagement;
+import io.graversen.rust.rcon.protocol.player.PlayerManagement;
 import io.graversen.rust.rcon.tasks.RconTask;
 import io.graversen.rust.rcon.tasks.RustPlayersEmitTask;
 import io.graversen.rust.rcon.tasks.ServerInfoEmitTask;
@@ -39,7 +41,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DefaultRustRconService implements RustRconService {
     private final AtomicBoolean isRconLogEnabled = new AtomicBoolean(false);
     private final AtomicReference<RustDiagnostics> diagnostics = new AtomicReference<>(null);
-    private final AtomicReference<List<RustPlayer>> rustPlayers = new AtomicReference<>(List.of());
+    private final AtomicReference<List<FullRustPlayer>> rustPlayers = new AtomicReference<>(List.of());
 
     private final @NonNull RustRconConfiguration configuration;
 
@@ -52,6 +54,7 @@ public class DefaultRustRconService implements RustRconService {
     private final Lazy<RustRconRouter> rustRconRouter = Lazy.of(this::createRustRconRouter);
     private final Lazy<Codec> codec = Lazy.of(this::createCodec);
     private final Lazy<OxideManagement> oxideManagement = Lazy.of(this::createOxideManagement);
+    private final Lazy<PlayerManagement> playerManagement = Lazy.of(this::createPlayerManagement);
 
     @Override
     public Codec codec() {
@@ -87,6 +90,11 @@ public class DefaultRustRconService implements RustRconService {
     }
 
     @Override
+    public PlayerManagement playerManagement() {
+        return playerManagement.get();
+    }
+
+    @Override
     public void schedule(@NonNull RconTask task, @NonNull Duration fixedDelay, @Nullable Duration initialDelay) {
         final var wrappedTask = wrapRconTask(task);
         scheduledExecutorService.get().scheduleWithFixedDelay(
@@ -103,7 +111,7 @@ public class DefaultRustRconService implements RustRconService {
     }
 
     @Override
-    public List<RustPlayer> rustPlayers() {
+    public List<FullRustPlayer> players() {
         return rustPlayers.get();
     }
 
@@ -151,6 +159,10 @@ public class DefaultRustRconService implements RustRconService {
 
     protected OxideManagement createOxideManagement() {
         return new DefaultOxideManagement(codec().oxide());
+    }
+
+    protected PlayerManagement createPlayerManagement() {
+        return new DefaultPlayerManagement(codec().admin());
     }
 
     protected RustWebSocketClient createWebSocketClient() {
