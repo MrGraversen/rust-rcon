@@ -58,6 +58,7 @@ public class RustProtocolTemplates {
         public static final String SERVER_INFO = "global.serverinfo";
         public static final String PLAYER_LIST = "playerlist";
         public static final String SLEEPING_PLAYERS = "global.sleepingusers";
+        public static final String TEAM_INFO = "global.teaminfo \"" + STEAM_ID_64 + "\"";
     }
 
     public static class OxideProtocol {

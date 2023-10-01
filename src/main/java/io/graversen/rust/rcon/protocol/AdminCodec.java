@@ -30,4 +30,6 @@ public interface AdminCodec {
     CompletableFuture<RustRconResponse> playerList();
 
     CompletableFuture<RustRconResponse> sleepingPlayers();
+
+    CompletableFuture<RustRconResponse> teamInfo(@NonNull SteamId64 steamId64);
 }

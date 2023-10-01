@@ -126,4 +126,15 @@ public class DefaultAdminCodec extends DefaultRustCodec implements AdminCodec {
         final var rconMessage = compile(SLEEPING_PLAYERS);
         return send(rconMessage);
     }
+
+    @Override
+    public CompletableFuture<RustRconResponse> teamInfo(@NonNull SteamId64 steamId64) {
+        final var rconMessage = compile(
+                TEAM_INFO,
+                Map.of(
+                        stripped(STEAM_ID_64), steamId64.get()
+                )
+        );
+        return send(rconMessage);
+    }
 }

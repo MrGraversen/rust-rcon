@@ -162,7 +162,7 @@ public class DefaultRustRconService implements RustRconService {
     }
 
     protected PlayerManagement createPlayerManagement() {
-        return new DefaultPlayerManagement(codec().admin());
+        return new DefaultPlayerManagement(codec().admin(), rustDtoMappers.get());
     }
 
     protected RustWebSocketClient createWebSocketClient() {

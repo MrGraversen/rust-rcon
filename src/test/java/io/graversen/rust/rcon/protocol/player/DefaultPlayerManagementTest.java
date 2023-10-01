@@ -45,4 +45,30 @@ class DefaultPlayerManagementTest {
         assertEquals(new RustPlayer(SteamId64.parseOrFail("76561198127947780"), new PlayerName("DKautobahnTV")), sleepingPlayers.get(0));
         assertEquals(new RustPlayer(SteamId64.parseOrFail("76561198201936914"), new PlayerName("Bosthief")), sleepingPlayers.get(12));
     }
+
+    @Test
+    void mapRustTeam() {
+        final var teamInfoOutput = "ID: 2\n" +
+                "\n" +
+                "steamID           username      online leader \n" +
+                "76561197979952036 Doctor Delete x      x      \n" +
+                "76561198154164007 Hubbi3000                   \n" +
+                "76561198046357656 DarkDouchebag               \n";
+
+        final var rustTeams = defaultPlayerManagement.mapRustTeam().apply(new TestRustRconResponse(teamInfoOutput));
+        assertTrue(rustTeams.isPresent());
+        assertEquals(3, rustTeams.get().getPlayers().size());
+        assertEquals("2", rustTeams.get().getId());
+        assertEquals(SteamId64.parseOrFail("76561197979952036"), rustTeams.get().getPlayers().get(0));
+        assertEquals(SteamId64.parseOrFail("76561198154164007"), rustTeams.get().getPlayers().get(1));
+        assertEquals(SteamId64.parseOrFail("76561198046357656"), rustTeams.get().getPlayers().get(2));
+    }
+
+    @Test
+    void mapRustTeam_noTeam() {
+        final var teamInfoOutput = "Player not found";
+
+        final var rustTeams = defaultPlayerManagement.mapRustTeam().apply(new TestRustRconResponse(teamInfoOutput));
+        assertFalse(rustTeams.isPresent());
+    }
 }
