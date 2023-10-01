@@ -13,6 +13,7 @@ public enum DamageTypes {
     RADIATION,
     SLASH,
     STAB,
+    COLLISION,
     UNKNOWN;
 
     public static DamageTypes parse(String damageType) {
