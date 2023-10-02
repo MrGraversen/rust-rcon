@@ -14,6 +14,7 @@ import io.graversen.rust.rcon.protocol.player.DefaultPlayerManagement;
 import io.graversen.rust.rcon.protocol.player.PlayerManagement;
 import io.graversen.rust.rcon.tasks.RconTask;
 import io.graversen.rust.rcon.tasks.RustPlayersEmitTask;
+import io.graversen.rust.rcon.tasks.RustTeamsEmitTask;
 import io.graversen.rust.rcon.tasks.ServerInfoEmitTask;
 import io.graversen.rust.rcon.util.DefaultJsonMapper;
 import io.graversen.rust.rcon.util.Lazy;
@@ -42,6 +43,7 @@ public class DefaultRustRconService implements RustRconService {
     private final AtomicBoolean isRconLogEnabled = new AtomicBoolean(false);
     private final AtomicReference<RustDiagnostics> diagnostics = new AtomicReference<>(null);
     private final AtomicReference<List<FullRustPlayer>> rustPlayers = new AtomicReference<>(List.of());
+    private final AtomicReference<List<RustTeam>> rustTeams = new AtomicReference<>(List.of());
 
     private final @NonNull RustRconConfiguration configuration;
 
@@ -116,6 +118,11 @@ public class DefaultRustRconService implements RustRconService {
     }
 
     @Override
+    public List<RustTeam> teams() {
+        return null;
+    }
+
+    @Override
     public void registerEvents(@NonNull Object subscriber) {
         eventBus.get().register(subscriber);
     }
@@ -139,6 +146,12 @@ public class DefaultRustRconService implements RustRconService {
                 eventBus.get()::post
         );
         registerInternalTask(rustPlayersEmitTask, Duration.ofSeconds(3));
+        final var rustTeamsEmitTask = new RustTeamsEmitTask(
+                rustRconClient.get().rustServer(),
+                () -> playerManagement().getTeams(),
+                eventBus.get()::post
+        );
+        registerInternalTask(rustTeamsEmitTask, Duration.ofMinutes(5), Duration.ofSeconds(10));
         registerRustDiagnosticsListener();
         registerRustPlayerEventListener();
     }
@@ -216,8 +229,12 @@ public class DefaultRustRconService implements RustRconService {
     }
 
     private void registerInternalTask(@NonNull RconTask task, @NonNull Duration fixedDelay) {
+        registerInternalTask(task, fixedDelay, null);
+    }
+
+    private void registerInternalTask(@NonNull RconTask task, @NonNull Duration fixedDelay, @Nullable Duration initialDelay) {
         log.info("Registering task: {} (Every {} seconds)", task.getClass().getSimpleName(), fixedDelay.getSeconds());
-        final var initialDelay = Objects.requireNonNullElse(defaultTaskInitialDelay(), Duration.ofSeconds(5));
+        initialDelay = Objects.requireNonNullElse(initialDelay, defaultTaskInitialDelay());
         schedule(task, fixedDelay, initialDelay);
     }
 

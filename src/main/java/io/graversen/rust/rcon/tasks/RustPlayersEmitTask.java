@@ -30,5 +30,4 @@ public class RustPlayersEmitTask implements RconTask {
     Function<List<RustPlayerDTO>, RustPlayersEvent> rustPlayersEventMapper() {
         return rustPlayers -> new RustPlayersEvent(server, rustPlayers);
     }
-
 }

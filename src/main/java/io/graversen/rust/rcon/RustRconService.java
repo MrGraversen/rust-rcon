@@ -32,4 +32,6 @@ public interface RustRconService extends EventEmitter {
     Optional<RustDiagnostics> diagnostics();
 
     List<FullRustPlayer> players();
+
+    List<RustTeam> teams();
 }
