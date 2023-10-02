@@ -37,6 +37,10 @@ public class OxidePluginEventParser extends BaseRustEventParser<OxidePluginEvent
     public boolean supports(@NonNull RustRconResponse payload) {
         final var message = payload.getMessage();
 
+        if (payload.getIdentifier() > 1) {
+            return false;
+        }
+
         if (message.isBlank()) {
             return false;
         }
