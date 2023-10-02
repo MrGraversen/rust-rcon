@@ -114,12 +114,12 @@ public class DefaultRustRconService implements RustRconService {
 
     @Override
     public List<FullRustPlayer> players() {
-        return rustPlayers.get();
+        return List.copyOf(rustPlayers.get());
     }
 
     @Override
     public List<RustTeam> teams() {
-        return rustTeams.get();
+        return List.copyOf(rustTeams.get());
     }
 
     @Override
