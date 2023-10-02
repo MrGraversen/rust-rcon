@@ -20,7 +20,7 @@ public class RustPlayerEventListener {
     private final @NonNull Consumer<List<FullRustPlayer>> rustPlayersConsumer;
 
     @Subscribe
-    public void onServerInfo(RustPlayersEvent rustPlayersEvent) {
+    public void onRustPlayers(RustPlayersEvent rustPlayersEvent) {
         final var rustPlayers = mapRustPlayers().apply(rustPlayersEvent);
         rustPlayersConsumer.accept(rustPlayers);
     }

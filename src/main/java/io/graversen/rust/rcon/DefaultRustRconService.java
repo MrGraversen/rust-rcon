@@ -119,7 +119,7 @@ public class DefaultRustRconService implements RustRconService {
 
     @Override
     public List<RustTeam> teams() {
-        return null;
+        return rustTeams.get();
     }
 
     @Override
@@ -154,6 +154,7 @@ public class DefaultRustRconService implements RustRconService {
         registerInternalTask(rustTeamsEmitTask, Duration.ofMinutes(5), Duration.ofSeconds(10));
         registerRustDiagnosticsListener();
         registerRustPlayerEventListener();
+        registerRustTeamsEventListener();
     }
 
     protected ScheduledExecutorService createScheduledExecutorService() {
@@ -246,6 +247,11 @@ public class DefaultRustRconService implements RustRconService {
     private void registerRustPlayerEventListener() {
         log.info("Registering {}", RustPlayerEventListener.class.getSimpleName());
         registerEvents(new RustPlayerEventListener(rustPlayers::set));
+    }
+
+    private void registerRustTeamsEventListener() {
+        log.info("Registering {}", RustTeamsEventListener.class.getSimpleName());
+        registerEvents(new RustTeamsEventListener(rustTeams::set));
     }
 
     private void runConfigure() {
