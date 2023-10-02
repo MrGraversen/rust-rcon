@@ -15,13 +15,13 @@ import java.util.function.Supplier;
 
 @Slf4j
 @RequiredArgsConstructor
-public class RustTeamsEmitTask implements RconTask {
+public class RustTeamsEmitTask extends RconTask {
     private final @NonNull RustServer server;
     private final @NonNull Supplier<CompletableFuture<List<RustTeam>>> rustTeamsGetter;
     private final @NonNull Consumer<RustTeamsEvent> rustTeamsEventEmitter;
 
     @Override
-    public void run() {
+    public void execute() {
         rustTeamsGetter.get()
                 .thenApply(rustTeamsEventMapper())
                 .thenAccept(rustTeamsEventEmitter);

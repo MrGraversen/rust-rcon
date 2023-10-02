@@ -6,11 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ReconnectRconTask implements RconTask {
+public class ReconnectRconTask extends RconTask {
     private final @NonNull Runnable reconnectHandle;
 
     @Override
-    public void run() {
+    public void execute() {
         log.debug("Invoking reconnect handle");
         reconnectHandle.run();
     }

@@ -14,13 +14,13 @@ import java.util.function.Supplier;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ServerInfoEmitTask implements RconTask {
+public class ServerInfoEmitTask extends RconTask {
     private final @NonNull RustServer server;
     private final @NonNull Supplier<CompletableFuture<ServerInfoDTO>> serverInfoGetter;
     private final @NonNull Consumer<ServerInfoEvent> serverInfoEmitter;
 
     @Override
-    public void run() {
+    public void execute() {
         serverInfoGetter.get()
                 .thenApply(serverInfoEventMapper())
                 .thenAccept(serverInfoEmitter);
