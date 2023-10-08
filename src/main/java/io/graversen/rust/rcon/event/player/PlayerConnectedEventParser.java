@@ -5,55 +5,61 @@ import io.graversen.rust.rcon.event.BaseRustEventParser;
 import io.graversen.rust.rcon.protocol.util.OperatingSystems;
 import io.graversen.rust.rcon.protocol.util.PlayerName;
 import io.graversen.rust.rcon.protocol.util.SteamId64;
-import io.graversen.rust.rcon.util.CommonUtils;
 import lombok.NonNull;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 public class PlayerConnectedEventParser extends BaseRustEventParser<PlayerConnectedEvent> {
+    private static final Pattern PATTERN_ONE = Pattern.compile("^([\\d\\.]+):\\d+/(\\d+)/(.+?) joined \\[(.+?)/");
+    private static final Pattern PATTERN_TWO = Pattern.compile("^(.+?) with steamid (\\d+) joined from ip ([\\d\\.]+):\\d+$");
+
     @Override
     protected Function<RustRconResponse, Optional<PlayerConnectedEvent>> eventParser() {
         return payload -> {
             final var message = payload.getMessage();
-            final var splitInput = message.split(delimiter());
+            final var matcherOne = PATTERN_ONE.matcher(message);
+            final var matcherTwo = PATTERN_TWO.matcher(message);
 
-            final var connectionTuple = splitInput[0];
-            final var ipAddress = connectionTuple.split(":")[0];
-            final var steamId64 = splitInput[1];
+            if (matcherOne.find()) {
+                final var ipAddress = matcherOne.group(1);
+                final var steamId64 = matcherOne.group(2);
+                final var playerName = matcherOne.group(3);
+                final var operatingSystemString = matcherOne.group(4);
+                final var operatingSystem = OperatingSystems.parse(operatingSystemString);
 
-            final int osDescriptorFromIndex = message.lastIndexOf('[') + 1;
-            final int osDescriptorToIndex = message.lastIndexOf(delimiter());
-            final var operatingSystemString = message.substring(osDescriptorFromIndex, osDescriptorToIndex);
+                return Optional.of(new PlayerConnectedEvent(
+                        new SteamId64(steamId64),
+                        new PlayerName(playerName),
+                        operatingSystem,
+                        ipAddress
+                ));
+            } else if (matcherTwo.find()) {
+                final var playerName = matcherTwo.group(1);
+                final var steamId64 = matcherTwo.group(2);
+                final var ipAddress = matcherTwo.group(3);
 
-            final int playerNameFromIndex = CommonUtils.nthIndexOf(message, delimiter().charAt(0), 2) + 1;
-            final int playerNameToIndex = message.lastIndexOf("joined");
-            final var playerName = message.substring(playerNameFromIndex, playerNameToIndex).trim();
+                return Optional.of(new PlayerConnectedEvent(
+                        new SteamId64(steamId64),
+                        new PlayerName(playerName),
+                        OperatingSystems.UNKNOWN,
+                        ipAddress
+                ));
+            }
 
-            final var operatingSystem = OperatingSystems.parse(operatingSystemString);
-
-            final var playerConnectedEvent = new PlayerConnectedEvent(
-                    new SteamId64(steamId64),
-                    new PlayerName(playerName),
-                    operatingSystem,
-                    ipAddress
-            );
-
-            return Optional.of(playerConnectedEvent);
+            return Optional.empty();
         };
     }
 
     @Override
     public boolean supports(@NonNull RustRconResponse payload) {
-        return payload.getMessage().contains(" joined ") && payload.getMessage().split(delimiter()).length >= 4;
+        final var message = payload.getMessage();
+        return PATTERN_ONE.matcher(message).find() || PATTERN_TWO.matcher(message).find();
     }
 
     @Override
     public Class<PlayerConnectedEvent> eventClass() {
         return PlayerConnectedEvent.class;
-    }
-
-    protected String delimiter() {
-        return "/";
     }
 }
