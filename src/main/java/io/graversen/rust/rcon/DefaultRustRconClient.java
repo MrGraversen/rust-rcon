@@ -19,6 +19,7 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.framing.CloseFrame;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -69,7 +70,7 @@ public class DefaultRustRconClient implements RustRconClient {
     }
 
     @Override
-    public Function<RustRconResponseDTO, RustRconResponse> mapResponse(@NonNull RustRconRequest request) {
+    public Function<RustRconResponseDTO, RustRconResponse> mapResponse(@Nullable RustRconRequest request) {
         return rustRconResponseDTO -> new RustRconResponse(
                 Objects.requireNonNullElse(rustRconResponseDTO.getIdentifier(), -1),
                 rustRconResponseDTO.getMessage(),
@@ -135,23 +136,19 @@ public class DefaultRustRconClient implements RustRconClient {
         final var rconMessage = jsonMapper().fromJson(messageEvent.getMessage(), RustRconResponseDTO.class);
         final var rconRequest = getAsyncRequests().getIfPresent(rconMessage.getIdentifier());
 
-        if (rconRequest != null) {
-            final var mappedRconMessage = mapResponse(rconRequest).apply(rconMessage);
+        final var mappedRconMessage = mapResponse(rconRequest).apply(rconMessage);
 
-            if (rconMessage.getIdentifier() >= initialMessageIdentifier()) {
-                final var responseFutureOrNull = getAsyncResponses().getIfPresent(rconMessage.getIdentifier());
+        if (rconMessage.getIdentifier() >= initialMessageIdentifier()) {
+            final var responseFutureOrNull = getAsyncResponses().getIfPresent(rconMessage.getIdentifier());
 
-                if (responseFutureOrNull != null) {
-                    responseFutureOrNull.complete(mappedRconMessage);
-                } else {
-                    log.warn("Could not resolve response future for ID: {} (Discarding it)", rconMessage.getIdentifier());
-                }
+            if (responseFutureOrNull != null) {
+                responseFutureOrNull.complete(mappedRconMessage);
+            } else {
+                log.warn("Could not resolve response future for ID: {} (Discarding it)", rconMessage.getIdentifier());
             }
-
-            eventBus.post(new RconReceivedEvent(name(), mappedRconMessage));
-        } else {
-            log.warn("Could not resolve request for ID: {} (Discarding it)", rconMessage.getIdentifier());
         }
+
+        eventBus.post(new RconReceivedEvent(name(), mappedRconMessage));
     }
 
     @Synchronized

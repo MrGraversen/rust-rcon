@@ -2,6 +2,7 @@ package io.graversen.rust.rcon;
 
 import lombok.*;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -13,5 +14,5 @@ public class RustRconResponse {
     private final @NonNull String message;
     private final @NonNull String type;
     private final @NonNull RustServer server;
-    private final @NonNull RustRconRequest request;
+    private final @Nullable RustRconRequest request;
 }

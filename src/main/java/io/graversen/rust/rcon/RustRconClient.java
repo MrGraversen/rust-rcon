@@ -4,6 +4,7 @@ import io.graversen.rust.rcon.util.EventEmitter;
 import io.graversen.rust.rcon.util.JsonMapper;
 import lombok.NonNull;
 
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -13,7 +14,7 @@ public interface RustRconClient extends EventEmitter, Closeable {
 
     Function<RustRconRequest, RustRconRequestDTO> mapRequest();
 
-    Function<RustRconResponseDTO, RustRconResponse> mapResponse(@NonNull RustRconRequest request);
+    Function<RustRconResponseDTO, RustRconResponse> mapResponse(@Nullable RustRconRequest request);
 
     JsonMapper jsonMapper();
 
