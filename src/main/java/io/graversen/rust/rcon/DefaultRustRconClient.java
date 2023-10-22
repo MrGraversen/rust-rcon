@@ -36,7 +36,8 @@ public class DefaultRustRconClient implements RustRconClient {
     private final @NonNull RustWebSocketClient webSocketClient;
     private final @NonNull EventBus eventBus;
 
-    private Cache<Integer, CompletableFuture<RustRconResponse>> asyncRequests;
+    private Cache<Integer, CompletableFuture<RustRconResponse>> asyncResponses;
+    private Cache<Integer, RustRconRequest> asyncRequests;
     private JsonMapper jsonMapper;
 
     @Override
@@ -46,7 +47,8 @@ public class DefaultRustRconClient implements RustRconClient {
             final var json = jsonMapper().toJson(mappedRequest);
 
             final var responseFuture = new CompletableFuture<RustRconResponse>();
-            getAsyncRequests().put(request.getIdentifier(), responseFuture);
+            getAsyncRequests().put(request.getIdentifier(), request);
+            getAsyncResponses().put(request.getIdentifier(), responseFuture);
             webSocketClient.send(json);
 
             return responseFuture;
@@ -67,12 +69,13 @@ public class DefaultRustRconClient implements RustRconClient {
     }
 
     @Override
-    public Function<RustRconResponseDTO, RustRconResponse> mapResponse() {
+    public Function<RustRconResponseDTO, RustRconResponse> mapResponse(@NonNull RustRconRequest request) {
         return rustRconResponseDTO -> new RustRconResponse(
                 Objects.requireNonNullElse(rustRconResponseDTO.getIdentifier(), -1),
                 rustRconResponseDTO.getMessage(),
                 rustRconResponseDTO.getType(),
-                rustServer.get()
+                rustServer.get(),
+                request
         );
     }
 
@@ -130,23 +133,38 @@ public class DefaultRustRconClient implements RustRconClient {
     @Subscribe
     public void onWsMessage(@NonNull WsMessageEvent messageEvent) {
         final var rconMessage = jsonMapper().fromJson(messageEvent.getMessage(), RustRconResponseDTO.class);
-        final var mappedRconMessage = mapResponse().apply(rconMessage);
+        final var rconRequest = getAsyncRequests().getIfPresent(rconMessage.getIdentifier());
 
-        if (rconMessage.getIdentifier() >= initialMessageIdentifier()) {
-            final var responseFutureOrNull = asyncRequests.getIfPresent(rconMessage.getIdentifier());
+        if (rconRequest != null) {
+            final var mappedRconMessage = mapResponse(rconRequest).apply(rconMessage);
 
-            if (responseFutureOrNull != null) {
-                responseFutureOrNull.complete(mappedRconMessage);
-            } else {
-                log.warn("Could not resolve response future for ID: {} (Discarding it)", rconMessage.getIdentifier());
+            if (rconMessage.getIdentifier() >= initialMessageIdentifier()) {
+                final var responseFutureOrNull = getAsyncResponses().getIfPresent(rconMessage.getIdentifier());
+
+                if (responseFutureOrNull != null) {
+                    responseFutureOrNull.complete(mappedRconMessage);
+                } else {
+                    log.warn("Could not resolve response future for ID: {} (Discarding it)", rconMessage.getIdentifier());
+                }
             }
-        }
 
-        eventBus.post(new RconReceivedEvent(name(), mappedRconMessage));
+            eventBus.post(new RconReceivedEvent(name(), mappedRconMessage));
+        } else {
+            log.warn("Could not resolve request for ID: {} (Discarding it)", rconMessage.getIdentifier());
+        }
     }
 
     @Synchronized
-    private Cache<Integer, CompletableFuture<RustRconResponse>> getAsyncRequests() {
+    private Cache<Integer, CompletableFuture<RustRconResponse>> getAsyncResponses() {
+        if (asyncResponses == null) {
+            asyncResponses = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
+        }
+
+        return asyncResponses;
+    }
+
+    @Synchronized
+    private Cache<Integer, RustRconRequest> getAsyncRequests() {
         if (asyncRequests == null) {
             asyncRequests = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
         }

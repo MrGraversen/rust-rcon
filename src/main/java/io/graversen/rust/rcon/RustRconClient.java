@@ -13,7 +13,7 @@ public interface RustRconClient extends EventEmitter, Closeable {
 
     Function<RustRconRequest, RustRconRequestDTO> mapRequest();
 
-    Function<RustRconResponseDTO, RustRconResponse> mapResponse();
+    Function<RustRconResponseDTO, RustRconResponse> mapResponse(@NonNull RustRconRequest request);
 
     JsonMapper jsonMapper();
 

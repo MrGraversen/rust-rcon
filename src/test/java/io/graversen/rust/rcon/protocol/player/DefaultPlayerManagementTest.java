@@ -3,6 +3,7 @@ package io.graversen.rust.rcon.protocol.player;
 import io.graversen.rust.rcon.RustPlayer;
 import io.graversen.rust.rcon.TestRustRconResponse;
 import io.graversen.rust.rcon.protocol.AdminCodec;
+import io.graversen.rust.rcon.protocol.dto.RustDtoMappers;
 import io.graversen.rust.rcon.protocol.util.PlayerName;
 import io.graversen.rust.rcon.protocol.util.SteamId64;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class DefaultPlayerManagementTest {
     @Mock
     private AdminCodec adminCodec;
+
+    @Mock
+    private RustDtoMappers rustDtoMappers;
 
     @InjectMocks
     private DefaultPlayerManagement defaultPlayerManagement;

@@ -13,4 +13,5 @@ public class RustRconResponse {
     private final @NonNull String message;
     private final @NonNull String type;
     private final @NonNull RustServer server;
+    private final @NonNull RustRconRequest request;
 }
