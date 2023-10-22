@@ -22,12 +22,11 @@ public class DefaultAdminCodec extends DefaultRustCodec implements AdminCodec {
     }
 
     @Override
-    public CompletableFuture<RustRconResponse> kickPlayer(@NonNull SteamId64 steamId64, @Nullable PlayerName playerName, @Nullable String reason) {
+    public CompletableFuture<RustRconResponse> kickPlayer(@NonNull SteamId64 steamId64, @Nullable String reason) {
         final var rconMessage = compile(
                 KICK_PLAYER,
                 Map.of(
                         stripped(STEAM_ID_64), steamId64.get(),
-                        stripped(PLAYER_NAME), requireNonNullElse(playerName, DEFAULT_PLAYER_NAME).get(),
                         stripped(REASON), requireNonNullElse(reason, DEFAULT_REASON)
                 )
         );

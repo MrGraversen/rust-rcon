@@ -47,9 +47,9 @@ public class RustProtocolTemplates {
     }
 
     public static class AdminProtocol {
-        public static final String KICK_PLAYER = "global.kick \"" + STEAM_ID_64 + "\" \"" + PLAYER_NAME + " \"" + REASON + "\"";
+        public static final String KICK_PLAYER = "global.kick \"" + STEAM_ID_64 + "\" \"" + REASON + "\"";
         public static final String KICK_ALL_PLAYERS = "global.kickall";
-        public static final String BAN_PLAYER = "global.banid \"" + STEAM_ID_64 + "\" \"" + PLAYER_NAME + " \"" + REASON + "\"";
+        public static final String BAN_PLAYER = "global.banid \"" + STEAM_ID_64 + "\" \"" + PLAYER_NAME + "\" \"" + REASON + "\"";
         public static final String UNBAN_PLAYER = "global.unban \"" + STEAM_ID_64 + "\"";
         public static final String ADD_OWNER = "global.ownerid \"" + STEAM_ID_64 + "\" \"" + PLAYER_NAME + "\"";
         public static final String REMOVE_OWNER = "global.removeowner \"" + STEAM_ID_64 + "\"";

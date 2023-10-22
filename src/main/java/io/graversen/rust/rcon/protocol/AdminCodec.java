@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 public interface AdminCodec {
-    CompletableFuture<RustRconResponse> kickPlayer(@NonNull SteamId64 steamId64, @Nullable PlayerName playerName, @Nullable String reason);
+    CompletableFuture<RustRconResponse> kickPlayer(@NonNull SteamId64 steamId64, @Nullable String reason);
 
     CompletableFuture<RustRconResponse> kickAllPlayers();
 
