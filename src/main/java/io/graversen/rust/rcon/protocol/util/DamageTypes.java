@@ -14,6 +14,8 @@ public enum DamageTypes {
     SLASH,
     STAB,
     COLLISION,
+    ANTIVEHICLE,
+    SUICIDE,
     UNKNOWN;
 
     public static DamageTypes parse(String damageType) {
