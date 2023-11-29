@@ -18,7 +18,7 @@
     <properties>
         <java.version>17</java.version>
         <lombok.version>1.18.26</lombok.version>
-        <logback.version>1.4.6</logback.version>
+        <logback.version>1.4.12</logback.version>
         <guava.version>31.1-jre</guava.version>
         <commons-text.version>1.10.0</commons-text.version>
         <java-websocket.version>1.5.3</java-websocket.version>
