@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 
+import javax.annotation.Nullable;
+
 @Getter
 @ToString(callSuper = true)
 public class PlayerChatEvent extends PlayerEvent {
@@ -15,7 +17,7 @@ public class PlayerChatEvent extends PlayerEvent {
     private final @NonNull ChatChannels chatChannel;
 
     public PlayerChatEvent(
-            @NonNull SteamId64 steamId,
+            @Nullable SteamId64 steamId,
             @NonNull PlayerName playerName,
             @NonNull String message,
             @NonNull ChatChannels chatChannel

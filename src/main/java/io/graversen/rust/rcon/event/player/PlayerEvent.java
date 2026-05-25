@@ -4,9 +4,11 @@ import io.graversen.rust.rcon.event.RustEvent;
 import io.graversen.rust.rcon.protocol.util.SteamId64;
 import lombok.*;
 
+import javax.annotation.Nullable;
+
 @Getter
 @ToString
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class PlayerEvent extends RustEvent {
-    private final @NonNull SteamId64 steamId;
+    private final @Nullable SteamId64 steamId;
 }

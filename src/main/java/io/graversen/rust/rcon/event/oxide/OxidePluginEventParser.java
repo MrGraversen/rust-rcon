@@ -11,7 +11,9 @@ public class OxidePluginEventParser extends BaseRustEventParser<OxidePluginEvent
     private static final String EVENT_PATTERN = "^\\[(.*?)\\].*";
     private static final String NATIVE_EVENT_PREFIX = "[event]";
     private static final String CHAT_EVENT_PREFIX = "[CHAT]";
+    private static final String GLOBAL_CHAT_EVENT_PREFIX = "[Global]";
     private static final String TEAM_CHAT_EVENT_PREFIX = "[TEAM CHAT]";
+    private static final String SIMPLE_TEAM_CHAT_EVENT_PREFIX = "[Team]";
     private static final String ENTITY_COMMAND_EVENT_PREFIX = "[ENTCMD]";
     private static final String GENERIC_SUFFIX = "(Generic)";
     private static final String DESTROYING_SUFFIX = "(destroying)";
@@ -53,7 +55,9 @@ public class OxidePluginEventParser extends BaseRustEventParser<OxidePluginEvent
             final var prefix = message.substring(message.indexOf('['), message.indexOf(']') + 1);
             return !prefix.equals(NATIVE_EVENT_PREFIX)
                     && !prefix.equals(CHAT_EVENT_PREFIX)
+                    && !prefix.equals(GLOBAL_CHAT_EVENT_PREFIX)
                     && !prefix.equals(TEAM_CHAT_EVENT_PREFIX)
+                    && !prefix.equals(SIMPLE_TEAM_CHAT_EVENT_PREFIX)
                     && !prefix.equals(ENTITY_COMMAND_EVENT_PREFIX);
         }
 
