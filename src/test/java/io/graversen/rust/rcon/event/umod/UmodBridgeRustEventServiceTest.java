@@ -387,6 +387,39 @@ class UmodBridgeRustEventServiceTest {
     }
 
     @Test
+    void emitsCargoShipWorldEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new WorldSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"world.event\",\"eventId\":\"evt-19\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"worldEvent\":\"cargo_ship_harbor_arrived\",\"attributes\":{\"entityId\":\"4321\",\"entity\":\"cargoshiptest\",\"position\":\"10,20,30\"}}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals(WorldEvents.CARGO_SHIP_HARBOR_ARRIVED, subscriber.events.get(0).getEvent());
+        assertEquals("4321", subscriber.events.get(0).getAttributes().get("entityId"));
+        assertEquals("cargoshiptest", subscriber.events.get(0).getAttributes().get("entity"));
+    }
+
+    @Test
+    void emitsSupplyDropWorldEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new WorldSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"world.event\",\"eventId\":\"evt-20\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"worldEvent\":\"supply_drop_dropped\",\"attributes\":{\"entityId\":\"9876\",\"entity\":\"supply_drop\",\"position\":\"10,20,30\",\"planeEntityId\":\"1234\",\"planePosition\":\"1,2,3\"}}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals(WorldEvents.SUPPLY_DROP_DROPPED, subscriber.events.get(0).getEvent());
+        assertEquals("9876", subscriber.events.get(0).getAttributes().get("entityId"));
+        assertEquals("1234", subscriber.events.get(0).getAttributes().get("planeEntityId"));
+        assertEquals("1,2,3", subscriber.events.get(0).getAttributes().get("planePosition"));
+    }
+
+    @Test
     void emitsDiagnosticForMalformedBridgeJson() {
         final var eventBus = new EventBus();
         final var eventService = new UmodBridgeRustEventService(eventBus);

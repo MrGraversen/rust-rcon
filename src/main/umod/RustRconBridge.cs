@@ -199,6 +199,42 @@ namespace Oxide.Plugins
             EmitWorldEvent("locked_crate_hack_completed", attributes);
         }
 
+        private object OnCargoShipHarborApproach(CargoShip ship, CargoNotifier notifier)
+        {
+            EmitWorldEvent("cargo_ship_harbor_approach", EntityAttributes(ship));
+            return null;
+        }
+
+        private void OnCargoShipHarborArrived(CargoShip ship)
+        {
+            EmitWorldEvent("cargo_ship_harbor_arrived", EntityAttributes(ship));
+        }
+
+        private void OnCargoShipHarborLeave(CargoShip ship)
+        {
+            EmitWorldEvent("cargo_ship_harbor_left", EntityAttributes(ship));
+        }
+
+        private void OnAirdrop(CargoPlane plane, Vector3 newDropPosition)
+        {
+            var attributes = EntityAttributes(plane);
+            attributes["dropPosition"] = Position(newDropPosition);
+            EmitWorldEvent("airdrop", attributes);
+        }
+
+        private void OnSupplyDropDropped(BaseEntity supplyDrop, CargoPlane plane)
+        {
+            var attributes = EntityAttributes(supplyDrop);
+            attributes["planeEntityId"] = EntityId(plane);
+            attributes["planePosition"] = Position(plane);
+            EmitWorldEvent("supply_drop_dropped", attributes);
+        }
+
+        private void OnSupplyDropLanded(SupplyDrop supplyDrop)
+        {
+            EmitWorldEvent("supply_drop_landed", EntityAttributes(supplyDrop));
+        }
+
         private void OnExplosiveThrown(BasePlayer player, BaseEntity entity, ThrownWeapon item)
         {
             EmitExplosiveUse("thrown", player, item?.GetType().Name ?? string.Empty, entity);
@@ -304,11 +340,16 @@ namespace Oxide.Plugins
 
         private Dictionary<string, object> CrateAttributes(HackableLockedCrate crate)
         {
+            return EntityAttributes(crate);
+        }
+
+        private Dictionary<string, object> EntityAttributes(BaseEntity entity)
+        {
             return new Dictionary<string, object>
             {
-                ["entityId"] = EntityId(crate),
-                ["entity"] = crate?.ShortPrefabName ?? string.Empty,
-                ["position"] = Position(crate)
+                ["entityId"] = EntityId(entity),
+                ["entity"] = entity?.ShortPrefabName ?? string.Empty,
+                ["position"] = Position(entity)
             };
         }
 
