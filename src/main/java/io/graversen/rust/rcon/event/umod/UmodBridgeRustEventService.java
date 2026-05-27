@@ -18,6 +18,9 @@ import io.graversen.rust.rcon.event.player.PlayerRecoveredEvent;
 import io.graversen.rust.rcon.event.player.PlayerRespawnedEvent;
 import io.graversen.rust.rcon.event.player.PlayerWoundedEvent;
 import io.graversen.rust.rcon.event.rcon.RconReceivedEvent;
+import io.graversen.rust.rcon.event.server.SaveEvent;
+import io.graversen.rust.rcon.event.server.ServerInitializedEvent;
+import io.graversen.rust.rcon.event.server.ServerShutdownEvent;
 import io.graversen.rust.rcon.protocol.util.ChatChannels;
 import io.graversen.rust.rcon.protocol.util.OperatingSystems;
 import io.graversen.rust.rcon.protocol.util.PlayerName;
@@ -43,6 +46,9 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
     private static final String PLAYER_RECOVERED_EVENT_TYPE = "player.recovered";
     private static final String PLAYER_RESPAWNED_EVENT_TYPE = "player.respawned";
     private static final String PLAYER_WOUNDED_EVENT_TYPE = "player.wounded";
+    private static final String SERVER_INITIALIZED_EVENT_TYPE = "server.initialized";
+    private static final String SERVER_SAVE_EVENT_TYPE = "server.save";
+    private static final String SERVER_SHUTDOWN_EVENT_TYPE = "server.shutdown";
 
     private final @NonNull EventBus eventBus;
     private final @NonNull JsonMapper jsonMapper = new DefaultJsonMapper();
@@ -57,7 +63,7 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
         }
 
         parseEnvelope(message)
-                .flatMap(envelope -> parseEvent(message, envelope))
+                .flatMap(envelope -> parseEvent(event, envelope))
                 .ifPresent(eventBus::post);
     }
 
@@ -78,6 +84,9 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
                         PlayerRecoveredEvent.class,
                         PlayerRespawnedEvent.class,
                         PlayerWoundedEvent.class,
+                        SaveEvent.class,
+                        ServerInitializedEvent.class,
+                        ServerShutdownEvent.class,
                         UmodBridgeDiagnosticEvent.class
                 )
         );
@@ -103,7 +112,8 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
         }
     }
 
-    private Optional<RustEvent> parseEvent(@NonNull String rawMessage, @NonNull UmodBridgeEnvelope envelope) {
+    private Optional<RustEvent> parseEvent(@NonNull RconReceivedEvent event, @NonNull UmodBridgeEnvelope envelope) {
+        final var rawMessage = event.getRconResponse().getMessage();
         if (PLAYER_CHAT_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return parsePlayerChat(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
         } else if (PLAYER_CONNECTED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
@@ -124,6 +134,12 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
             return parsePlayerLifecycle(rawMessage, envelope.getPayload())
                     .map(data -> new PlayerWoundedEvent(data.steamId(), data.playerName()))
                     .map(RustEvent.class::cast);
+        } else if (SERVER_INITIALIZED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return Optional.of(new ServerInitializedEvent(event.getRconResponse().getServer()));
+        } else if (SERVER_SAVE_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return Optional.of(new SaveEvent(event.getRconResponse().getServer()));
+        } else if (SERVER_SHUTDOWN_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return Optional.of(new ServerShutdownEvent(event.getRconResponse().getServer()));
         }
 
         emitDiagnostic(

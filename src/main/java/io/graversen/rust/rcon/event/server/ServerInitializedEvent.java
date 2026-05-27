@@ -1,14 +1,12 @@
 package io.graversen.rust.rcon.event.server;
 
 import io.graversen.rust.rcon.RustServer;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 
-@Getter
 @ToString(callSuper = true)
-public class SaveEvent extends ServerEvent {
-    public SaveEvent(@NonNull RustServer server) {
+public class ServerInitializedEvent extends ServerEvent {
+    public ServerInitializedEvent(@NonNull RustServer server) {
         super(server);
     }
 }

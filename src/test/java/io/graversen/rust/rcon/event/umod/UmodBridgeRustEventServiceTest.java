@@ -12,6 +12,9 @@ import io.graversen.rust.rcon.event.player.PlayerRecoveredEvent;
 import io.graversen.rust.rcon.event.player.PlayerRespawnedEvent;
 import io.graversen.rust.rcon.event.player.PlayerWoundedEvent;
 import io.graversen.rust.rcon.event.rcon.RconReceivedEvent;
+import io.graversen.rust.rcon.event.server.SaveEvent;
+import io.graversen.rust.rcon.event.server.ServerInitializedEvent;
+import io.graversen.rust.rcon.event.server.ServerShutdownEvent;
 import io.graversen.rust.rcon.protocol.util.ChatChannels;
 import io.graversen.rust.rcon.protocol.util.CombatTypes;
 import io.graversen.rust.rcon.protocol.util.DamageTypes;
@@ -41,6 +44,9 @@ class UmodBridgeRustEventServiceTest {
         assertTrue(capabilities.supports(PlayerRecoveredEvent.class));
         assertTrue(capabilities.supports(PlayerRespawnedEvent.class));
         assertTrue(capabilities.supports(PlayerWoundedEvent.class));
+        assertTrue(capabilities.supports(SaveEvent.class));
+        assertTrue(capabilities.supports(ServerInitializedEvent.class));
+        assertTrue(capabilities.supports(ServerShutdownEvent.class));
         assertTrue(capabilities.supports(UmodBridgeDiagnosticEvent.class));
     }
 
@@ -174,6 +180,48 @@ class UmodBridgeRustEventServiceTest {
     }
 
     @Test
+    void emitsServerInitializedEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new ServerInitializedSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"server.initialized\",\"eventId\":\"evt-8\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("test", subscriber.events.get(0).getServer().getName());
+    }
+
+    @Test
+    void emitsSaveEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new SaveSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"server.save\",\"eventId\":\"evt-9\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("test", subscriber.events.get(0).getServer().getName());
+    }
+
+    @Test
+    void emitsServerShutdownEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new ServerShutdownSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"server.shutdown\",\"eventId\":\"evt-10\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("test", subscriber.events.get(0).getServer().getName());
+    }
+
+    @Test
     void emitsDiagnosticForMalformedBridgeJson() {
         final var eventBus = new EventBus();
         final var eventService = new UmodBridgeRustEventService(eventBus);
@@ -273,6 +321,33 @@ class UmodBridgeRustEventServiceTest {
 
         @Subscribe
         public void onPlayerRecovered(PlayerRecoveredEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class ServerInitializedSubscriber {
+        private final List<ServerInitializedEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onServerInitialized(ServerInitializedEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class SaveSubscriber {
+        private final List<SaveEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onSave(SaveEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class ServerShutdownSubscriber {
+        private final List<ServerShutdownEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onServerShutdown(ServerShutdownEvent event) {
             events.add(event);
         }
     }

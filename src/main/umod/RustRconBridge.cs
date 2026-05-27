@@ -34,6 +34,21 @@ namespace Oxide.Plugins
             });
         }
 
+        private void OnServerInitialized()
+        {
+            Emit("server.initialized", new Dictionary<string, object>());
+        }
+
+        private void OnServerSave()
+        {
+            Emit("server.save", new Dictionary<string, object>());
+        }
+
+        private void OnServerShutdown()
+        {
+            Emit("server.shutdown", new Dictionary<string, object>());
+        }
+
         private void OnPlayerDisconnected(BasePlayer player, string reason)
         {
             Emit("player.disconnected", new Dictionary<string, object>
