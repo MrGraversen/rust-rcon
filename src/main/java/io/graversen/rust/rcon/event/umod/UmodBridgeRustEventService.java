@@ -14,6 +14,9 @@ import io.graversen.rust.rcon.event.player.PlayerDeathDTO;
 import io.graversen.rust.rcon.event.player.PlayerDeathEvent;
 import io.graversen.rust.rcon.event.player.PlayerDeathEventParser;
 import io.graversen.rust.rcon.event.player.PlayerDisconnectedEvent;
+import io.graversen.rust.rcon.event.player.PlayerRecoveredEvent;
+import io.graversen.rust.rcon.event.player.PlayerRespawnedEvent;
+import io.graversen.rust.rcon.event.player.PlayerWoundedEvent;
 import io.graversen.rust.rcon.event.rcon.RconReceivedEvent;
 import io.graversen.rust.rcon.protocol.util.ChatChannels;
 import io.graversen.rust.rcon.protocol.util.OperatingSystems;
@@ -37,6 +40,9 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
     private static final String PLAYER_CONNECTED_EVENT_TYPE = "player.connected";
     private static final String PLAYER_DEATH_EVENT_TYPE = "player.death";
     private static final String PLAYER_DISCONNECTED_EVENT_TYPE = "player.disconnected";
+    private static final String PLAYER_RECOVERED_EVENT_TYPE = "player.recovered";
+    private static final String PLAYER_RESPAWNED_EVENT_TYPE = "player.respawned";
+    private static final String PLAYER_WOUNDED_EVENT_TYPE = "player.wounded";
 
     private final @NonNull EventBus eventBus;
     private final @NonNull JsonMapper jsonMapper = new DefaultJsonMapper();
@@ -69,6 +75,9 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
                         PlayerConnectedEvent.class,
                         PlayerDeathEvent.class,
                         PlayerDisconnectedEvent.class,
+                        PlayerRecoveredEvent.class,
+                        PlayerRespawnedEvent.class,
+                        PlayerWoundedEvent.class,
                         UmodBridgeDiagnosticEvent.class
                 )
         );
@@ -103,6 +112,18 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
             return parsePlayerDeath(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
         } else if (PLAYER_DISCONNECTED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return parsePlayerDisconnected(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
+        } else if (PLAYER_RECOVERED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return parsePlayerLifecycle(rawMessage, envelope.getPayload())
+                    .map(data -> new PlayerRecoveredEvent(data.steamId(), data.playerName()))
+                    .map(RustEvent.class::cast);
+        } else if (PLAYER_RESPAWNED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return parsePlayerLifecycle(rawMessage, envelope.getPayload())
+                    .map(data -> new PlayerRespawnedEvent(data.steamId(), data.playerName()))
+                    .map(RustEvent.class::cast);
+        } else if (PLAYER_WOUNDED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return parsePlayerLifecycle(rawMessage, envelope.getPayload())
+                    .map(data -> new PlayerWoundedEvent(data.steamId(), data.playerName()))
+                    .map(RustEvent.class::cast);
         }
 
         emitDiagnostic(
@@ -195,6 +216,31 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
                 steamId.get(),
                 payload.get("reason").asText()
         ));
+    }
+
+    private Optional<PlayerLifecycleData> parsePlayerLifecycle(@NonNull String rawMessage, JsonNode payload) {
+        if (payload == null || !payload.hasNonNull("steamId") || !payload.hasNonNull("playerName")) {
+            emitDiagnostic(
+                    UmodBridgeDiagnosticType.INVALID_PAYLOAD,
+                    rawMessage,
+                    "player lifecycle payload must contain steamId and playerName"
+            );
+            return Optional.empty();
+        }
+
+        final var steamId = SteamId64.parse(payload.get("steamId").asText());
+        if (steamId.isEmpty()) {
+            emitDiagnostic(UmodBridgeDiagnosticType.INVALID_PAYLOAD, rawMessage, "player lifecycle steamId is invalid");
+            return Optional.empty();
+        }
+
+        return Optional.of(new PlayerLifecycleData(
+                steamId.get(),
+                PlayerName.ofNullable(payload.get("playerName").asText())
+        ));
+    }
+
+    private record PlayerLifecycleData(SteamId64 steamId, PlayerName playerName) {
     }
 
     private Optional<String> text(JsonNode payload, @NonNull String fieldName) {

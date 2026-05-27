@@ -44,9 +44,35 @@ namespace Oxide.Plugins
             });
         }
 
+        private void OnPlayerRespawned(BasePlayer player)
+        {
+            EmitPlayerLifecycle("player.respawned", player);
+        }
+
+        private object OnPlayerWound(BasePlayer player, HitInfo info)
+        {
+            EmitPlayerLifecycle("player.wounded", player);
+            return null;
+        }
+
+        private object OnPlayerRecover(BasePlayer player)
+        {
+            EmitPlayerLifecycle("player.recovered", player);
+            return null;
+        }
+
         private void OnRawDeathNotice(Dictionary<string, string> data, string message)
         {
             Emit("player.death", data);
+        }
+
+        private void EmitPlayerLifecycle(string eventType, BasePlayer player)
+        {
+            Emit(eventType, new Dictionary<string, object>
+            {
+                ["steamId"] = player.UserIDString,
+                ["playerName"] = player.displayName
+            });
         }
 
         private void Emit(string eventType, object payload)

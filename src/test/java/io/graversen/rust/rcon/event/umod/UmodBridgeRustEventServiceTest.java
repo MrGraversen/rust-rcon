@@ -8,6 +8,9 @@ import io.graversen.rust.rcon.event.player.PlayerChatEvent;
 import io.graversen.rust.rcon.event.player.PlayerConnectedEvent;
 import io.graversen.rust.rcon.event.player.PlayerDeathEvent;
 import io.graversen.rust.rcon.event.player.PlayerDisconnectedEvent;
+import io.graversen.rust.rcon.event.player.PlayerRecoveredEvent;
+import io.graversen.rust.rcon.event.player.PlayerRespawnedEvent;
+import io.graversen.rust.rcon.event.player.PlayerWoundedEvent;
 import io.graversen.rust.rcon.event.rcon.RconReceivedEvent;
 import io.graversen.rust.rcon.protocol.util.ChatChannels;
 import io.graversen.rust.rcon.protocol.util.CombatTypes;
@@ -35,6 +38,9 @@ class UmodBridgeRustEventServiceTest {
         assertTrue(capabilities.supports(PlayerConnectedEvent.class));
         assertTrue(capabilities.supports(PlayerDeathEvent.class));
         assertTrue(capabilities.supports(PlayerDisconnectedEvent.class));
+        assertTrue(capabilities.supports(PlayerRecoveredEvent.class));
+        assertTrue(capabilities.supports(PlayerRespawnedEvent.class));
+        assertTrue(capabilities.supports(PlayerWoundedEvent.class));
         assertTrue(capabilities.supports(UmodBridgeDiagnosticEvent.class));
     }
 
@@ -123,6 +129,51 @@ class UmodBridgeRustEventServiceTest {
     }
 
     @Test
+    void emitsPlayerRespawnedEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new RespawnedSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"player.respawned\",\"eventId\":\"evt-5\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\"}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getSteamId().get());
+        assertEquals("Doctor Delete", subscriber.events.get(0).getPlayerName().get());
+    }
+
+    @Test
+    void emitsPlayerWoundedEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new WoundedSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"player.wounded\",\"eventId\":\"evt-6\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\"}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getSteamId().get());
+        assertEquals("Doctor Delete", subscriber.events.get(0).getPlayerName().get());
+    }
+
+    @Test
+    void emitsPlayerRecoveredEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new RecoveredSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"player.recovered\",\"eventId\":\"evt-7\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\"}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getSteamId().get());
+        assertEquals("Doctor Delete", subscriber.events.get(0).getPlayerName().get());
+    }
+
+    @Test
     void emitsDiagnosticForMalformedBridgeJson() {
         final var eventBus = new EventBus();
         final var eventService = new UmodBridgeRustEventService(eventBus);
@@ -195,6 +246,33 @@ class UmodBridgeRustEventServiceTest {
 
         @Subscribe
         public void onPlayerDeath(PlayerDeathEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class RespawnedSubscriber {
+        private final List<PlayerRespawnedEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onPlayerRespawned(PlayerRespawnedEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class WoundedSubscriber {
+        private final List<PlayerWoundedEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onPlayerWounded(PlayerWoundedEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class RecoveredSubscriber {
+        private final List<PlayerRecoveredEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onPlayerRecovered(PlayerRecoveredEvent event) {
             events.add(event);
         }
     }
