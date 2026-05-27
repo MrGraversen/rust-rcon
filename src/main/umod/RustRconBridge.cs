@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Newtonsoft.Json;
 using Oxide.Core.Libraries.Covalence;
+using UnityEngine;
 
 namespace Oxide.Plugins
 {
@@ -60,6 +62,33 @@ namespace Oxide.Plugins
             });
         }
 
+        private void OnPlayerReported(BasePlayer reporter, string targetName, string targetId, string subject, string message, string type)
+        {
+            Emit("player.reported", new Dictionary<string, object>
+            {
+                ["reporterSteamId"] = reporter?.UserIDString ?? string.Empty,
+                ["reporterName"] = reporter?.displayName ?? string.Empty,
+                ["targetSteamId"] = targetId ?? string.Empty,
+                ["targetName"] = targetName ?? string.Empty,
+                ["subject"] = subject ?? string.Empty,
+                ["message"] = message ?? string.Empty,
+                ["reportType"] = type ?? string.Empty
+            });
+        }
+
+        private object OnPlayerViolation(BasePlayer player, AntiHackType type, float amount, GameObject gameObject)
+        {
+            Emit("player.violation", new Dictionary<string, object>
+            {
+                ["steamId"] = player?.UserIDString ?? string.Empty,
+                ["playerName"] = player?.displayName ?? string.Empty,
+                ["violationType"] = type.ToString(),
+                ["amount"] = amount
+            });
+
+            return null;
+        }
+
         private void OnUserKicked(IPlayer player, string reason)
         {
             Emit("player.kicked", new Dictionary<string, object>
@@ -93,6 +122,44 @@ namespace Oxide.Plugins
             });
         }
 
+        private void OnTeamCreated(BasePlayer player, RelationshipManager.PlayerTeam team)
+        {
+            EmitTeam("created", team, player, 0);
+        }
+
+        private void OnTeamDisbanded(RelationshipManager.PlayerTeam team)
+        {
+            EmitTeam("disbanded", team, null, 0);
+        }
+
+        private object OnTeamAcceptInvite(RelationshipManager.PlayerTeam team, BasePlayer player)
+        {
+            EmitTeam("joined", team, player, 0);
+            return null;
+        }
+
+        private object OnTeamLeave(RelationshipManager.PlayerTeam team, BasePlayer player)
+        {
+            EmitTeam("left", team, player, 0);
+            return null;
+        }
+
+        private object OnTeamKick(RelationshipManager.PlayerTeam team, BasePlayer player, ulong target)
+        {
+            EmitTeam("kicked", team, player, target);
+            return null;
+        }
+
+        private void OnExplosiveThrown(BasePlayer player, BaseEntity entity, ThrownWeapon item)
+        {
+            EmitExplosiveUse("thrown", player, item?.GetType().Name ?? string.Empty, entity);
+        }
+
+        private void OnRocketLaunched(BasePlayer player, BaseEntity entity)
+        {
+            EmitExplosiveUse("rocket", player, string.Empty, entity);
+        }
+
         private void OnPlayerRespawned(BasePlayer player)
         {
             EmitPlayerLifecycle("player.respawned", player);
@@ -124,6 +191,33 @@ namespace Oxide.Plugins
             });
         }
 
+        private void EmitTeam(string teamEventType, RelationshipManager.PlayerTeam team, BasePlayer actor, ulong target)
+        {
+            Emit("team", new Dictionary<string, object>
+            {
+                ["teamId"] = team?.teamID ?? 0,
+                ["leaderSteamId"] = team?.teamLeader ?? 0,
+                ["teamEventType"] = teamEventType,
+                ["actorSteamId"] = actor?.UserIDString ?? string.Empty,
+                ["actorName"] = actor?.displayName ?? string.Empty,
+                ["targetSteamId"] = target == 0 ? string.Empty : target.ToString(),
+                ["members"] = TeamMembers(team)
+            });
+        }
+
+        private void EmitExplosiveUse(string explosiveUseType, BasePlayer player, string weapon, BaseEntity entity)
+        {
+            Emit("explosive.use", new Dictionary<string, object>
+            {
+                ["steamId"] = player?.UserIDString ?? string.Empty,
+                ["playerName"] = player?.displayName ?? string.Empty,
+                ["explosiveUseType"] = explosiveUseType,
+                ["weapon"] = weapon ?? string.Empty,
+                ["entity"] = entity?.ShortPrefabName ?? string.Empty,
+                ["position"] = Position(entity)
+            });
+        }
+
         private void Emit(string eventType, object payload)
         {
             var envelope = new Dictionary<string, object>
@@ -148,6 +242,38 @@ namespace Oxide.Plugins
         private string IpAddress(BasePlayer player)
         {
             return player?.net?.connection?.ipaddress ?? string.Empty;
+        }
+
+        private List<string> TeamMembers(RelationshipManager.PlayerTeam team)
+        {
+            var members = new List<string>();
+            if (team?.members == null)
+            {
+                return members;
+            }
+
+            foreach (var member in team.members)
+            {
+                members.Add(member.ToString());
+            }
+
+            return members;
+        }
+
+        private string Position(BaseEntity entity)
+        {
+            return entity == null ? string.Empty : Position(entity.transform.position);
+        }
+
+        private string Position(Vector3 position)
+        {
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0:0.##},{1:0.##},{2:0.##}",
+                position.x,
+                position.y,
+                position.z
+            );
         }
     }
 }

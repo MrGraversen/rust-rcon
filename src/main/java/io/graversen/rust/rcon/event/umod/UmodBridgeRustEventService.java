@@ -17,13 +17,19 @@ import io.graversen.rust.rcon.event.player.PlayerDeathEventParser;
 import io.graversen.rust.rcon.event.player.PlayerDisconnectedEvent;
 import io.graversen.rust.rcon.event.player.PlayerKickedEvent;
 import io.graversen.rust.rcon.event.player.PlayerRecoveredEvent;
+import io.graversen.rust.rcon.event.player.PlayerReportedEvent;
 import io.graversen.rust.rcon.event.player.PlayerRespawnedEvent;
 import io.graversen.rust.rcon.event.player.PlayerUnbannedEvent;
+import io.graversen.rust.rcon.event.player.PlayerViolationEvent;
 import io.graversen.rust.rcon.event.player.PlayerWoundedEvent;
 import io.graversen.rust.rcon.event.rcon.RconReceivedEvent;
+import io.graversen.rust.rcon.event.server.ExplosiveUseEvent;
+import io.graversen.rust.rcon.event.server.ExplosiveUseTypes;
 import io.graversen.rust.rcon.event.server.SaveEvent;
 import io.graversen.rust.rcon.event.server.ServerInitializedEvent;
 import io.graversen.rust.rcon.event.server.ServerShutdownEvent;
+import io.graversen.rust.rcon.event.server.TeamEvent;
+import io.graversen.rust.rcon.event.server.TeamEventTypes;
 import io.graversen.rust.rcon.protocol.util.ChatChannels;
 import io.graversen.rust.rcon.protocol.util.OperatingSystems;
 import io.graversen.rust.rcon.protocol.util.PlayerName;
@@ -34,6 +40,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -42,6 +50,7 @@ import java.util.Set;
 public class UmodBridgeRustEventService extends BaseEventHandler implements RustEventService {
     public static final String BRIDGE_PREFIX = "[rust-rcon]";
 
+    private static final String EXPLOSIVE_USE_EVENT_TYPE = "explosive.use";
     private static final String PLAYER_BANNED_EVENT_TYPE = "player.banned";
     private static final String PLAYER_CHAT_EVENT_TYPE = "player.chat";
     private static final String PLAYER_CONNECTED_EVENT_TYPE = "player.connected";
@@ -49,12 +58,15 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
     private static final String PLAYER_DISCONNECTED_EVENT_TYPE = "player.disconnected";
     private static final String PLAYER_KICKED_EVENT_TYPE = "player.kicked";
     private static final String PLAYER_RECOVERED_EVENT_TYPE = "player.recovered";
+    private static final String PLAYER_REPORTED_EVENT_TYPE = "player.reported";
     private static final String PLAYER_RESPAWNED_EVENT_TYPE = "player.respawned";
     private static final String PLAYER_UNBANNED_EVENT_TYPE = "player.unbanned";
+    private static final String PLAYER_VIOLATION_EVENT_TYPE = "player.violation";
     private static final String PLAYER_WOUNDED_EVENT_TYPE = "player.wounded";
     private static final String SERVER_INITIALIZED_EVENT_TYPE = "server.initialized";
     private static final String SERVER_SAVE_EVENT_TYPE = "server.save";
     private static final String SERVER_SHUTDOWN_EVENT_TYPE = "server.shutdown";
+    private static final String TEAM_EVENT_TYPE = "team";
 
     private final @NonNull EventBus eventBus;
     private final @NonNull JsonMapper jsonMapper = new DefaultJsonMapper();
@@ -83,6 +95,7 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
         return new RustEventCapabilities(
                 RustEventSourceStrategy.UMOD,
                 Set.of(
+                        ExplosiveUseEvent.class,
                         PlayerBannedEvent.class,
                         PlayerChatEvent.class,
                         PlayerConnectedEvent.class,
@@ -90,12 +103,15 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
                         PlayerDisconnectedEvent.class,
                         PlayerKickedEvent.class,
                         PlayerRecoveredEvent.class,
+                        PlayerReportedEvent.class,
                         PlayerRespawnedEvent.class,
                         PlayerUnbannedEvent.class,
+                        PlayerViolationEvent.class,
                         PlayerWoundedEvent.class,
                         SaveEvent.class,
                         ServerInitializedEvent.class,
                         ServerShutdownEvent.class,
+                        TeamEvent.class,
                         UmodBridgeDiagnosticEvent.class
                 )
         );
@@ -123,7 +139,9 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
 
     private Optional<RustEvent> parseEvent(@NonNull RconReceivedEvent event, @NonNull UmodBridgeEnvelope envelope) {
         final var rawMessage = event.getRconResponse().getMessage();
-        if (PLAYER_BANNED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+        if (EXPLOSIVE_USE_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return parseExplosiveUse(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
+        } else if (PLAYER_BANNED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return parsePlayerBan(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
         } else if (PLAYER_CHAT_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return parsePlayerChat(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
@@ -139,12 +157,16 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
             return parsePlayerLifecycle(rawMessage, envelope.getPayload())
                     .map(data -> new PlayerRecoveredEvent(data.steamId(), data.playerName()))
                     .map(RustEvent.class::cast);
+        } else if (PLAYER_REPORTED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return parsePlayerReported(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
         } else if (PLAYER_RESPAWNED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return parsePlayerLifecycle(rawMessage, envelope.getPayload())
                     .map(data -> new PlayerRespawnedEvent(data.steamId(), data.playerName()))
                     .map(RustEvent.class::cast);
         } else if (PLAYER_UNBANNED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return parsePlayerUnban(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
+        } else if (PLAYER_VIOLATION_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return parsePlayerViolation(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
         } else if (PLAYER_WOUNDED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return parsePlayerLifecycle(rawMessage, envelope.getPayload())
                     .map(data -> new PlayerWoundedEvent(data.steamId(), data.playerName()))
@@ -155,6 +177,8 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
             return Optional.of(new SaveEvent(event.getRconResponse().getServer()));
         } else if (SERVER_SHUTDOWN_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return Optional.of(new ServerShutdownEvent(event.getRconResponse().getServer()));
+        } else if (TEAM_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return parseTeam(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
         }
 
         emitDiagnostic(
@@ -249,6 +273,68 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
         ));
     }
 
+    private Optional<PlayerReportedEvent> parsePlayerReported(@NonNull String rawMessage, JsonNode payload) {
+        if (payload == null
+                || !payload.hasNonNull("reporterSteamId")
+                || !payload.hasNonNull("reporterName")
+                || !payload.hasNonNull("targetName")
+                || !payload.hasNonNull("subject")
+                || !payload.hasNonNull("message")
+                || !payload.hasNonNull("reportType")) {
+            emitDiagnostic(
+                    UmodBridgeDiagnosticType.INVALID_PAYLOAD,
+                    rawMessage,
+                    "player.reported payload must contain reporterSteamId, reporterName, targetName, subject, message and reportType"
+            );
+            return Optional.empty();
+        }
+
+        final var reporterSteamId = SteamId64.parse(payload.get("reporterSteamId").asText());
+        if (reporterSteamId.isEmpty()) {
+            emitDiagnostic(UmodBridgeDiagnosticType.INVALID_PAYLOAD, rawMessage, "player.reported reporterSteamId is invalid");
+            return Optional.empty();
+        }
+
+        final var targetSteamId = text(payload, "targetSteamId").flatMap(SteamId64::parse).orElse(null);
+        return Optional.of(new PlayerReportedEvent(
+                reporterSteamId.get(),
+                PlayerName.ofNullable(payload.get("reporterName").asText()),
+                targetSteamId,
+                PlayerName.ofNullable(payload.get("targetName").asText()),
+                payload.get("subject").asText(),
+                payload.get("message").asText(),
+                payload.get("reportType").asText()
+        ));
+    }
+
+    private Optional<PlayerViolationEvent> parsePlayerViolation(@NonNull String rawMessage, JsonNode payload) {
+        if (payload == null
+                || !payload.hasNonNull("steamId")
+                || !payload.hasNonNull("playerName")
+                || !payload.hasNonNull("violationType")
+                || !payload.hasNonNull("amount")) {
+            emitDiagnostic(
+                    UmodBridgeDiagnosticType.INVALID_PAYLOAD,
+                    rawMessage,
+                    "player.violation payload must contain steamId, playerName, violationType and amount"
+            );
+            return Optional.empty();
+        }
+
+        final var steamId = SteamId64.parse(payload.get("steamId").asText());
+        if (steamId.isEmpty()) {
+            emitDiagnostic(UmodBridgeDiagnosticType.INVALID_PAYLOAD, rawMessage, "player.violation steamId is invalid");
+            return Optional.empty();
+        }
+
+        return Optional.of(new PlayerViolationEvent(
+                steamId.get(),
+                PlayerName.ofNullable(payload.get("playerName").asText()),
+                payload.get("violationType").asText(),
+                new BigDecimal(payload.get("amount").asText())
+        ));
+    }
+
     private Optional<PlayerBannedEvent> parsePlayerBan(@NonNull String rawMessage, JsonNode payload) {
         return parsePlayerModeration(rawMessage, payload, PLAYER_BANNED_EVENT_TYPE, true)
                 .map(data -> new PlayerBannedEvent(
@@ -315,6 +401,69 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
         ));
     }
 
+    private Optional<TeamEvent> parseTeam(@NonNull String rawMessage, JsonNode payload) {
+        if (payload == null
+                || !payload.hasNonNull("teamId")
+                || !payload.hasNonNull("leaderSteamId")
+                || !payload.hasNonNull("teamEventType")) {
+            emitDiagnostic(
+                    UmodBridgeDiagnosticType.INVALID_PAYLOAD,
+                    rawMessage,
+                    "team payload must contain teamId, leaderSteamId and teamEventType"
+            );
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(new TeamEvent(
+                    payload.get("teamId").asLong(),
+                    payload.get("leaderSteamId").asLong(),
+                    TeamEventTypes.valueOf(payload.get("teamEventType").asText().toUpperCase()),
+                    text(payload, "actorSteamId").flatMap(SteamId64::parse).orElse(null),
+                    PlayerName.ofNullable(text(payload, "actorName").orElse(null)),
+                    text(payload, "targetSteamId").flatMap(SteamId64::parse).orElse(null),
+                    parseStringSet(payload.get("members"))
+            ));
+        } catch (IllegalArgumentException e) {
+            emitDiagnostic(UmodBridgeDiagnosticType.INVALID_PAYLOAD, rawMessage, e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    private Optional<ExplosiveUseEvent> parseExplosiveUse(@NonNull String rawMessage, JsonNode payload) {
+        if (payload == null
+                || !payload.hasNonNull("steamId")
+                || !payload.hasNonNull("playerName")
+                || !payload.hasNonNull("explosiveUseType")) {
+            emitDiagnostic(
+                    UmodBridgeDiagnosticType.INVALID_PAYLOAD,
+                    rawMessage,
+                    "explosive.use payload must contain steamId, playerName and explosiveUseType"
+            );
+            return Optional.empty();
+        }
+
+        final var steamId = SteamId64.parse(payload.get("steamId").asText());
+        if (steamId.isEmpty()) {
+            emitDiagnostic(UmodBridgeDiagnosticType.INVALID_PAYLOAD, rawMessage, "explosive.use steamId is invalid");
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(new ExplosiveUseEvent(
+                    steamId.get(),
+                    PlayerName.ofNullable(payload.get("playerName").asText()),
+                    ExplosiveUseTypes.valueOf(payload.get("explosiveUseType").asText().toUpperCase()),
+                    text(payload, "weapon").orElse(""),
+                    text(payload, "entity").orElse(""),
+                    text(payload, "position").orElse("")
+            ));
+        } catch (IllegalArgumentException e) {
+            emitDiagnostic(UmodBridgeDiagnosticType.INVALID_PAYLOAD, rawMessage, e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     private Optional<PlayerLifecycleData> parsePlayerLifecycle(@NonNull String rawMessage, JsonNode payload) {
         if (payload == null || !payload.hasNonNull("steamId") || !payload.hasNonNull("playerName")) {
             emitDiagnostic(
@@ -349,6 +498,15 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
         }
 
         return Optional.empty();
+    }
+
+    private Set<String> parseStringSet(JsonNode value) {
+        final var values = new HashSet<String>();
+        if (value != null && value.isArray()) {
+            value.forEach(member -> values.add(member.asText()));
+        }
+
+        return values;
     }
 
     private ChatChannels parseChatChannel(@NonNull String rawMessage, JsonNode payload) {

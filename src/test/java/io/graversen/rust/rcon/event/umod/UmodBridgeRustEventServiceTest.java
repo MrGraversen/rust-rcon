@@ -11,13 +11,19 @@ import io.graversen.rust.rcon.event.player.PlayerDeathEvent;
 import io.graversen.rust.rcon.event.player.PlayerDisconnectedEvent;
 import io.graversen.rust.rcon.event.player.PlayerKickedEvent;
 import io.graversen.rust.rcon.event.player.PlayerRecoveredEvent;
+import io.graversen.rust.rcon.event.player.PlayerReportedEvent;
 import io.graversen.rust.rcon.event.player.PlayerRespawnedEvent;
 import io.graversen.rust.rcon.event.player.PlayerUnbannedEvent;
+import io.graversen.rust.rcon.event.player.PlayerViolationEvent;
 import io.graversen.rust.rcon.event.player.PlayerWoundedEvent;
 import io.graversen.rust.rcon.event.rcon.RconReceivedEvent;
+import io.graversen.rust.rcon.event.server.ExplosiveUseEvent;
+import io.graversen.rust.rcon.event.server.ExplosiveUseTypes;
 import io.graversen.rust.rcon.event.server.SaveEvent;
 import io.graversen.rust.rcon.event.server.ServerInitializedEvent;
 import io.graversen.rust.rcon.event.server.ServerShutdownEvent;
+import io.graversen.rust.rcon.event.server.TeamEvent;
+import io.graversen.rust.rcon.event.server.TeamEventTypes;
 import io.graversen.rust.rcon.protocol.util.ChatChannels;
 import io.graversen.rust.rcon.protocol.util.CombatTypes;
 import io.graversen.rust.rcon.protocol.util.DamageTypes;
@@ -40,6 +46,7 @@ class UmodBridgeRustEventServiceTest {
         final var capabilities = eventService.capabilities();
 
         assertEquals(RustEventSourceStrategy.UMOD, capabilities.getStrategy());
+        assertTrue(capabilities.supports(ExplosiveUseEvent.class));
         assertTrue(capabilities.supports(PlayerBannedEvent.class));
         assertTrue(capabilities.supports(PlayerChatEvent.class));
         assertTrue(capabilities.supports(PlayerConnectedEvent.class));
@@ -47,12 +54,15 @@ class UmodBridgeRustEventServiceTest {
         assertTrue(capabilities.supports(PlayerDisconnectedEvent.class));
         assertTrue(capabilities.supports(PlayerKickedEvent.class));
         assertTrue(capabilities.supports(PlayerRecoveredEvent.class));
+        assertTrue(capabilities.supports(PlayerReportedEvent.class));
         assertTrue(capabilities.supports(PlayerRespawnedEvent.class));
         assertTrue(capabilities.supports(PlayerUnbannedEvent.class));
+        assertTrue(capabilities.supports(PlayerViolationEvent.class));
         assertTrue(capabilities.supports(PlayerWoundedEvent.class));
         assertTrue(capabilities.supports(SaveEvent.class));
         assertTrue(capabilities.supports(ServerInitializedEvent.class));
         assertTrue(capabilities.supports(ServerShutdownEvent.class));
+        assertTrue(capabilities.supports(TeamEvent.class));
         assertTrue(capabilities.supports(UmodBridgeDiagnosticEvent.class));
     }
 
@@ -279,6 +289,81 @@ class UmodBridgeRustEventServiceTest {
     }
 
     @Test
+    void emitsPlayerReportedEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new ReportedSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"player.reported\",\"eventId\":\"evt-14\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"reporterSteamId\":\"76561197979952036\",\"reporterName\":\"Doctor Delete\",\"targetSteamId\":\"76561197979952037\",\"targetName\":\"Professor Create\",\"subject\":\"Cheating\",\"message\":\"Suspicious recoil\",\"reportType\":\"abuse\"}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getReporterSteamId().get());
+        assertEquals("Doctor Delete", subscriber.events.get(0).getReporterName().get());
+        assertEquals("76561197979952037", subscriber.events.get(0).getTargetSteamId().get());
+        assertEquals("Professor Create", subscriber.events.get(0).getTargetName().get());
+        assertEquals("Cheating", subscriber.events.get(0).getSubject());
+        assertEquals("Suspicious recoil", subscriber.events.get(0).getMessage());
+        assertEquals("abuse", subscriber.events.get(0).getReportType());
+    }
+
+    @Test
+    void emitsPlayerViolationEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new ViolationSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"player.violation\",\"eventId\":\"evt-15\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\",\"violationType\":\"FlyHack\",\"amount\":132.5}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getSteamId().get());
+        assertEquals("Doctor Delete", subscriber.events.get(0).getPlayerName().get());
+        assertEquals("FlyHack", subscriber.events.get(0).getViolationType());
+        assertEquals(new BigDecimal("132.5"), subscriber.events.get(0).getAmount());
+    }
+
+    @Test
+    void emitsTeamEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new TeamSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"team\",\"eventId\":\"evt-16\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"teamId\":42,\"leaderSteamId\":76561197979952036,\"teamEventType\":\"created\",\"actorSteamId\":\"76561197979952036\",\"actorName\":\"Doctor Delete\",\"targetSteamId\":\"\",\"members\":[\"76561197979952036\",\"76561197979952037\"]}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals(42L, subscriber.events.get(0).getTeamId());
+        assertEquals(76561197979952036L, subscriber.events.get(0).getLeaderSteamId());
+        assertEquals(TeamEventTypes.CREATED, subscriber.events.get(0).getTeamEventType());
+        assertEquals("76561197979952036", subscriber.events.get(0).getActorSteamId().get());
+        assertEquals("Doctor Delete", subscriber.events.get(0).getActorName().get());
+        assertEquals(Set.of("76561197979952036", "76561197979952037"), subscriber.events.get(0).getMembers());
+    }
+
+    @Test
+    void emitsExplosiveUseEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new ExplosiveUseSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"explosive.use\",\"eventId\":\"evt-17\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\",\"explosiveUseType\":\"rocket\",\"weapon\":\"rocket.launcher\",\"entity\":\"rocket_basic\",\"position\":\"1.25,2,3.5\"}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getSteamId().get());
+        assertEquals("Doctor Delete", subscriber.events.get(0).getPlayerName().get());
+        assertEquals(ExplosiveUseTypes.ROCKET, subscriber.events.get(0).getExplosiveUseType());
+        assertEquals("rocket.launcher", subscriber.events.get(0).getWeapon());
+        assertEquals("rocket_basic", subscriber.events.get(0).getEntity());
+        assertEquals("1.25,2,3.5", subscriber.events.get(0).getPosition());
+    }
+
+    @Test
     void emitsDiagnosticForMalformedBridgeJson() {
         final var eventBus = new EventBus();
         final var eventService = new UmodBridgeRustEventService(eventBus);
@@ -432,6 +517,42 @@ class UmodBridgeRustEventServiceTest {
 
         @Subscribe
         public void onPlayerUnbanned(PlayerUnbannedEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class ReportedSubscriber {
+        private final List<PlayerReportedEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onPlayerReported(PlayerReportedEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class ViolationSubscriber {
+        private final List<PlayerViolationEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onPlayerViolation(PlayerViolationEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class TeamSubscriber {
+        private final List<TeamEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onTeam(TeamEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class ExplosiveUseSubscriber {
+        private final List<ExplosiveUseEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onExplosiveUse(ExplosiveUseEvent event) {
             events.add(event);
         }
     }
