@@ -10,7 +10,7 @@ import lombok.ToString;
 public class PlayerDisconnectedEvent extends PlayerEvent {
     private final @NonNull String reason;
 
-    PlayerDisconnectedEvent(@NonNull SteamId64 steamId, @NonNull String reason) {
+    public PlayerDisconnectedEvent(@NonNull SteamId64 steamId, @NonNull String reason) {
         super(steamId);
         this.reason = reason;
     }

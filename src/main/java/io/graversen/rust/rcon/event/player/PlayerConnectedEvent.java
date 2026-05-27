@@ -14,7 +14,7 @@ public class PlayerConnectedEvent extends PlayerEvent {
     private final @NonNull OperatingSystems operatingSystem;
     private final @NonNull String ipAddress;
 
-    PlayerConnectedEvent(
+    public PlayerConnectedEvent(
             @NonNull SteamId64 steamId,
             @NonNull PlayerName playerName,
             @NonNull OperatingSystems operatingSystem,

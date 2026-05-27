@@ -56,6 +56,15 @@ public class AutoConfiguringRustEventService extends BaseEventHandler implements
         log.debug("Configuration completed");
     }
 
+    @Override
+    public RustEventCapabilities capabilities() {
+        final var supportedEvents = eventParsers.stream()
+                .map(BaseRustEventParser::eventClass)
+                .collect(java.util.stream.Collectors.<Class<? extends RustEvent>>toUnmodifiableSet());
+
+        return new RustEventCapabilities(RustEventSourceStrategy.RCON, supportedEvents);
+    }
+
     protected Set<String> eventParserPackages() {
         return Set.of(
                 "io.graversen.rust.rcon.event"

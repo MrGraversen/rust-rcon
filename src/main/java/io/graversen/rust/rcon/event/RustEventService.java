@@ -7,4 +7,6 @@ public interface RustEventService {
     void onRconReceived(@NonNull RconReceivedEvent event);
 
     void configure();
+
+    RustEventCapabilities capabilities();
 }

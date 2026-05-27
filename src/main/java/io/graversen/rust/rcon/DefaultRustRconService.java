@@ -2,8 +2,10 @@ package io.graversen.rust.rcon;
 
 import com.google.common.eventbus.EventBus;
 import io.graversen.rust.rcon.event.AutoConfiguringRustEventService;
+import io.graversen.rust.rcon.event.RustEventCapabilities;
 import io.graversen.rust.rcon.event.RustEventService;
 import io.graversen.rust.rcon.event.rcon.RconLogSubscriber;
+import io.graversen.rust.rcon.event.umod.UmodBridgeRustEventService;
 import io.graversen.rust.rcon.protocol.Codec;
 import io.graversen.rust.rcon.protocol.DefaultRustCodec;
 import io.graversen.rust.rcon.protocol.dto.RustDtoMappers;
@@ -123,6 +125,11 @@ public class DefaultRustRconService implements RustRconService {
     }
 
     @Override
+    public RustEventCapabilities eventCapabilities() {
+        return rustEventService.get().capabilities();
+    }
+
+    @Override
     public void registerEvents(@NonNull Object subscriber) {
         eventBus.get().register(subscriber);
     }
@@ -203,7 +210,10 @@ public class DefaultRustRconService implements RustRconService {
     }
 
     protected RustEventService createRustEventService(@NonNull EventBus eventBus) {
-        return new AutoConfiguringRustEventService(eventBus);
+        return switch (configuration.getEventSourceStrategy()) {
+            case RCON -> new AutoConfiguringRustEventService(eventBus);
+            case UMOD -> new UmodBridgeRustEventService(eventBus);
+        };
     }
 
     protected EventBus createEventBus() {
