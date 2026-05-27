@@ -24,7 +24,7 @@ public class PlayerDeathEvent extends PlayerEvent {
     private final CombatTypes combatType;
     private final DamageTypes damageType;
 
-    PlayerDeathEvent(
+    public PlayerDeathEvent(
             @NonNull SteamId64 steamId,
             String victim,
             EntityTypes victimEntity,

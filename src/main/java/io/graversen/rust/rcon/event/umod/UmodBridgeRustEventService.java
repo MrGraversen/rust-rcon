@@ -10,6 +10,9 @@ import io.graversen.rust.rcon.event.RustEventService;
 import io.graversen.rust.rcon.event.RustEventSourceStrategy;
 import io.graversen.rust.rcon.event.player.PlayerChatEvent;
 import io.graversen.rust.rcon.event.player.PlayerConnectedEvent;
+import io.graversen.rust.rcon.event.player.PlayerDeathDTO;
+import io.graversen.rust.rcon.event.player.PlayerDeathEvent;
+import io.graversen.rust.rcon.event.player.PlayerDeathEventParser;
 import io.graversen.rust.rcon.event.player.PlayerDisconnectedEvent;
 import io.graversen.rust.rcon.event.rcon.RconReceivedEvent;
 import io.graversen.rust.rcon.protocol.util.ChatChannels;
@@ -32,10 +35,12 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
 
     private static final String PLAYER_CHAT_EVENT_TYPE = "player.chat";
     private static final String PLAYER_CONNECTED_EVENT_TYPE = "player.connected";
+    private static final String PLAYER_DEATH_EVENT_TYPE = "player.death";
     private static final String PLAYER_DISCONNECTED_EVENT_TYPE = "player.disconnected";
 
     private final @NonNull EventBus eventBus;
     private final @NonNull JsonMapper jsonMapper = new DefaultJsonMapper();
+    private final @NonNull PlayerDeathEventParser playerDeathEventParser = new PlayerDeathEventParser();
 
     @Subscribe
     @Override
@@ -62,6 +67,7 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
                 Set.of(
                         PlayerChatEvent.class,
                         PlayerConnectedEvent.class,
+                        PlayerDeathEvent.class,
                         PlayerDisconnectedEvent.class,
                         UmodBridgeDiagnosticEvent.class
                 )
@@ -93,6 +99,8 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
             return parsePlayerChat(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
         } else if (PLAYER_CONNECTED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return parsePlayerConnected(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
+        } else if (PLAYER_DEATH_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return parsePlayerDeath(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
         } else if (PLAYER_DISCONNECTED_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return parsePlayerDisconnected(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
         }
@@ -150,6 +158,21 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
                 OperatingSystems.UNKNOWN,
                 payload.get("ipAddress").asText()
         ));
+    }
+
+    private Optional<PlayerDeathEvent> parsePlayerDeath(@NonNull String rawMessage, JsonNode payload) {
+        if (payload == null) {
+            emitDiagnostic(UmodBridgeDiagnosticType.INVALID_PAYLOAD, rawMessage, "player.death payload must not be null");
+            return Optional.empty();
+        }
+
+        try {
+            final var playerDeath = jsonMapper.fromJson(payload.toString(), PlayerDeathDTO.class);
+            return Optional.of(playerDeathEventParser.mapPlayerDeathEvent().apply(playerDeath));
+        } catch (Exception e) {
+            emitDiagnostic(UmodBridgeDiagnosticType.INVALID_PAYLOAD, rawMessage, e.getMessage());
+            return Optional.empty();
+        }
     }
 
     private Optional<PlayerDisconnectedEvent> parsePlayerDisconnected(@NonNull String rawMessage, JsonNode payload) {

@@ -62,7 +62,7 @@ public class PlayerDeathEventParser extends BaseRustEventParser<PlayerDeathEvent
         };
     }
 
-    Function<PlayerDeathDTO, PlayerDeathEvent> mapPlayerDeathEvent() {
+    public Function<PlayerDeathDTO, PlayerDeathEvent> mapPlayerDeathEvent() {
         return playerDeath -> {
             final var attachments = playerDeath.getAttachments() == null
                     ? Set.<String>of()

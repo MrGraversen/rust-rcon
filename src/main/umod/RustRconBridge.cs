@@ -44,6 +44,11 @@ namespace Oxide.Plugins
             });
         }
 
+        private void OnRawDeathNotice(Dictionary<string, string> data, string message)
+        {
+            Emit("player.death", data);
+        }
+
         private void Emit(string eventType, object payload)
         {
             var envelope = new Dictionary<string, object>
