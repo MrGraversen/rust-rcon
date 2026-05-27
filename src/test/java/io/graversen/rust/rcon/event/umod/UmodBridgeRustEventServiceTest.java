@@ -24,10 +24,12 @@ import io.graversen.rust.rcon.event.server.ServerInitializedEvent;
 import io.graversen.rust.rcon.event.server.ServerShutdownEvent;
 import io.graversen.rust.rcon.event.server.TeamEvent;
 import io.graversen.rust.rcon.event.server.TeamEventTypes;
+import io.graversen.rust.rcon.event.server.WorldEvent;
 import io.graversen.rust.rcon.protocol.util.ChatChannels;
 import io.graversen.rust.rcon.protocol.util.CombatTypes;
 import io.graversen.rust.rcon.protocol.util.DamageTypes;
 import io.graversen.rust.rcon.protocol.util.OperatingSystems;
+import io.graversen.rust.rcon.protocol.util.WorldEvents;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -63,6 +65,7 @@ class UmodBridgeRustEventServiceTest {
         assertTrue(capabilities.supports(ServerInitializedEvent.class));
         assertTrue(capabilities.supports(ServerShutdownEvent.class));
         assertTrue(capabilities.supports(TeamEvent.class));
+        assertTrue(capabilities.supports(WorldEvent.class));
         assertTrue(capabilities.supports(UmodBridgeDiagnosticEvent.class));
     }
 
@@ -364,6 +367,26 @@ class UmodBridgeRustEventServiceTest {
     }
 
     @Test
+    void emitsWorldEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new WorldSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"world.event\",\"eventId\":\"evt-18\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"worldEvent\":\"locked_crate_hack_started\",\"attributes\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\",\"entityId\":\"1234\",\"entity\":\"codelockedhackablecrate\",\"position\":\"1.25,2,3.5\"}}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals(WorldEvents.LOCKED_CRATE_HACK_STARTED, subscriber.events.get(0).getEvent());
+        assertEquals("test", subscriber.events.get(0).getServer().getName());
+        assertEquals("76561197979952036", subscriber.events.get(0).getAttributes().get("steamId"));
+        assertEquals("Doctor Delete", subscriber.events.get(0).getAttributes().get("playerName"));
+        assertEquals("1234", subscriber.events.get(0).getAttributes().get("entityId"));
+        assertEquals("codelockedhackablecrate", subscriber.events.get(0).getAttributes().get("entity"));
+        assertEquals("1.25,2,3.5", subscriber.events.get(0).getAttributes().get("position"));
+    }
+
+    @Test
     void emitsDiagnosticForMalformedBridgeJson() {
         final var eventBus = new EventBus();
         final var eventService = new UmodBridgeRustEventService(eventBus);
@@ -553,6 +576,15 @@ class UmodBridgeRustEventServiceTest {
 
         @Subscribe
         public void onExplosiveUse(ExplosiveUseEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class WorldSubscriber {
+        private final List<WorldEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onWorld(WorldEvent event) {
             events.add(event);
         }
     }

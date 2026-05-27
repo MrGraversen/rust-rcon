@@ -30,10 +30,12 @@ import io.graversen.rust.rcon.event.server.ServerInitializedEvent;
 import io.graversen.rust.rcon.event.server.ServerShutdownEvent;
 import io.graversen.rust.rcon.event.server.TeamEvent;
 import io.graversen.rust.rcon.event.server.TeamEventTypes;
+import io.graversen.rust.rcon.event.server.WorldEvent;
 import io.graversen.rust.rcon.protocol.util.ChatChannels;
 import io.graversen.rust.rcon.protocol.util.OperatingSystems;
 import io.graversen.rust.rcon.protocol.util.PlayerName;
 import io.graversen.rust.rcon.protocol.util.SteamId64;
+import io.graversen.rust.rcon.protocol.util.WorldEvents;
 import io.graversen.rust.rcon.util.DefaultJsonMapper;
 import io.graversen.rust.rcon.util.JsonMapper;
 import lombok.NonNull;
@@ -41,7 +43,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -67,6 +71,7 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
     private static final String SERVER_SAVE_EVENT_TYPE = "server.save";
     private static final String SERVER_SHUTDOWN_EVENT_TYPE = "server.shutdown";
     private static final String TEAM_EVENT_TYPE = "team";
+    private static final String WORLD_EVENT_TYPE = "world.event";
 
     private final @NonNull EventBus eventBus;
     private final @NonNull JsonMapper jsonMapper = new DefaultJsonMapper();
@@ -112,6 +117,7 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
                         ServerInitializedEvent.class,
                         ServerShutdownEvent.class,
                         TeamEvent.class,
+                        WorldEvent.class,
                         UmodBridgeDiagnosticEvent.class
                 )
         );
@@ -179,6 +185,8 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
             return Optional.of(new ServerShutdownEvent(event.getRconResponse().getServer()));
         } else if (TEAM_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
             return parseTeam(rawMessage, envelope.getPayload()).map(RustEvent.class::cast);
+        } else if (WORLD_EVENT_TYPE.equalsIgnoreCase(envelope.getEventType())) {
+            return parseWorld(event, envelope.getPayload()).map(RustEvent.class::cast);
         }
 
         emitDiagnostic(
@@ -464,6 +472,29 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
         }
     }
 
+    private Optional<WorldEvent> parseWorld(@NonNull RconReceivedEvent event, JsonNode payload) {
+        final var rawMessage = event.getRconResponse().getMessage();
+        if (payload == null || !payload.hasNonNull("worldEvent")) {
+            emitDiagnostic(
+                    UmodBridgeDiagnosticType.INVALID_PAYLOAD,
+                    rawMessage,
+                    "world.event payload must contain worldEvent"
+            );
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(new WorldEvent(
+                    event.getRconResponse().getServer(),
+                    WorldEvents.valueOf(payload.get("worldEvent").asText().toUpperCase()),
+                    parseAttributes(payload.get("attributes"))
+            ));
+        } catch (IllegalArgumentException e) {
+            emitDiagnostic(UmodBridgeDiagnosticType.INVALID_PAYLOAD, rawMessage, e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     private Optional<PlayerLifecycleData> parsePlayerLifecycle(@NonNull String rawMessage, JsonNode payload) {
         if (payload == null || !payload.hasNonNull("steamId") || !payload.hasNonNull("playerName")) {
             emitDiagnostic(
@@ -507,6 +538,15 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
         }
 
         return values;
+    }
+
+    private Map<String, String> parseAttributes(JsonNode value) {
+        final var attributes = new HashMap<String, String>();
+        if (value != null && value.isObject()) {
+            value.fields().forEachRemaining(entry -> attributes.put(entry.getKey(), entry.getValue().asText()));
+        }
+
+        return attributes;
     }
 
     private ChatChannels parseChatChannel(@NonNull String rawMessage, JsonNode payload) {

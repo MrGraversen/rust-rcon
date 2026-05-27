@@ -13,6 +13,7 @@ namespace Oxide.Plugins
     {
         private const int SchemaVersion = 1;
         private const string Prefix = "[rust-rcon]";
+        private readonly Dictionary<string, Dictionary<string, object>> crateHackers = new Dictionary<string, Dictionary<string, object>>();
 
         private object OnPlayerChat(BasePlayer player, string message, Chat.ChatChannel channel)
         {
@@ -150,6 +151,54 @@ namespace Oxide.Plugins
             return null;
         }
 
+        private object CanHackCrate(BasePlayer player, HackableLockedCrate crate)
+        {
+            crateHackers[EntityId(crate)] = new Dictionary<string, object>
+            {
+                ["steamId"] = player?.UserIDString ?? string.Empty,
+                ["playerName"] = player?.displayName ?? string.Empty
+            };
+
+            return null;
+        }
+
+        private void OnCrateLanded(HackableLockedCrate crate)
+        {
+            EmitWorldEvent("locked_crate_landed", CrateAttributes(crate));
+        }
+
+        private void OnCrateHack(HackableLockedCrate crate)
+        {
+            var attributes = CrateAttributes(crate);
+            var entityId = EntityId(crate);
+            if (crateHackers.TryGetValue(entityId, out var hacker))
+            {
+                foreach (var attribute in hacker)
+                {
+                    attributes[attribute.Key] = attribute.Value;
+                }
+            }
+
+            EmitWorldEvent("locked_crate_hack_started", attributes);
+        }
+
+        private void OnCrateHackEnd(HackableLockedCrate crate)
+        {
+            var attributes = CrateAttributes(crate);
+            var entityId = EntityId(crate);
+            if (crateHackers.TryGetValue(entityId, out var hacker))
+            {
+                foreach (var attribute in hacker)
+                {
+                    attributes[attribute.Key] = attribute.Value;
+                }
+
+                crateHackers.Remove(entityId);
+            }
+
+            EmitWorldEvent("locked_crate_hack_completed", attributes);
+        }
+
         private void OnExplosiveThrown(BasePlayer player, BaseEntity entity, ThrownWeapon item)
         {
             EmitExplosiveUse("thrown", player, item?.GetType().Name ?? string.Empty, entity);
@@ -218,6 +267,15 @@ namespace Oxide.Plugins
             });
         }
 
+        private void EmitWorldEvent(string worldEvent, Dictionary<string, object> attributes)
+        {
+            Emit("world.event", new Dictionary<string, object>
+            {
+                ["worldEvent"] = worldEvent,
+                ["attributes"] = attributes
+            });
+        }
+
         private void Emit(string eventType, object payload)
         {
             var envelope = new Dictionary<string, object>
@@ -242,6 +300,21 @@ namespace Oxide.Plugins
         private string IpAddress(BasePlayer player)
         {
             return player?.net?.connection?.ipaddress ?? string.Empty;
+        }
+
+        private Dictionary<string, object> CrateAttributes(HackableLockedCrate crate)
+        {
+            return new Dictionary<string, object>
+            {
+                ["entityId"] = EntityId(crate),
+                ["entity"] = crate?.ShortPrefabName ?? string.Empty,
+                ["position"] = Position(crate)
+            };
+        }
+
+        private string EntityId(BaseEntity entity)
+        {
+            return entity?.net?.ID.ToString() ?? string.Empty;
         }
 
         private List<string> TeamMembers(RelationshipManager.PlayerTeam team)
