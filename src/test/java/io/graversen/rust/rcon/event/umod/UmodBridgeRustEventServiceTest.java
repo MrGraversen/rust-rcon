@@ -4,12 +4,15 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import io.graversen.rust.rcon.TestRustRconResponse;
 import io.graversen.rust.rcon.event.RustEventSourceStrategy;
+import io.graversen.rust.rcon.event.player.PlayerBannedEvent;
 import io.graversen.rust.rcon.event.player.PlayerChatEvent;
 import io.graversen.rust.rcon.event.player.PlayerConnectedEvent;
 import io.graversen.rust.rcon.event.player.PlayerDeathEvent;
 import io.graversen.rust.rcon.event.player.PlayerDisconnectedEvent;
+import io.graversen.rust.rcon.event.player.PlayerKickedEvent;
 import io.graversen.rust.rcon.event.player.PlayerRecoveredEvent;
 import io.graversen.rust.rcon.event.player.PlayerRespawnedEvent;
+import io.graversen.rust.rcon.event.player.PlayerUnbannedEvent;
 import io.graversen.rust.rcon.event.player.PlayerWoundedEvent;
 import io.graversen.rust.rcon.event.rcon.RconReceivedEvent;
 import io.graversen.rust.rcon.event.server.SaveEvent;
@@ -37,12 +40,15 @@ class UmodBridgeRustEventServiceTest {
         final var capabilities = eventService.capabilities();
 
         assertEquals(RustEventSourceStrategy.UMOD, capabilities.getStrategy());
+        assertTrue(capabilities.supports(PlayerBannedEvent.class));
         assertTrue(capabilities.supports(PlayerChatEvent.class));
         assertTrue(capabilities.supports(PlayerConnectedEvent.class));
         assertTrue(capabilities.supports(PlayerDeathEvent.class));
         assertTrue(capabilities.supports(PlayerDisconnectedEvent.class));
+        assertTrue(capabilities.supports(PlayerKickedEvent.class));
         assertTrue(capabilities.supports(PlayerRecoveredEvent.class));
         assertTrue(capabilities.supports(PlayerRespawnedEvent.class));
+        assertTrue(capabilities.supports(PlayerUnbannedEvent.class));
         assertTrue(capabilities.supports(PlayerWoundedEvent.class));
         assertTrue(capabilities.supports(SaveEvent.class));
         assertTrue(capabilities.supports(ServerInitializedEvent.class));
@@ -222,6 +228,57 @@ class UmodBridgeRustEventServiceTest {
     }
 
     @Test
+    void emitsPlayerKickedEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new KickedSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"player.kicked\",\"eventId\":\"evt-11\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\",\"ipAddress\":\"127.0.0.1\",\"reason\":\"Too spicy\"}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getSteamId().get());
+        assertEquals("Doctor Delete", subscriber.events.get(0).getPlayerName().get());
+        assertEquals("127.0.0.1", subscriber.events.get(0).getIpAddress());
+        assertEquals("Too spicy", subscriber.events.get(0).getReason());
+    }
+
+    @Test
+    void emitsPlayerBannedEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new BannedSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"player.banned\",\"eventId\":\"evt-12\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\",\"ipAddress\":\"127.0.0.1\",\"reason\":\"Nope\",\"expiry\":1790000000}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getSteamId().get());
+        assertEquals("Doctor Delete", subscriber.events.get(0).getPlayerName().get());
+        assertEquals("127.0.0.1", subscriber.events.get(0).getIpAddress());
+        assertEquals("Nope", subscriber.events.get(0).getReason());
+        assertEquals(1790000000L, subscriber.events.get(0).getExpiry());
+    }
+
+    @Test
+    void emitsPlayerUnbannedEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new UnbannedSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"player.unbanned\",\"eventId\":\"evt-13\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\",\"ipAddress\":\"127.0.0.1\"}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getSteamId().get());
+        assertEquals("Doctor Delete", subscriber.events.get(0).getPlayerName().get());
+        assertEquals("127.0.0.1", subscriber.events.get(0).getIpAddress());
+    }
+
+    @Test
     void emitsDiagnosticForMalformedBridgeJson() {
         final var eventBus = new EventBus();
         final var eventService = new UmodBridgeRustEventService(eventBus);
@@ -348,6 +405,33 @@ class UmodBridgeRustEventServiceTest {
 
         @Subscribe
         public void onServerShutdown(ServerShutdownEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class KickedSubscriber {
+        private final List<PlayerKickedEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onPlayerKicked(PlayerKickedEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class BannedSubscriber {
+        private final List<PlayerBannedEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onPlayerBanned(PlayerBannedEvent event) {
+            events.add(event);
+        }
+    }
+
+    static class UnbannedSubscriber {
+        private final List<PlayerUnbannedEvent> events = new ArrayList<>();
+
+        @Subscribe
+        public void onPlayerUnbanned(PlayerUnbannedEvent event) {
             events.add(event);
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Oxide.Core.Libraries.Covalence;
 
 namespace Oxide.Plugins
 {
@@ -56,6 +57,39 @@ namespace Oxide.Plugins
                 ["steamId"] = player.UserIDString,
                 ["playerName"] = player.displayName,
                 ["reason"] = reason
+            });
+        }
+
+        private void OnUserKicked(IPlayer player, string reason)
+        {
+            Emit("player.kicked", new Dictionary<string, object>
+            {
+                ["steamId"] = player?.Id ?? string.Empty,
+                ["playerName"] = player?.Name ?? string.Empty,
+                ["ipAddress"] = player?.Address ?? string.Empty,
+                ["reason"] = reason ?? string.Empty
+            });
+        }
+
+        private void OnUserBanned(string playerName, string playerId, string ipAddress, string reason, long expiry)
+        {
+            Emit("player.banned", new Dictionary<string, object>
+            {
+                ["steamId"] = playerId ?? string.Empty,
+                ["playerName"] = playerName ?? string.Empty,
+                ["ipAddress"] = ipAddress ?? string.Empty,
+                ["reason"] = reason ?? string.Empty,
+                ["expiry"] = expiry
+            });
+        }
+
+        private void OnUserUnbanned(string playerName, string playerId, string ipAddress)
+        {
+            Emit("player.unbanned", new Dictionary<string, object>
+            {
+                ["steamId"] = playerId ?? string.Empty,
+                ["playerName"] = playerName ?? string.Empty,
+                ["ipAddress"] = ipAddress ?? string.Empty
             });
         }
 
