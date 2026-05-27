@@ -29,7 +29,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UmodBridgeRustEventService extends BaseEventHandler implements RustEventService {
     public static final String BRIDGE_PREFIX = "[rust-rcon]";
-    public static final int SUPPORTED_SCHEMA_VERSION = 1;
 
     private static final String PLAYER_CHAT_EVENT_TYPE = "player.chat";
     private static final String PLAYER_CONNECTED_EVENT_TYPE = "player.connected";
@@ -73,11 +72,11 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
         final var json = rawMessage.substring(BRIDGE_PREFIX.length()).trim();
         try {
             final var envelope = jsonMapper.fromJson(json, UmodBridgeEnvelope.class);
-            if (envelope.getSchemaVersion() == null || envelope.getSchemaVersion() != SUPPORTED_SCHEMA_VERSION) {
+            if (envelope.getSchemaVersion() == null || envelope.getSchemaVersion() != RustRconBridgePlugin.SCHEMA_VERSION) {
                 emitDiagnostic(
                         UmodBridgeDiagnosticType.UNSUPPORTED_SCHEMA_VERSION,
                         rawMessage,
-                        String.format("Expected schema version %d but got %s", SUPPORTED_SCHEMA_VERSION, envelope.getSchemaVersion())
+                        String.format("Expected schema version %d but got %s", RustRconBridgePlugin.SCHEMA_VERSION, envelope.getSchemaVersion())
                 );
                 return Optional.empty();
             }

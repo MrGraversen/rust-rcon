@@ -5,6 +5,7 @@ import io.graversen.rust.rcon.protocol.dto.ServerInfoDTO;
 import io.graversen.rust.rcon.protocol.oxide.OxideManagement;
 import io.graversen.rust.rcon.protocol.player.PlayerManagement;
 import io.graversen.rust.rcon.event.RustEventCapabilities;
+import io.graversen.rust.rcon.event.umod.UmodBridgeManagement;
 import io.graversen.rust.rcon.tasks.RconTask;
 import io.graversen.rust.rcon.util.EventEmitter;
 import lombok.NonNull;
@@ -25,6 +26,8 @@ public interface RustRconService extends EventEmitter {
     CompletableFuture<ServerInfoDTO> serverInfo();
 
     OxideManagement oxideManagement();
+
+    UmodBridgeManagement umodBridgeManagement();
 
     PlayerManagement playerManagement();
 
