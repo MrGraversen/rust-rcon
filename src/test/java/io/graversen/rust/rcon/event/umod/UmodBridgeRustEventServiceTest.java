@@ -420,6 +420,41 @@ class UmodBridgeRustEventServiceTest {
     }
 
     @Test
+    void emitsBossWorldEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new WorldSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"world.event\",\"eventId\":\"evt-21\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"worldEvent\":\"patrol_helicopter_killed\",\"attributes\":{\"entityId\":\"3333\",\"entity\":\"patrolhelicopter\",\"position\":\"10,20,30\",\"killerSteamId\":\"76561197979952036\",\"killerName\":\"Doctor Delete\"}}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals(WorldEvents.PATROL_HELICOPTER_KILLED, subscriber.events.get(0).getEvent());
+        assertEquals("3333", subscriber.events.get(0).getAttributes().get("entityId"));
+        assertEquals("patrolhelicopter", subscriber.events.get(0).getAttributes().get("entity"));
+        assertEquals("76561197979952036", subscriber.events.get(0).getAttributes().get("killerSteamId"));
+        assertEquals("Doctor Delete", subscriber.events.get(0).getAttributes().get("killerName"));
+    }
+
+    @Test
+    void emitsMlrsWorldEventFromBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new WorldSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[rust-rcon] {\"schemaVersion\":1,\"eventType\":\"world.event\",\"eventId\":\"evt-22\",\"timestamp\":\"2026-05-27T12:00:00Z\",\"payload\":{\"worldEvent\":\"mlrs_fired\",\"attributes\":{\"entityId\":\"4444\",\"entity\":\"mlrs\",\"position\":\"10,20,30\",\"ownerSteamId\":\"76561197979952036\",\"ownerName\":\"Doctor Delete\"}}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals(WorldEvents.MLRS_FIRED, subscriber.events.get(0).getEvent());
+        assertEquals("4444", subscriber.events.get(0).getAttributes().get("entityId"));
+        assertEquals("76561197979952036", subscriber.events.get(0).getAttributes().get("ownerSteamId"));
+        assertEquals("Doctor Delete", subscriber.events.get(0).getAttributes().get("ownerName"));
+    }
+
+    @Test
     void emitsDiagnosticForMalformedBridgeJson() {
         final var eventBus = new EventBus();
         final var eventService = new UmodBridgeRustEventService(eventBus);

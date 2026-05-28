@@ -235,6 +235,33 @@ namespace Oxide.Plugins
             EmitWorldEvent("supply_drop_landed", EntityAttributes(supplyDrop));
         }
 
+        private object OnPatrolHelicopterKill(PatrolHelicopter helicopter, HitInfo info)
+        {
+            var attributes = EntityAttributes(helicopter);
+            AddPlayerAttributes(attributes, "killer", info?.InitiatorPlayer);
+            EmitWorldEvent("patrol_helicopter_killed", attributes);
+            return null;
+        }
+
+        private void OnEntityDeath(BaseCombatEntity entity, HitInfo info)
+        {
+            if (!(entity is BradleyAPC))
+            {
+                return;
+            }
+
+            var attributes = EntityAttributes(entity);
+            AddPlayerAttributes(attributes, "killer", info?.InitiatorPlayer);
+            EmitWorldEvent("bradley_apc_destroyed", attributes);
+        }
+
+        private void OnMlrsFired(MLRS mlrs, BasePlayer owner)
+        {
+            var attributes = EntityAttributes(mlrs);
+            AddPlayerAttributes(attributes, "owner", owner);
+            EmitWorldEvent("mlrs_fired", attributes);
+        }
+
         private void OnExplosiveThrown(BasePlayer player, BaseEntity entity, ThrownWeapon item)
         {
             EmitExplosiveUse("thrown", player, item?.GetType().Name ?? string.Empty, entity);
@@ -351,6 +378,12 @@ namespace Oxide.Plugins
                 ["entity"] = entity?.ShortPrefabName ?? string.Empty,
                 ["position"] = Position(entity)
             };
+        }
+
+        private void AddPlayerAttributes(Dictionary<string, object> attributes, string prefix, BasePlayer player)
+        {
+            attributes[$"{prefix}SteamId"] = player?.UserIDString ?? string.Empty;
+            attributes[$"{prefix}Name"] = player?.displayName ?? string.Empty;
         }
 
         private string EntityId(BaseEntity entity)
