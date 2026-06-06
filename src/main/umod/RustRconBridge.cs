@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
 using Oxide.Core.Libraries.Covalence;
+using Rust;
 using UnityEngine;
 
 namespace Oxide.Plugins
@@ -12,10 +13,9 @@ namespace Oxide.Plugins
     class RustRconBridge : RustPlugin
     {
         private const int SchemaVersion = 1;
-        private const string Prefix = "[rust-rcon]";
         private readonly Dictionary<string, Dictionary<string, object>> crateHackers = new Dictionary<string, Dictionary<string, object>>();
 
-        private object OnPlayerChat(BasePlayer player, string message, Chat.ChatChannel channel)
+        private object OnPlayerChat(BasePlayer player, string message, ConVar.Chat.ChatChannel channel)
         {
             Emit("player.chat", new Dictionary<string, object>
             {
@@ -350,10 +350,10 @@ namespace Oxide.Plugins
                 ["payload"] = payload
             };
 
-            Puts($"{Prefix} {JsonConvert.SerializeObject(envelope)}");
+            Puts(JsonConvert.SerializeObject(envelope));
         }
 
-        private string ChatChannelName(Chat.ChatChannel channel)
+        private string ChatChannelName(ConVar.Chat.ChatChannel channel)
         {
             return string.Equals(channel.ToString(), "Team", StringComparison.OrdinalIgnoreCase)
                 ? "team"

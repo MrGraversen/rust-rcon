@@ -52,7 +52,8 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 public class UmodBridgeRustEventService extends BaseEventHandler implements RustEventService {
-    public static final String BRIDGE_PREFIX = "[rust-rcon]";
+    public static final String BRIDGE_PREFIX = "[" + RustRconBridgePlugin.PLUGIN_NAME + "]";
+    private static final String LEGACY_BRIDGE_PREFIX = "[rust-rcon]";
 
     private static final String EXPLOSIVE_USE_EVENT_TYPE = "explosive.use";
     private static final String PLAYER_BANNED_EVENT_TYPE = "player.banned";
@@ -81,12 +82,15 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
     @Override
     public void onRconReceived(@NonNull RconReceivedEvent event) {
         final var message = event.getRconResponse().getMessage();
-        if (!message.startsWith(BRIDGE_PREFIX)) {
+        if (bridgeJson(message).isEmpty()) {
             return;
         }
 
         parseEnvelope(message)
-                .flatMap(envelope -> parseEvent(event, envelope))
+                .flatMap(envelope -> {
+                    logBridgeEnvelope(event, envelope);
+                    return parseEvent(event, envelope);
+                })
                 .ifPresent(eventBus::post);
     }
 
@@ -124,9 +128,12 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
     }
 
     private Optional<UmodBridgeEnvelope> parseEnvelope(@NonNull String rawMessage) {
-        final var json = rawMessage.substring(BRIDGE_PREFIX.length()).trim();
+        final var json = bridgeJson(rawMessage);
+        if (json.isEmpty()) {
+            return Optional.empty();
+        }
         try {
-            final var envelope = jsonMapper.fromJson(json, UmodBridgeEnvelope.class);
+            final var envelope = jsonMapper.fromJson(json.get(), UmodBridgeEnvelope.class);
             if (envelope.getSchemaVersion() == null || envelope.getSchemaVersion() != RustRconBridgePlugin.SCHEMA_VERSION) {
                 emitDiagnostic(
                         UmodBridgeDiagnosticType.UNSUPPORTED_SCHEMA_VERSION,
@@ -141,6 +148,20 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
             emitDiagnostic(UmodBridgeDiagnosticType.MALFORMED_JSON, rawMessage, e.getMessage());
             return Optional.empty();
         }
+    }
+
+    private Optional<String> bridgeJson(@NonNull String rawMessage) {
+        final var legacyBridgePrefixIndex = rawMessage.indexOf(LEGACY_BRIDGE_PREFIX);
+        if (legacyBridgePrefixIndex >= 0) {
+            return Optional.of(rawMessage.substring(legacyBridgePrefixIndex + LEGACY_BRIDGE_PREFIX.length()).trim());
+        }
+
+        final var bridgePrefixIndex = rawMessage.indexOf(BRIDGE_PREFIX);
+        if (bridgePrefixIndex >= 0) {
+            return Optional.of(rawMessage.substring(bridgePrefixIndex + BRIDGE_PREFIX.length()).trim());
+        }
+
+        return Optional.empty();
     }
 
     private Optional<RustEvent> parseEvent(@NonNull RconReceivedEvent event, @NonNull UmodBridgeEnvelope envelope) {
@@ -568,5 +589,15 @@ public class UmodBridgeRustEventService extends BaseEventHandler implements Rust
     ) {
         log.debug("uMod bridge diagnostic {}: {}", diagnosticType, details);
         eventBus.post(new UmodBridgeDiagnosticEvent(diagnosticType, rawMessage, details));
+    }
+
+    private void logBridgeEnvelope(@NonNull RconReceivedEvent event, @NonNull UmodBridgeEnvelope envelope) {
+        log.info(
+                "Received uMod bridge event {} from {} ({}) payload={}",
+                envelope.getEventType(),
+                event.getClientName(),
+                envelope.getEventId(),
+                envelope.getPayload()
+        );
     }
 }

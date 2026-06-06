@@ -132,6 +132,36 @@ class UmodBridgeRustEventServiceTest {
     }
 
     @Test
+    void emitsPlayerDisconnectedEventFromPluginPrefixedBridgeEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new DisconnectedSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[RustRconBridge] [rust-rcon] {\"schemaVersion\":1,\"eventType\":\"player.disconnected\",\"eventId\":\"c1ccec3986f643388dac0020acbf7cca\",\"timestamp\":\"2026-06-06T10:27:50.2828820Z\",\"payload\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\",\"reason\":\"Disconnected\"}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getSteamId().get());
+        assertEquals("Disconnected", subscriber.events.get(0).getReason());
+    }
+
+    @Test
+    void emitsPlayerDisconnectedEventFromPluginPrefixedJsonEnvelope() {
+        final var eventBus = new EventBus();
+        final var eventService = new UmodBridgeRustEventService(eventBus);
+        final var subscriber = new DisconnectedSubscriber();
+        eventBus.register(subscriber);
+        eventService.configure();
+
+        eventBus.post(rconReceived("[RustRconBridge] {\"schemaVersion\":1,\"eventType\":\"player.disconnected\",\"eventId\":\"c1ccec3986f643388dac0020acbf7cca\",\"timestamp\":\"2026-06-06T10:27:50.2828820Z\",\"payload\":{\"steamId\":\"76561197979952036\",\"playerName\":\"Doctor Delete\",\"reason\":\"Disconnected\"}}"));
+
+        assertEquals(1, subscriber.events.size());
+        assertEquals("76561197979952036", subscriber.events.get(0).getSteamId().get());
+        assertEquals("Disconnected", subscriber.events.get(0).getReason());
+    }
+
+    @Test
     void emitsPlayerDeathEventFromBridgeEnvelope() {
         final var eventBus = new EventBus();
         final var eventService = new UmodBridgeRustEventService(eventBus);
