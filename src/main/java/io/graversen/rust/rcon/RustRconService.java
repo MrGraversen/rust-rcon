@@ -1,6 +1,7 @@
 package io.graversen.rust.rcon;
 
 import io.graversen.rust.rcon.protocol.Codec;
+import io.graversen.rust.rcon.protocol.broadcast.BroadcastManagement;
 import io.graversen.rust.rcon.protocol.dto.ServerInfoDTO;
 import io.graversen.rust.rcon.protocol.oxide.OxideManagement;
 import io.graversen.rust.rcon.protocol.player.PlayerManagement;
@@ -28,6 +29,8 @@ public interface RustRconService extends EventEmitter {
     OxideManagement oxideManagement();
 
     UmodBridgeManagement umodBridgeManagement();
+
+    BroadcastManagement broadcastManagement();
 
     PlayerManagement playerManagement();
 

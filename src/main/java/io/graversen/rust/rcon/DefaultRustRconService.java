@@ -10,6 +10,8 @@ import io.graversen.rust.rcon.event.umod.UmodBridgeManagement;
 import io.graversen.rust.rcon.event.umod.UmodBridgeRustEventService;
 import io.graversen.rust.rcon.protocol.Codec;
 import io.graversen.rust.rcon.protocol.DefaultRustCodec;
+import io.graversen.rust.rcon.protocol.broadcast.BroadcastManagement;
+import io.graversen.rust.rcon.protocol.broadcast.DefaultBroadcastManagement;
 import io.graversen.rust.rcon.protocol.dto.RustDtoMappers;
 import io.graversen.rust.rcon.protocol.dto.ServerInfoDTO;
 import io.graversen.rust.rcon.protocol.oxide.DefaultOxideManagement;
@@ -61,6 +63,7 @@ public class DefaultRustRconService implements RustRconService {
     private final Lazy<Codec> codec = Lazy.of(this::createCodec);
     private final Lazy<OxideManagement> oxideManagement = Lazy.of(this::createOxideManagement);
     private final Lazy<UmodBridgeManagement> umodBridgeManagement = Lazy.of(this::createUmodBridgeManagement);
+    private final Lazy<BroadcastManagement> broadcastManagement = Lazy.of(this::createBroadcastManagement);
     private final Lazy<PlayerManagement> playerManagement = Lazy.of(this::createPlayerManagement);
 
     @Override
@@ -99,6 +102,11 @@ public class DefaultRustRconService implements RustRconService {
     @Override
     public UmodBridgeManagement umodBridgeManagement() {
         return umodBridgeManagement.get();
+    }
+
+    @Override
+    public BroadcastManagement broadcastManagement() {
+        return broadcastManagement.get();
     }
 
     @Override
@@ -192,6 +200,10 @@ public class DefaultRustRconService implements RustRconService {
 
     protected UmodBridgeManagement createUmodBridgeManagement() {
         return new DefaultUmodBridgeManagement(oxideManagement());
+    }
+
+    protected BroadcastManagement createBroadcastManagement() {
+        return new DefaultBroadcastManagement(codec());
     }
 
     protected PlayerManagement createPlayerManagement() {
